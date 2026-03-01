@@ -461,20 +461,7 @@ tbody tr:hover td{background:rgba(255,255,255,.012)}
         </div>
       </div>
     </div>
-    <div class="fcard">
-      <div class="fc-title">📍 Onde Vai Devolver?</div>
-      <p style="font-size:.74rem;color:var(--muted);margin-bottom:.85rem;line-height:1.55">Informe onde deixará os equipamentos.</p>
-      <div class="local-grid" id="local-grid">
-        <div class="local-opt" onclick="selLocal(this,'Balcão TI')"><i>🏢</i><span>Balcão TI</span></div>
-        <div class="local-opt" onclick="selLocal(this,'Sala de Aula')"><i>🚪</i><span>Sala de Aula</span></div>
-        <div class="local-opt" onclick="selLocal(this,'Recepção')"><i>📋</i><span>Recepção</span></div>
-        <div class="local-opt" onclick="selLocal(this,'Coordenação')"><i>🏫</i><span>Coordenação</span></div>
-      </div>
-      <div class="field" style="margin-bottom:0;margin-top:.65rem">
-        <label>Detalhe o local <span class="opt-tag">OPCIONAL</span></label>
-        <input type="text" id="pf-local" placeholder="Ex: Sala L101, mesa do professor…">
-      </div>
-    </div>
+
     <div class="fcard">
       <div class="fc-title green">✍️ Assinatura do Professor</div>
       <p style="font-size:.74rem;color:var(--muted);margin-bottom:.75rem;line-height:1.55">Ao assinar, você confirma a solicitação e <strong style="color:var(--text2)">assume responsabilidade</strong> pelos equipamentos.</p>
@@ -563,16 +550,17 @@ tbody tr:hover td{background:rgba(255,255,255,.012)}
       </div>
     </div>
     <div class="fcard" id="dev-local-card" style="display:none">
-      <div class="fc-title warn">📍 Onde Está Devolvendo Agora?</div>
+      <div class="fc-title warn">📍 Onde Está Devolvendo?</div>
+      <p style="font-size:.74rem;color:var(--muted);margin-bottom:.85rem;line-height:1.55">Se não encontrou o técnico na sala, informe onde está deixando o equipamento.</p>
       <div class="local-grid" id="dev-local-grid">
-        <div class="local-opt" onclick="selLocalDev(this,'Balcão TI')"><i>🏢</i><span>Balcão TI</span></div>
-        <div class="local-opt" onclick="selLocalDev(this,'Sala de Aula')"><i>🚪</i><span>Sala de Aula</span></div>
-        <div class="local-opt" onclick="selLocalDev(this,'Recepção')"><i>📋</i><span>Recepção</span></div>
         <div class="local-opt" onclick="selLocalDev(this,'Coordenação')"><i>🏫</i><span>Coordenação</span></div>
+        <div class="local-opt" onclick="selLocalDev(this,'Recepção')"><i>📋</i><span>Recepção</span></div>
+        <div class="local-opt" onclick="selLocalDev(this,'Balcão TI')"><i>🏢</i><span>Balcão TI</span></div>
+        <div class="local-opt" onclick="selLocalDev(this,'Portaria')"><i>🚪</i><span>Portaria</span></div>
       </div>
       <div class="field" style="margin-bottom:0;margin-top:.65rem">
         <label>Detalhe <span class="opt-tag">OPCIONAL</span></label>
-        <input type="text" id="dev-local-det" placeholder="Ex: Corredor bloco B…">
+        <input type="text" id="dev-local-det" placeholder="Ex: Com a recepcionista do bloco B…">
       </div>
     </div>
     <div class="fcard" id="dev-cond-card" style="display:none">
@@ -1507,12 +1495,11 @@ function renderQR(canvasId, proto){
    PROFESSOR — SOLICITAR
 ═══════════════════════════════════════ */
 function abrirFormulario(){
-  ['pf-nome','pf-sala','pf-local'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  ['pf-nome','pf-sala'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
   document.getElementById('pf-uni').value='';
   document.querySelectorAll('.eq-item').forEach(e=>e.classList.remove('sel'));
   document.querySelectorAll('.qty-row').forEach(e=>e.style.display='none');
   selEquips=[]; profSig=null; localSelecionado='';
-  document.querySelectorAll('#local-grid .local-opt').forEach(e=>e.classList.remove('sel'));
   clearSig('sig-p','sig-hp','sig-wp');
   setTipo('agora');
   show('s-prof');
@@ -1531,7 +1518,6 @@ function toggleEq(el){
 
 function chQty(id,d){ const el=document.getElementById(id); let v=parseInt(el.textContent)+d; if(v<1)v=1; if(v>20)v=20; el.textContent=v; }
 function setTipo(t){ tipoSolic=t; document.getElementById('t-agora').classList.toggle('sel',t==='agora'); document.getElementById('t-agendar').classList.toggle('sel',t==='agendar'); document.getElementById('agendar-block').style.display=t==='agendar'?'block':'none'; }
-function selLocal(el,nome){ document.querySelectorAll('#local-grid .local-opt').forEach(e=>e.classList.remove('sel')); el.classList.add('sel'); localSelecionado=nome; }
 
 async function submitProf(){
   const nome=document.getElementById('pf-nome').value.trim();
@@ -1539,7 +1525,6 @@ async function submitProf(){
   const uni=document.getElementById('pf-uni').value;
   if(!nome||!sala||!uni){ toast('⚠️','Campos obrigatórios','Preencha nome, sala e unidade.','w'); return; }
   if(selEquips.length===0){ toast('⚠️','Selecione equipamentos','Escolha ao menos um item.','w'); return; }
-  if(!localSelecionado){ toast('📍','Local obrigatório','Informe onde vai devolver.','w'); document.getElementById('local-grid').scrollIntoView({behavior:'smooth',block:'center'}); return; }
   if(!document.getElementById('sig-wp').classList.contains('has')){ toast('✍️','Assinatura obrigatória','Assine para confirmar.','w'); document.getElementById('sig-wp').scrollIntoView({behavior:'smooth',block:'center'}); return; }
 
   const cbQ=parseInt(document.getElementById('cb-n').textContent);
@@ -1551,8 +1536,7 @@ async function submitProf(){
   const agHora=tipoSolic==='agendar'?(document.getElementById('pf-ag-hora').value||''):'';
 
   const nova={ id:Date.now(), proto, prof:nome, sala, uni, equips:ef, obs:'', tipo:tipoSolic,
-    hora:_agora(), nova:true, sig:profSig, local:localSelecionado,
-    localDet:document.getElementById('pf-local').value, status:'pendente', agData, agHora };
+    hora:_agora(), nova:true, sig:profSig, local:'', localDet:'', status:'pendente', agData, agHora };
 
   if(!sbOnline){
     toast('⚠️','Sem conexão','Não foi possível conectar ao banco de dados.','r');
