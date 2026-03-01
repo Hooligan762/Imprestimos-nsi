@@ -1345,6 +1345,9 @@ async function sbInsertSolicitacao(d){
 
 async function sbInsertDevolucao(d){
   if(!sbOnline||!sbClient) return {ok:false};
+  // Verificar se já existe devolução pendente para esse protocolo original
+  const {data:existe}=await sbClient.from('devolucoes').select('id,status').eq('protocolo_original',d.protoOrig).in('status',['aguardando_tecnico','confirmado']).maybeSingle();
+  if(existe) return {ok:false, error:'Devolução duplicada bloqueada pelo banco'};
   const {error}=await sbClient.from('devolucoes').insert({
     protocolo:d.proto, protocolo_original:d.protoOrig, professor:d.prof, sala:d.sala,
     equipamentos:d.equips, assinatura_prof:d.sigProf, local_devolucao:d.localDev,
@@ -1607,15 +1610,41 @@ async function buscarProtocolo(){
   toast('🔍','Buscando…','Localizando empréstimo.','b');
   const res=await sbBuscarProtocolo(proto);
   if(!res.ok){ toast('❌','Não encontrado',res.error||'Verifique o protocolo digitado.','r'); return; }
+  // Bloquear status que não permitem devolução
+  const st = res.data.status;
+  const bloqueios = {
+    pendente:            { msg:'Empréstimo ainda não foi aprovado.', cor:'var(--amber)' },
+    aprovado:            { msg:'Equipamento ainda não foi retirado.', cor:'var(--blue)' },
+    cancelado:           { msg:'Este empréstimo foi cancelado.', cor:'var(--red)' },
+    devolucao_pendente:  { msg:'Devolução já registrada — aguardando confirmação do técnico.', cor:'var(--amber)' },
+    devolvido_confirmado:{ msg:'Este equipamento já foi devolvido e confirmado pelo técnico.', cor:'var(--green)' },
+  };
+  if(bloqueios[st]){
+    // Mostrar resultado mas bloquear o formulário
+    document.getElementById('dr-nome').textContent=res.data.professor||'—';
+    document.getElementById('dr-sala').textContent=res.data.sala||'—';
+    document.getElementById('dr-hora').textContent=res.data.hora||'—';
+    document.getElementById('dr-equips').innerHTML=(res.data.equipamentos||[]).map(e=>`<span class="dev-tag">${e}</span>`).join('');
+    const statusEl=document.getElementById('dr-status');
+    statusEl.textContent=bloqueios[st].msg;
+    statusEl.style.color=bloqueios[st].cor;
+    document.getElementById('proto-result').style.display='block';
+    document.getElementById('dev-local-card').style.display='none';
+    document.getElementById('dev-cond-card').style.display='none';
+    document.getElementById('dev-sig-card').style.display='none';
+    document.getElementById('btn-submit-dev').style.display='none';
+    _devBuscaResult=null;
+    toast('⚠️','Devolução não permitida',bloqueios[st].msg,'w');
+    return;
+  }
+
   _devBuscaResult=res.data;
   document.getElementById('dr-nome').textContent=res.data.professor||'—';
   document.getElementById('dr-sala').textContent=res.data.sala||'—';
   document.getElementById('dr-hora').textContent=res.data.hora||'—';
-  const statusMap={pendente:'⏳ Aguardando aprovação',aprovado:'✅ Aprovado — aguardando retirada',retirado:'🔄 Em uso — pode devolver',cancelado:'❌ Cancelado'};
   const statusEl=document.getElementById('dr-status');
-  statusEl.textContent=statusMap[res.data.status]||res.data.status||'—';
-  const clrMap={pendente:'var(--amber)',aprovado:'var(--blue)',retirado:'var(--green)',cancelado:'var(--red)'};
-  statusEl.style.color=clrMap[res.data.status]||'var(--text)';
+  statusEl.textContent='🔄 Em uso — pode devolver';
+  statusEl.style.color='var(--green)';
   document.getElementById('dr-equips').innerHTML=(res.data.equipamentos||[]).map(e=>`<span class="dev-tag">${e}</span>`).join('');
   document.getElementById('proto-result').style.display='block';
   document.getElementById('dev-local-card').style.display='block';
@@ -1626,6 +1655,13 @@ async function submitDevolucao(){
   if(!_devBuscaResult){ toast('⚠️','Busque o protocolo primeiro.','','w'); return; }
   if(!localDevSelecionado){ toast('📍','Local obrigatório','Selecione onde está devolvendo.','w'); return; }
   if(!document.getElementById('sig-wdp').classList.contains('has')){ toast('✍️','Assinatura obrigatória','Assine para confirmar.','w'); document.getElementById('sig-wdp').scrollIntoView({behavior:'smooth',block:'center'}); return; }
+  // Verificação de segurança: checar status atual no banco antes de enviar
+  const chk=await sbBuscarProtocolo(_devBuscaResult.proto);
+  if(chk.ok&&chk.data.status!=='retirado'){
+    const msgs={devolucao_pendente:'Devolução já registrada para este protocolo.',devolvido_confirmado:'Este equipamento já foi devolvido e confirmado.'};
+    toast('⚠️','Devolução bloqueada',msgs[chk.data.status]||'Este protocolo não pode ser devolvido agora.','r');
+    _devBuscaResult=null; return;
+  }
 
   const btn=document.getElementById('btn-submit-dev');
   btn.disabled=true; btn.textContent='Enviando…';
