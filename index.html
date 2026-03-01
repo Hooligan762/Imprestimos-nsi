@@ -1892,7 +1892,7 @@ function renderEmprestimos(){
       <td>${statusMap[s.status]||s.status}</td>
       <td>${s.sig?`<button class="sc-sig-btn" data-sig-id="${s.id}" onclick="verAssinaturaPorId(this.dataset.sigId)">✍️ Ver</button>`:'<span style="color:var(--muted);font-size:.7rem">—</span>'}</td>
       <td><span class="mono-sm" style="color:var(--muted)">${s.hora}</span></td>
-      <td>${s.status==='aprovado'?`<button class="bs amber" onclick="openMarcarEntregue(${s.id})">📦 Entregar</button>`:s.status==='retirado'?`<button class="bs amber" onclick="openConfirmarDevPorProto('${s.proto}')">↩ Devolver</button>`:`<button class="bs ghost" data-emp-id="${s.id}" onclick="verDetalhesEmprestimo(this.dataset.empId)">🔍 Ver</button>`}</td>
+      <td>${s.status==='aprovado'?`<button class="bs amber" onclick="openMarcarEntregue(${s.id})">📦 Entregar</button>`:s.status==='retirado'?`<button class="bs amber" onclick="openConfirmarDevPorProto('${s.proto}')">↩ Devolver</button>`:'<span style="color:var(--muted);font-size:.7rem">—</span>'}</td>
     </tr>`).join('');
 }
 
