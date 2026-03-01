@@ -760,6 +760,44 @@ tbody tr:hover td{background:rgba(255,255,255,.012)}
   </main>
 </div>
 
+<!-- MODAL: Detalhes do Empréstimo -->
+<div class="overlay" id="ov-detalhes-emp">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-h"><h3>📋 Detalhes do Empréstimo</h3><button class="modal-x" onclick="closeOv('ov-detalhes-emp')">✕</button></div>
+    <div class="modal-b">
+      <div class="info-box">
+        <div style="font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:.7rem">Identificação</div>
+        <div class="info-row"><span class="info-lbl">Protocolo</span><span class="info-val mono-sm" id="de-proto" style="color:var(--blue)">—</span></div>
+        <div class="info-row"><span class="info-lbl">Professor</span><span class="info-val" id="de-prof">—</span></div>
+        <div class="info-row"><span class="info-lbl">Sala</span><span class="info-val" id="de-sala">—</span></div>
+        <div class="info-row"><span class="info-lbl">Campus</span><span class="info-val" id="de-campus">—</span></div>
+      </div>
+      <div class="info-box">
+        <div style="font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:.7rem">Equipamentos &amp; Logística</div>
+        <div class="info-row"><span class="info-lbl">Equipamentos</span><div class="dev-tags" id="de-equips" style="margin-top:.1rem"></div></div>
+        <div class="info-row"><span class="info-lbl">Local Dev.</span><span class="info-val" id="de-local" style="color:#c4b5fd">—</span></div>
+        <div class="info-row"><span class="info-lbl">Tipo</span><span class="info-val" id="de-tipo">—</span></div>
+        <div class="info-row" id="de-ag-row" style="display:none"><span class="info-lbl">Agendado</span><span class="info-val" id="de-ag" style="color:var(--blue)">—</span></div>
+      </div>
+      <div class="info-box">
+        <div style="font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:.7rem">Status &amp; Datas</div>
+        <div class="info-row"><span class="info-lbl">Status</span><span class="info-val" id="de-status-val">—</span></div>
+        <div class="info-row"><span class="info-lbl">Solicitado em</span><span class="info-val mono-sm" id="de-hora">—</span></div>
+        <div class="info-row" id="de-aprov-row" style="display:none"><span class="info-lbl">Aprovado em</span><span class="info-val mono-sm" id="de-aprov-hora" style="color:var(--green)">—</span></div>
+        <div class="info-row" id="de-tec-row" style="display:none"><span class="info-lbl">Técnico</span><span class="info-val" id="de-tec">—</span></div>
+      </div>
+      <div id="de-sig-box" style="display:none">
+        <p style="font-size:.7rem;color:var(--muted);margin-bottom:.5rem">✍️ Assinatura do Professor:</p>
+        <div class="sig-view-box"><img id="de-sig-img" src="" alt="Assinatura" style="max-height:110px;width:100%;object-fit:contain"></div>
+      </div>
+    </div>
+    <div class="modal-f">
+      <button class="bs ghost" onclick="closeOv('ov-detalhes-emp')">Fechar</button>
+      <button class="bs blue" id="de-aprovar-btn" style="display:none" onclick="aprovarDoModal()">✓ Aprovar</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL: Ver assinatura -->
 <div class="overlay" id="ov-sig">
   <div class="modal" style="max-width:440px">
@@ -1854,7 +1892,7 @@ function renderEmprestimos(){
       <td>${statusMap[s.status]||s.status}</td>
       <td>${s.sig?`<button class="sc-sig-btn" data-sig-id="${s.id}" onclick="verAssinaturaPorId(this.dataset.sigId)">✍️ Ver</button>`:'<span style="color:var(--muted);font-size:.7rem">—</span>'}</td>
       <td><span class="mono-sm" style="color:var(--muted)">${s.hora}</span></td>
-      <td>${s.status==='aprovado'?`<button class="bs amber" onclick="openMarcarEntregue(${s.id})">📦 Entregar</button>`:s.status==='retirado'?`<button class="bs amber" onclick="openConfirmarDevPorProto('${s.proto}')">↩ Devolver</button>`:`<button class="bs ghost">Ver</button>`}</td>
+      <td>${s.status==='aprovado'?`<button class="bs amber" onclick="openMarcarEntregue(${s.id})">📦 Entregar</button>`:s.status==='retirado'?`<button class="bs amber" onclick="openConfirmarDevPorProto('${s.proto}')">↩ Devolver</button>`:`<button class="bs ghost" data-emp-id="${s.id}" onclick="verDetalhesEmprestimo(this.dataset.empId)">🔍 Ver</button>`}</td>
     </tr>`).join('');
 }
 
@@ -2205,6 +2243,71 @@ async function salvarEquipamento(){
   toast('✅','Equipamento Cadastrado!',`${pat} — ${nome} adicionado ao inventário.`);
   addLog('m','Equipamento Cadastrado',`${pat} — ${nome} · ${cat} · ${CAMPUS_LABEL[uni]||uni}`);
   showBanner('💻','Novo Equipamento',`${nome} (${pat}) adicionado ao inventário`,'aprov');
+}
+
+
+/* ═══════════════════════════════════════
+   VER DETALHES EMPRÉSTIMO
+═══════════════════════════════════════ */
+let _detalheId = null;
+function verDetalhesEmprestimo(id){
+  const s = solicitacoes.find(x => String(x.id) === String(id));
+  if(!s){ toast('❌','Não encontrado','Registro não localizado.','r'); return; }
+  _detalheId = s.id;
+
+  const statusMap = {
+    pendente:'<span class="bdg pend">Pendente</span>',
+    aprovado:'<span class="bdg aprov">Aprovado</span>',
+    retirado:'<span class="bdg retir">Retirado</span>',
+    cancelado:'<span class="bdg atr">Cancelado</span>',
+    devolucao_pendente:'<span class="bdg devpend">Dev. Pendente</span>',
+    devolvido_confirmado:'<span class="bdg dev">Devolvido</span>'
+  };
+  const campusLabel = {aimores:'UNA Aimorés', liberdade:'UNA Liberdade'};
+
+  document.getElementById('de-proto').textContent = s.proto || '—';
+  document.getElementById('de-prof').textContent  = s.prof  || '—';
+  document.getElementById('de-sala').textContent  = s.sala  || '—';
+  document.getElementById('de-campus').textContent = campusLabel[s.uni] || s.uni || '—';
+  document.getElementById('de-equips').innerHTML  = (s.equips||[]).map(e=>`<span class="dev-tag">${escHtml(e)}</span>`).join('') || '—';
+  document.getElementById('de-local').textContent  = s.local ? (s.local + (s.localDet?' · '+s.localDet:'')) : '—';
+  document.getElementById('de-tipo').textContent   = s.tipo === 'agendar' ? 'Agendado' : 'Retirada imediata';
+  document.getElementById('de-status-val').innerHTML = statusMap[s.status] || s.status || '—';
+  document.getElementById('de-hora').textContent  = s.hora || '—';
+
+  const agRow = document.getElementById('de-ag-row');
+  if(s.tipo === 'agendar' && s.agData){
+    document.getElementById('de-ag').textContent = s.agData + (s.agHora?' às '+s.agHora:'');
+    agRow.style.display = 'flex';
+  } else { agRow.style.display = 'none'; }
+
+  const aprovRow = document.getElementById('de-aprov-row');
+  const tecRow = document.getElementById('de-tec-row');
+  if(s.horaAprovacao){
+    document.getElementById('de-aprov-hora').textContent = s.horaAprovacao;
+    aprovRow.style.display = 'flex';
+  } else { aprovRow.style.display = 'none'; }
+  if(s.tecAprovador){
+    document.getElementById('de-tec').textContent = s.tecAprovador;
+    tecRow.style.display = 'flex';
+  } else { tecRow.style.display = 'none'; }
+
+  const sigBox = document.getElementById('de-sig-box');
+  const sigImg = document.getElementById('de-sig-img');
+  if(s.sig && s.sig.length > 100){
+    sigImg.src = s.sig; sigBox.style.display = 'block';
+  } else { sigBox.style.display = 'none'; }
+
+  const aprovBtn = document.getElementById('de-aprovar-btn');
+  aprovBtn.style.display = s.status === 'pendente' ? 'flex' : 'none';
+
+  document.getElementById('ov-detalhes-emp').classList.add('open');
+}
+
+function aprovarDoModal(){
+  if(!_detalheId) return;
+  closeOv('ov-detalhes-emp');
+  aprovar(_detalheId);
 }
 
 /* ═══════════════════════════════════════
