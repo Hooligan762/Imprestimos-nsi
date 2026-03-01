@@ -1417,22 +1417,12 @@ async function sbBuscarProtocolo(proto){
 /* ═══════════════════════════════════════
    STATE
 ═══════════════════════════════════════ */
-let solicitacoes = [
-  { id:1, proto:'TL202500001', prof:'Fernanda Costa', sala:'C110', uni:'aimores', equips:['Microfone','USB-C → HDMI'], obs:'Apresentação TCC', tipo:'agora', hora:'Há 2 min', nova:true, sig:null, local:'Balcão TI', localDet:'', status:'pendente', agData:'', agHora:'' },
-  { id:2, proto:'TL202500002', prof:'Ricardo Alves',  sala:'L204', uni:'aimores', equips:['Chromebook (2×)','Notebook'], obs:'Aula prática', tipo:'agendar', hora:'Há 8 min', nova:false, sig:null, local:'Sala de Aula', localDet:'Mesa do fundo', status:'pendente', agData:'2025-06-15', agHora:'14:00' },
-  { id:3, proto:'TL202500003', prof:'Ana Claudia Melo', sala:'B102', uni:'liberdade', equips:['Chromebook (3×)'], obs:'', tipo:'agora', hora:'Há 15 min', nova:false, sig:null, local:'Balcão TI', localDet:'', status:'aprovado', horaAprovacao:'Hoje 08:30', tecAprovador:'Bruno T.', agData:'', agHora:'' },
-  { id:4, proto:'TL202500004', prof:'Carlos Duarte', sala:'A301', uni:'aimores', equips:['Notebook','HDMI → VGA'], obs:'', tipo:'agora', hora:'Ontem', nova:false, sig:null, local:'Sala de Aula', localDet:'', status:'retirado', horaAprovacao:'Ontem 10:00', horaRetirada:'Ontem 10:30', tecAprovador:'Bruno T.', agData:'', agHora:'' }
-];
+let solicitacoes = [];
 let devsPendentes = [];
-let logs = [
-  {tipo:'e',acao:'Solicitação Recebida',detalhe:'Fernanda Costa → Microfone, USB-C → HDMI · Sala C110',hora:_agora()},
-  {tipo:'e',acao:'Solicitação Recebida',detalhe:'Ricardo Alves → Chromebook (2×), Notebook · Sala L204',hora:_agora()},
-  {tipo:'a',acao:'Solicitação Aprovada',detalhe:'Bruno T. aprovou TL202500003 de Ana Claudia Melo',hora:_agora()},
-  {tipo:'d',acao:'Equipamento Entregue',detalhe:'Carlos Duarte retirou Notebook, HDMI → VGA · Sala A301',hora:_agora()},
-];
+let logs = [];
 
 let selEquips=[], tipoSolic='agora', profSig=null, tecSig=null, devProfSig=null;
-let protoSeq=4, localSelecionado='', localDevSelecionado='';
+let protoSeq=0, localSelecionado='', localDevSelecionado='';
 let currentUser=null, _devBuscaResult=null, _cdSigProf=null, _cdDevId=null;
 let _meId=null, _sigFullData=null, _editUserData=null;
 
@@ -1668,9 +1658,10 @@ async function doLogin(){
     campusBadgeEl.style.display='inline-flex';
   }
   show('s-tec');
-  renderAll(); renderLogs(); renderUsers(); updateBadges();
-  setTimeout(()=>toast('✅','Bem-vindo!',`Logado como ${u.nome}`),300);
   addLog('d','Login',`${u.nome} acessou o painel`);
+  renderAll(); renderLogs(); renderUsers(); updateBadges();
+  await carregarDadosBanco();
+  setTimeout(()=>toast('✅','Bem-vindo!',`Logado como ${u.nome}`),300);
   const tb=document.getElementById('access-log-tbody');
   if(tb){
     if(tb.children.length===1&&tb.children[0].cells[0].textContent==='Nenhum acesso registrado') tb.innerHTML='';
@@ -1680,7 +1671,56 @@ async function doLogin(){
   }
 }
 
-function doLogout(){ if(currentUser) addLog('d','Logout',`${currentUser.nome} saiu do sistema`); currentUser=null; show('s-home'); }
+/* ═══════════════════════════════════════
+   CARREGAR DADOS DO BANCO NO LOGIN
+═══════════════════════════════════════ */
+async function carregarDadosBanco(){
+  if(!sbOnline||!sbClient) return;
+  try{
+    const {data:sData}=await sbClient.from('solicitacoes')
+      .select('*').order('data_solicitacao',{ascending:false}).limit(200);
+    if(sData){
+      solicitacoes=sData.map(s=>({
+        id:s.id, proto:s.protocolo, prof:s.professor, sala:s.sala, uni:s.unidade||'aimores',
+        equips:s.equipamentos||[], obs:s.observacao||'', tipo:s.tipo||'agora',
+        hora:s.data_solicitacao?_formatarData(s.data_solicitacao):_agora(),
+        nova:false, sig:s.assinatura_prof, local:s.local_devolucao||'',
+        localDet:s.local_detalhe||'', status:s.status||'pendente',
+        agData:s.ag_data||'', agHora:s.ag_hora||'',
+        horaAprovacao:s.hora_aprovacao||'', horaRetirada:s.hora_retirada||'',
+        tecAprovador:s.tecnico_aprovador||''
+      }));
+      const nums=sData.map(s=>parseInt((s.protocolo||'').replace(/\D/g,''))).filter(n=>!isNaN(n));
+      if(nums.length) protoSeq=Math.max(...nums);
+    }
+    const {data:dData}=await sbClient.from('devolucoes')
+      .select('*').eq('status','aguardando_tecnico').order('data_devolucao',{ascending:false});
+    if(dData){
+      devsPendentes=dData.map(d=>({
+        id:d.id, proto:d.protocolo, protoOrig:d.protocolo_original,
+        prof:d.professor, sala:d.sala||'', equips:d.equipamentos||[],
+        hora:d.data_devolucao?_formatarData(d.data_devolucao):_agora(),
+        nova:false, sigProf:d.assinatura_prof,
+        localDev:d.local_devolucao||'', localDet:d.local_detalhe||''
+      }));
+    }
+    renderAll(); updateBadges();
+    toast('📋','Dados carregados',`${solicitacoes.length} solicitação(ões) · ${devsPendentes.length} pendente(s)`,'b');
+  }catch(e){ console.warn('Erro ao carregar banco:',e); }
+}
+
+function _formatarData(iso){
+  try{
+    const d=new Date(iso);
+    return `${_p(d.getDate())}/${_p(d.getMonth()+1)} ${_p(d.getHours())}:${_p(d.getMinutes())}`;
+  }catch(e){ return '—'; }
+}
+
+function doLogout(){
+  if(currentUser) addLog('d','Logout',`${currentUser.nome} saiu do sistema`);
+  currentUser=null; solicitacoes=[]; devsPendentes=[]; logs=[]; protoSeq=0;
+  show('s-home');
+}
 
 /* ═══════════════════════════════════════
    NAV
@@ -1905,8 +1945,15 @@ function openMarcarEntregue(id){
 async function confirmarEntrega(){
   if(!_meId) return;
   const s=solicitacoes.find(x=>x.id===_meId); if(!s) return;
+
+  const btnEnt=document.querySelector('#ov-marcar-entregue .bs.green');
+  if(btnEnt){ btnEnt.disabled=true; btnEnt.textContent='Confirmando…'; }
+
   s.status='retirado'; s.horaRetirada=_agora();
-  await sbMarcarRetirado(_meId);
+  const res=await sbMarcarRetirado(_meId);
+  if(sbOnline&&!res.ok) toast('⚠️','Aviso','Erro ao salvar no banco, tente novamente.','w');
+
+  if(btnEnt){ btnEnt.disabled=false; btnEnt.textContent='✓ Entregue ao Professor'; }
   closeOv('ov-marcar-entregue');
   renderAll(); updateBadges();
   toast('📦','Entregue!',`${s.prof} retirou ${s.equips.join(', ')}`);
@@ -1949,7 +1996,15 @@ function openConfirmarDevPorId(id){
 }
 function openConfirmarDevPorProto(proto){
   const s=solicitacoes.find(x=>x.proto===proto); if(!s) return;
-  openConfirmarDev(s.proto,s.prof,s.sala,s.sig,null,s.equips,s.local||'');
+  // Verifica se existe devolução pendente registrada para este protocolo
+  const devPend=devsPendentes.find(d=>d.protoOrig===proto);
+  if(devPend){
+    // Usa os dados da devolução pendente (tem assinatura do professor)
+    openConfirmarDev(proto,devPend.prof,devPend.sala,devPend.sigProf,devPend.id,devPend.equips,devPend.localDev);
+  } else {
+    // Devolução direta pelo técnico (sem registro prévio do professor)
+    openConfirmarDev(s.proto,s.prof,s.sala,s.sig,null,s.equips,s.local||'');
+  }
 }
 function openConfirmarDev(proto,nome,sala,sigProf,devId,equips,localDev){
   document.getElementById('cd-proto').textContent=proto||'—';
@@ -1983,15 +2038,37 @@ async function confirmarDevTec(){
   const nome=document.getElementById('cd-nome').textContent;
   const cond=document.getElementById('cd-cond').value;
   const obs=document.getElementById('cd-obs').value;
-  if(_cdDevId) await sbConfirmarDevolucao(_cdDevId,{sigTec:tecSig,tecNome:currentUser?.nome||'Técnico',cond,obs});
-  if(_cdDevId){ devsPendentes=devsPendentes.filter(x=>x.id!==_cdDevId); }
+  const tecNome=currentUser?.nome||'Técnico';
+  const horaReal=_agora();
+
+  // Botão desabilita durante o envio
+  const btnConf=document.querySelector('#ov-confirmar-dev .bs.green');
+  if(btnConf){ btnConf.disabled=true; btnConf.textContent='Confirmando…'; }
+
+  // 1) Se veio de uma devolução pendente (professor registrou via app)
+  if(_cdDevId){
+    await sbConfirmarDevolucao(_cdDevId,{sigTec:tecSig,tecNome,cond,obs});
+    devsPendentes=devsPendentes.filter(x=>x.id!==_cdDevId);
+  }
+
+  // 2) Sempre atualiza a solicitação no Supabase para 'devolvido_confirmado'
   const s=solicitacoes.find(x=>x.proto===proto);
-  if(s) s.status='devolvido_confirmado';
+  if(s){
+    s.status='devolvido_confirmado';
+    if(sbOnline&&sbClient){
+      await sbClient.from('solicitacoes').update({
+        status:'devolvido_confirmado',
+        tecnico_aprovador: tecNome,
+        hora_aprovacao: horaReal
+      }).eq('protocolo', proto);
+    }
+  }
+
+  if(btnConf){ btnConf.disabled=false; btnConf.textContent='✓ Confirmar Devolução'; }
   closeOv('ov-confirmar-dev');
   renderAll(); updateBadges();
-  const horaReal=_agora();
   toast('✅','Devolução Confirmada!',`${nome} · ${proto} · ${horaReal}`);
-  addLog('d','Devolução Confirmada',`${currentUser?.nome||'Técnico'} confirmou ${proto} de ${nome} · ${horaReal} · ${cond}`);
+  addLog('d','Devolução Confirmada',`${tecNome} confirmou ${proto} de ${nome} · ${horaReal} · ${cond}`);
   showBanner('✅','Devolução Confirmada',`${nome} · ${proto}`,'aprov');
 }
 
