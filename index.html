@@ -2116,7 +2116,7 @@ async function confirmarDevTec(){
 
   const s=solicitacoes.find(x=>x.proto===proto);
   if(s){
-    devsConfirmadas.push({protoOrig:devObj.protoOrig||devObj.proto, sigTec:tecSig, tecNome:tecNome, horaConf:_agora()});
+    const _dOrig=devsPendentes.find(x=>x.id===_cdDevId); devsConfirmadas.push({protoOrig:(_dOrig&&(_dOrig.protoOrig||_dOrig.proto))||proto, sigTec:tecSig, tecNome:tecNome, horaConf:_agora()});
     s.status='devolvido_confirmado';
     if(sbOnline&&sbClient){
       await sbClient.from('solicitacoes').update({
