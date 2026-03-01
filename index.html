@@ -351,11 +351,7 @@ tbody tr:hover td{background:rgba(255,255,255,.012)}
 .u-info{font-size:clamp(.61rem,1.8vw,.68rem);color:var(--muted);margin-top:.06rem}
 .u-actions{margin-left:auto;display:flex;gap:.4rem}
 
-.sb-status{position:fixed;bottom:1rem;left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--bdr);border-radius:99px;padding:.38rem .88rem;font-size:.66rem;display:flex;align-items:center;gap:.48rem;z-index:400;white-space:nowrap;box-shadow:var(--sh);font-family:'Outfit',sans-serif}
-.sb-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
-.sb-dot.ok{background:var(--green);animation:glow 2s infinite}
-.sb-dot.err{background:var(--red)}
-.sb-dot.conn{background:var(--amber);animation:glow 1s infinite}
+
 
 .notif-banner{position:fixed;top:max(1rem,env(safe-area-inset-top));left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--green);border-radius:var(--rl);padding:.85rem 1.2rem;box-shadow:var(--shl),var(--ggreen);display:flex;align-items:center;gap:.75rem;z-index:600;max-width:min(400px,92vw);width:100%;animation:notifIn .32s cubic-bezier(.175,.885,.32,1.275);font-size:clamp(.74rem,2.3vw,.83rem)}
 .notif-banner.dev{border-color:var(--amber);box-shadow:var(--shl),var(--gamber)}
@@ -1065,7 +1061,6 @@ tbody tr:hover td{background:rgba(255,255,255,.012)}
   </div>
 </div>
 
-<div class="sb-status" id="sb-status"><div class="sb-dot conn" id="sb-dot"></div><span id="sb-txt">Conectando…</span></div>
 <div id="toasts"></div>
 
 <script>
@@ -1095,7 +1090,7 @@ async function sbInit(){
 }
 
 function loadScript(src){ return new Promise((res,rej)=>{ const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=rej;document.head.appendChild(s); }); }
-function setSbStatus(t,txt){ const d=document.getElementById('sb-dot'),e=document.getElementById('sb-txt'); d.className='sb-dot '+t; e.textContent=txt; }
+function setSbStatus(t,txt){}
 
 function setupRealtime(){
   if(!sbClient||!sbOnline) return;
