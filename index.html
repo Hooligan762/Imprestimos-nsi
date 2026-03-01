@@ -1327,14 +1327,14 @@ function filterEquip(inp){
 ═══════════════════════════════════════ */
 async function sbInsertSolicitacao(d){
   if(!sbOnline||!sbClient) return {ok:false};
-  const {error}=await sbClient.from('solicitacoes').insert({
+  const {data,error}=await sbClient.from('solicitacoes').insert({
     protocolo:d.proto, professor:d.prof, sala:d.sala, unidade:d.uni,
     equipamentos:d.equips, observacao:d.obs, tipo:d.tipo,
     assinatura_prof:d.sig, local_devolucao:d.local, local_detalhe:d.localDet,
     ag_data:d.agData||null, ag_hora:d.agHora||null,
     data_solicitacao:new Date().toISOString(), status:'pendente'
-  });
-  return {ok:!error, error};
+  }).select().single();
+  return {ok:!error, data, error};
 }
 
 async function sbInsertDevolucao(d){
@@ -1434,7 +1434,7 @@ let devsPendentes = [];
 let logs = [];
 
 let selEquips=[], tipoSolic='agora', profSig=null, tecSig=null, devProfSig=null;
-let protoSeq=0, localSelecionado='', localDevSelecionado='';
+let localSelecionado='', localDevSelecionado='';
 let currentUser=null, _devBuscaResult=null, _cdSigProf=null, _cdDevId=null;
 let _meId=null, _sigFullData=null, _editUserData=null;
 let tecUsers=[];
@@ -1442,6 +1442,13 @@ let tecUsers=[];
 /* ═══════════════════════════════════════
    HELPERS
 ═══════════════════════════════════════ */
+function gerarProtocolo(prefix){
+  const ano = new Date().getFullYear();
+  const ts  = Date.now().toString(36).toUpperCase().slice(-4);
+  const rand = Math.random().toString(36).toUpperCase().slice(2,6);
+  return `${prefix}${ano}-${ts}${rand}`;
+}
+
 function _agora(){ const n=new Date(); return `${_p(n.getDate())}/${_p(n.getMonth()+1)} ${_p(n.getHours())}:${_p(n.getMinutes())}`; }
 function _p(v){ return String(v).padStart(2,'0'); }
 function _campusOk(uni){ if(!currentUser) return false; if(currentUser.campus==='todos'||currentUser.nivel==='master') return true; return (currentUser.campus||'').toLowerCase()===(uni||'').toLowerCase(); }
@@ -1521,8 +1528,7 @@ async function submitProf(){
   const nbQ=parseInt(document.getElementById('nb-n').textContent);
   const ef=selEquips.map(e=>{ if(e==='Chromebook')return`Chromebook (${cbQ}×)`; if(e==='Notebook')return`Notebook (${nbQ}×)`; return e; });
 
-  protoSeq++;
-  const proto=`TL${new Date().getFullYear()}${String(protoSeq).padStart(5,'0')}`;
+  const proto = gerarProtocolo('TL');
   const agData=tipoSolic==='agendar'?(document.getElementById('pf-ag-data').value||''):'';
   const agHora=tipoSolic==='agendar'?(document.getElementById('pf-ag-hora').value||''):'';
 
@@ -1530,11 +1536,24 @@ async function submitProf(){
     hora:_agora(), nova:true, sig:profSig, local:localSelecionado,
     localDet:document.getElementById('pf-local').value, status:'pendente', agData, agHora };
 
+  if(!sbOnline){
+    toast('⚠️','Sem conexão','Não foi possível conectar ao banco de dados.','r');
+    return;
+  }
+
   const btn=document.getElementById('btn-submit-prof');
   btn.disabled=true; btn.textContent='Enviando…';
 
   const sbRes=await sbInsertSolicitacao(nova);
-  if(sbOnline&&!sbRes.ok) toast('⚠️','Erro no servidor','Tente novamente.','w');
+
+  if(!sbRes.ok){
+    btn.disabled=false; btn.textContent='📤 Enviar Solicitação';
+    toast('❌','Erro ao salvar','Não foi possível registrar no banco. Tente novamente.','r');
+    return;
+  }
+
+  // Usa o ID retornado pelo banco se disponível
+  if(sbRes.data && sbRes.data.id) nova.id = sbRes.data.id;
 
   solicitacoes.unshift(nova);
   updateBadges(); addLog('e','Solicitação Enviada',`${nome} → ${ef.join(', ')} · Sala ${sala}`);
@@ -1609,8 +1628,7 @@ async function submitDevolucao(){
   const btn=document.getElementById('btn-submit-dev');
   btn.disabled=true; btn.textContent='Enviando…';
 
-  protoSeq++;
-  const protoD=`DEV${new Date().getFullYear()}${String(protoSeq).padStart(5,'0')}`;
+  const protoD = gerarProtocolo('DEV');
   const dados={
     proto:protoD, protoOrig:_devBuscaResult.proto||document.getElementById('dev-proto-inp').value.trim().toUpperCase(),
     prof:_devBuscaResult.professor, sala:_devBuscaResult.sala,
@@ -1704,8 +1722,7 @@ async function carregarDadosBanco(){
         horaAprovacao:s.hora_aprovacao||'', horaRetirada:s.hora_retirada||'',
         tecAprovador:s.tecnico_aprovador||''
       }));
-      const nums=sData.map(s=>parseInt((s.protocolo||'').replace(/\D/g,''))).filter(n=>!isNaN(n));
-      if(nums.length) protoSeq=Math.max(...nums);
+      // protocolo único gerado no cliente — sem sequencial
     }
     const {data:dData}=await sbClient.from('devolucoes')
       .select('*').eq('status','aguardando_tecnico').order('data_devolucao',{ascending:false});
@@ -1732,7 +1749,7 @@ function _formatarData(iso){
 
 function doLogout(){
   if(currentUser) addLog('d','Logout',`${currentUser.nome} saiu do sistema`);
-  currentUser=null; solicitacoes=[]; devsPendentes=[]; logs=[]; protoSeq=0;
+  currentUser=null; solicitacoes=[]; devsPendentes=[]; logs=[];
   show('s-home');
 }
 
@@ -1890,9 +1907,9 @@ function renderEmprestimos(){
       <td><span style="font-size:.68rem;color:${CAMPUS_COR[s.uni]||'var(--muted)'}">🏫 ${CAMPUS_LABEL[s.uni]||s.uni||'—'}</span></td>
       <td style="color:#c4b5fd;font-size:.7rem">📍 ${escHtml(s.local||'—')}</td>
       <td>${statusMap[s.status]||s.status}</td>
-      <td>${s.sig?`<button class="sc-sig-btn" data-sig-id="${s.id}" onclick="verAssinaturaPorId(this.dataset.sigId)">✍️ Ver</button>`:'<span style="color:var(--muted);font-size:.7rem">—</span>'}</td>
+      <td>${s.sig?`<button class="sc-sig-btn" data-sig-id="${s.id}" onclick="verAssinaturaPorId(this.dataset.sigId)">✍️ Ver</button>`:`<button class="bs ghost" data-emp-id="${s.id}" onclick="verDetalhesEmprestimo(this.dataset.empId)">🔍 Ver</button>`}</td>
       <td><span class="mono-sm" style="color:var(--muted)">${s.hora}</span></td>
-      <td>${s.status==='aprovado'?`<button class="bs amber" onclick="openMarcarEntregue(${s.id})">📦 Entregar</button>`:s.status==='retirado'?`<button class="bs amber" onclick="openConfirmarDevPorProto('${s.proto}')">↩ Devolver</button>`:'<span style="color:var(--muted);font-size:.7rem">—</span>'}</td>
+      <td>${s.status==='aprovado'?`<button class="bs amber" onclick="openMarcarEntregue(${s.id})">📦 Entregar</button>`:s.status==='retirado'?`<button class="bs amber" onclick="openConfirmarDevPorProto('${s.proto}')">↩ Devolver</button>`:`<button class="bs ghost" data-emp-id="${s.id}" onclick="verDetalhesEmprestimo(this.dataset.empId)">🔍 Ver</button>`}</td>
     </tr>`).join('');
 }
 
