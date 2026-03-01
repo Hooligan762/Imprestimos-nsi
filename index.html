@@ -269,6 +269,8 @@ tbody tr:hover td{background:rgba(255,255,255,.012)}
 .bdg.devpend{background:rgba(255,181,71,.1);color:var(--amber);border:1px solid rgba(255,181,71,.2)}.bdg.devpend::before{background:var(--amber);animation:pulse 1.5s infinite}
 .bdg.dev{background:rgba(82,96,128,.1);color:var(--muted);border:1px solid rgba(82,96,128,.2)}.bdg.dev::before{background:var(--muted)}
 .bdg.atr{background:rgba(255,77,109,.1);color:var(--red);border:1px solid rgba(255,77,109,.2)}.bdg.atr::before{background:var(--red);animation:pulse 1s infinite}
+.bdg.manut{background:rgba(255,77,109,.1);color:var(--red);border:1px solid rgba(255,77,109,.2)}.bdg.manut::before{background:var(--red)}
+.bdg.disp{background:rgba(0,217,126,.1);color:var(--green);border:1px solid rgba(0,217,126,.2)}.bdg.disp::before{background:var(--green)}
 
 .bs{font-size:clamp(.65rem,1.9vw,.73rem);font-weight:600;padding:clamp(.28rem,1vw,.38rem) clamp(.6rem,1.8vw,.88rem);border-radius:var(--rs);cursor:pointer;transition:.14s;border:none;white-space:nowrap;font-family:'Outfit',sans-serif}
 .bs.blue{background:var(--blue);color:#fff}.bs.blue:hover{background:var(--blue2)}
@@ -428,7 +430,6 @@ tbody tr:hover td{background:rgba(255,255,255,.012)}
       <div class="flow-arr">›</div>
       <div class="flow-step"><div class="flow-num nxt" id="fs4">4</div><span class="flow-lbl">Assinar</span></div>
     </div>
-    <!-- 1. ID -->
     <div class="fcard">
       <div class="fc-title">👤 Identificação</div>
       <div class="field"><label>Nome Completo <span class="req">*</span></label><input type="text" id="pf-nome" placeholder="Ex: João da Silva" autocomplete="name"></div>
@@ -443,23 +444,15 @@ tbody tr:hover td{background:rgba(255,255,255,.012)}
         <div class="field"><label>Sala <span class="req">*</span></label><input type="text" id="pf-sala" placeholder="Ex: L101"></div>
       </div>
     </div>
-    <!-- 2. EQUIPAMENTOS -->
+    <!-- EQUIPAMENTOS — renderizado dinamicamente do banco -->
     <div class="fcard">
       <div class="fc-title">💻 Equipamentos Disponíveis</div>
       <div class="eq-grid" id="eq-grid">
-        <div class="eq-item" data-nome="Chromebook" data-qid="cb-qty" onclick="toggleEq(this)"><span class="eq-icon">💻</span><div class="eq-name">Chromebook</div><div class="eq-avail ok">12 disp.</div></div>
-        <div class="eq-item" data-nome="Notebook" data-qid="nb-qty" onclick="toggleEq(this)"><span class="eq-icon">🖥️</span><div class="eq-name">Notebook</div><div class="eq-avail ok">5 disp.</div></div>
-        <div class="eq-item" data-nome="Microfone" onclick="toggleEq(this)"><span class="eq-icon">🎙️</span><div class="eq-name">Microfone</div><div class="eq-avail low">2 disp.</div></div>
-        <div class="eq-item" data-nome="USB-C → HDMI" onclick="toggleEq(this)"><span class="eq-icon">🔌</span><div class="eq-name">USB-C → HDMI</div><div class="eq-avail ok">8 disp.</div></div>
-        <div class="eq-item" data-nome="HDMI → VGA" onclick="toggleEq(this)"><span class="eq-icon">📺</span><div class="eq-name">HDMI → VGA</div><div class="eq-avail ok">6 disp.</div></div>
-        <div class="eq-item" data-nome="Carregador" onclick="toggleEq(this)"><span class="eq-icon">⚡</span><div class="eq-name">Carregador</div><div class="eq-avail ok">10 disp.</div></div>
-        <div class="eq-item" data-nome="Cabo HDMI" onclick="toggleEq(this)"><span class="eq-icon">🔗</span><div class="eq-name">Cabo HDMI</div><div class="eq-avail low">3 disp.</div></div>
-        <div class="eq-item zerado"><span class="eq-icon">📽️</span><div class="eq-name">Projetor</div><div class="eq-avail zero">0 disp.</div></div>
+        <div class="empty" style="grid-column:1/-1"><i>⏳</i><p>Carregando equipamentos…</p></div>
       </div>
       <div id="cb-qty" class="qty-row" style="display:none"><span class="qty-lbl">Quantos Chromebooks?</span><div class="qty-ctrl"><button class="qty-btn" onclick="chQty('cb-n',-1)">−</button><span class="qty-v" id="cb-n">1</span><button class="qty-btn" onclick="chQty('cb-n',1)">+</button></div></div>
       <div id="nb-qty" class="qty-row" style="display:none"><span class="qty-lbl">Quantos Notebooks?</span><div class="qty-ctrl"><button class="qty-btn" onclick="chQty('nb-n',-1)">−</button><span class="qty-v" id="nb-n">1</span><button class="qty-btn" onclick="chQty('nb-n',1)">+</button></div></div>
     </div>
-    <!-- 3. QUANDO -->
     <div class="fcard">
       <div class="fc-title">📅 Quando Precisa?</div>
       <div class="tipo-row">
@@ -473,7 +466,6 @@ tbody tr:hover td{background:rgba(255,255,255,.012)}
         </div>
       </div>
     </div>
-    <!-- LOCAL -->
     <div class="fcard">
       <div class="fc-title">📍 Onde Vai Devolver?</div>
       <p style="font-size:.74rem;color:var(--muted);margin-bottom:.85rem;line-height:1.55">Informe onde deixará os equipamentos.</p>
@@ -488,7 +480,6 @@ tbody tr:hover td{background:rgba(255,255,255,.012)}
         <input type="text" id="pf-local" placeholder="Ex: Sala L101, mesa do professor…">
       </div>
     </div>
-    <!-- ASSINATURA -->
     <div class="fcard">
       <div class="fc-title green">✍️ Assinatura do Professor</div>
       <p style="font-size:.74rem;color:var(--muted);margin-bottom:.75rem;line-height:1.55">Ao assinar, você confirma a solicitação e <strong style="color:var(--text2)">assume responsabilidade</strong> pelos equipamentos.</p>
@@ -721,24 +712,27 @@ tbody tr:hover td{background:rgba(255,255,255,.012)}
       </div>
     </div>
 
-    <!-- EQUIPAMENTOS -->
+    <!-- EQUIPAMENTOS — TOTALMENTE SINCRONIZADO COM SUPABASE -->
     <div class="tec-page" id="pg-equip">
-      <div class="pg-head"><div><h1>Equipamentos</h1></div><button class="bs blue" onclick="openNovoEquipModal()">+ Cadastrar</button></div>
+      <div class="pg-head">
+        <div><h1>Equipamentos</h1><p>Inventário sincronizado com o banco de dados</p></div>
+        <div style="display:flex;gap:.5rem">
+          <button class="bs ghost" onclick="carregarEquipamentos()">🔄 Atualizar</button>
+          <button class="bs blue" onclick="openNovoEquipModal()">+ Cadastrar</button>
+        </div>
+      </div>
+      <!-- Stats dinâmicos -->
       <div class="stats-grid" style="margin-bottom:.2rem">
-        <div class="stat-c" data-ico="✅" style="--accent-grad:linear-gradient(90deg,var(--green),var(--green2));--stat-clr:var(--green)"><div class="s-lbl">Disponíveis</div><div class="s-val">38</div><div class="s-trend">Prontos</div></div>
-        <div class="stat-c" data-ico="🔄" style="--accent-grad:linear-gradient(90deg,var(--amber),var(--amber2));--stat-clr:var(--amber)"><div class="s-lbl">Em Uso</div><div class="s-val">8</div><div class="s-trend">Emprestados</div></div>
-        <div class="stat-c" data-ico="🔧" style="--accent-grad:linear-gradient(90deg,var(--red),var(--red2));--stat-clr:var(--red)"><div class="s-lbl">Manutenção</div><div class="s-val">2</div><div class="s-trend">Em reparo</div></div>
-        <div class="stat-c" data-ico="📦" style="--accent-grad:linear-gradient(90deg,var(--blue),var(--purple));--stat-clr:#93c5fd"><div class="s-lbl">Total</div><div class="s-val">48</div><div class="s-trend">Inventário</div></div>
+        <div class="stat-c" data-ico="✅" style="--accent-grad:linear-gradient(90deg,var(--green),var(--green2));--stat-clr:var(--green)"><div class="s-lbl">Disponíveis</div><div class="s-val" id="eq-stat-disp">—</div><div class="s-trend">Prontos para uso</div></div>
+        <div class="stat-c" data-ico="🔄" style="--accent-grad:linear-gradient(90deg,var(--amber),var(--amber2));--stat-clr:var(--amber)"><div class="s-lbl">Em Uso</div><div class="s-val" id="eq-stat-uso">—</div><div class="s-trend">Emprestados</div></div>
+        <div class="stat-c" data-ico="🔧" style="--accent-grad:linear-gradient(90deg,var(--red),var(--red2));--stat-clr:var(--red)"><div class="s-lbl">Manutenção</div><div class="s-val" id="eq-stat-manut">—</div><div class="s-trend">Em reparo</div></div>
+        <div class="stat-c" data-ico="📦" style="--accent-grad:linear-gradient(90deg,var(--blue),var(--purple));--stat-clr:#93c5fd"><div class="s-lbl">Total</div><div class="s-val" id="eq-stat-total">—</div><div class="s-trend">Inventário</div></div>
       </div>
       <div class="tc">
-        <div class="tc-head"><div class="tc-title">Inventário</div><input class="sinp" placeholder="Buscar…"></div>
+        <div class="tc-head"><div class="tc-title">Inventário</div><input class="sinp" placeholder="Buscar…" oninput="filterEquip(this)"></div>
         <div class="tbl-scroll"><table>
-          <thead><tr><th>Patrimônio</th><th>Nome</th><th>Categoria</th><th>Unidade</th><th>Condição</th><th>Status</th></tr></thead>
-          <tbody>
-            <tr><td class="mono-sm" style="color:var(--muted)">UNA-0001</td><td>Chromebook Lenovo 300e</td><td>Chromebook</td><td>Aimorés</td><td style="color:var(--green)">Ótimo</td><td><span class="bdg retir">disponível</span></td></tr>
-            <tr><td class="mono-sm" style="color:var(--muted)">UNA-0002</td><td>Notebook Dell Inspiron</td><td>Notebook</td><td>Aimorés</td><td style="color:var(--green)">Bom</td><td><span class="bdg atr">em uso</span></td></tr>
-            <tr><td class="mono-sm" style="color:var(--muted)">UNA-0010</td><td>Microfone Fifine K670</td><td>Microfone</td><td>Liberdade</td><td style="color:var(--amber)">Regular</td><td><span class="bdg retir">disponível</span></td></tr>
-          </tbody>
+          <thead><tr><th>Patrimônio</th><th>Nome</th><th>Categoria</th><th>Unidade</th><th>Condição</th><th>Status</th><th>Ação</th></tr></thead>
+          <tbody id="equip-tbody"><tr><td colspan="7" style="text-align:center;color:var(--muted);padding:2rem">⏳ Carregando inventário…</td></tr></tbody>
         </table></div>
       </div>
     </div>
@@ -884,7 +878,7 @@ tbody tr:hover td{background:rgba(255,255,255,.012)}
   </div>
 </div>
 
-<!-- MODAL: Editar Técnico — CORRIGIDO: usa data-id em vez de onclick inline com JSON -->
+<!-- MODAL: Editar Técnico -->
 <div class="overlay" id="ov-edit-user">
   <div class="modal" style="max-width:460px">
     <div class="modal-h"><h3>✏️ Editar Técnico</h3><button class="modal-x" onclick="closeOv('ov-edit-user')">✕</button></div>
@@ -928,22 +922,110 @@ tbody tr:hover td{background:rgba(255,255,255,.012)}
   </div>
 </div>
 
-<!-- MODAL: Novo Equipamento -->
+<!-- MODAL: Novo Equipamento — SINCRONIZADO COM SUPABASE -->
 <div class="overlay" id="ov-new-equip">
   <div class="modal">
     <div class="modal-h"><h3>💻 Cadastrar Equipamento</h3><button class="modal-x" onclick="closeOv('ov-new-equip')">✕</button></div>
     <div class="modal-b">
       <div class="frow">
         <div class="field"><label>N° Patrimônio <span class="req">*</span></label><input type="text" id="ne-pat" placeholder="UNA-0025"></div>
-        <div class="field"><label>Categoria</label><select id="ne-cat"><option>Chromebook</option><option>Notebook</option><option>Microfone</option><option>Cabo HDMI</option><option>Adaptador</option><option>Projetor</option><option>Carregador</option></select></div>
+        <div class="field"><label>Categoria <span class="req">*</span></label>
+          <select id="ne-cat">
+            <option value="Chromebook">Chromebook</option>
+            <option value="Notebook">Notebook</option>
+            <option value="Microfone">Microfone</option>
+            <option value="Cabo HDMI">Cabo HDMI</option>
+            <option value="USB-C → HDMI">USB-C → HDMI</option>
+            <option value="HDMI → VGA">HDMI → VGA</option>
+            <option value="Projetor">Projetor</option>
+            <option value="Carregador">Carregador</option>
+            <option value="Outro">Outro</option>
+          </select>
+        </div>
       </div>
-      <div class="field"><label>Nome <span class="req">*</span></label><input type="text" id="ne-nome" placeholder="Ex: Chromebook Lenovo 300e"></div>
+      <div class="field"><label>Nome / Modelo <span class="req">*</span></label><input type="text" id="ne-nome" placeholder="Ex: Chromebook Lenovo 300e"></div>
       <div class="frow">
-        <div class="field"><label>Unidade</label><select id="ne-uni"><option value="aimores">UNA Aimorés</option><option value="liberdade">UNA Liberdade</option></select></div>
-        <div class="field"><label>Condição</label><select id="ne-cond"><option value="otimo">Ótimo</option><option value="bom">Bom</option><option value="regular">Regular</option></select></div>
+        <div class="field"><label>Unidade <span class="req">*</span></label>
+          <select id="ne-uni">
+            <option value="aimores">UNA Aimorés</option>
+            <option value="liberdade">UNA Liberdade</option>
+          </select>
+        </div>
+        <div class="field"><label>Condição</label>
+          <select id="ne-cond">
+            <option value="otimo">✅ Ótimo</option>
+            <option value="bom" selected>👍 Bom</option>
+            <option value="regular">⚠️ Regular</option>
+          </select>
+        </div>
+      </div>
+      <div class="field" style="margin-bottom:0">
+        <label>Status Inicial</label>
+        <select id="ne-status">
+          <option value="disponivel">✅ Disponível</option>
+          <option value="manutencao">🔧 Em Manutenção</option>
+        </select>
       </div>
     </div>
-    <div class="modal-f"><button class="bs ghost" onclick="closeOv('ov-new-equip')">Cancelar</button><button class="bs blue" onclick="salvarEquipamento()">✓ Cadastrar</button></div>
+    <div class="modal-f">
+      <button class="bs ghost" onclick="closeOv('ov-new-equip')">Cancelar</button>
+      <button class="bs blue" id="ne-save-btn" onclick="salvarEquipamento()">✓ Cadastrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Editar Equipamento -->
+<div class="overlay" id="ov-edit-equip">
+  <div class="modal" style="max-width:460px">
+    <div class="modal-h"><h3>✏️ Editar Equipamento</h3><button class="modal-x" onclick="closeOv('ov-edit-equip')">✕</button></div>
+    <div class="modal-b">
+      <input type="hidden" id="ee-id">
+      <div class="frow">
+        <div class="field"><label>N° Patrimônio</label><input type="text" id="ee-pat" placeholder="UNA-0025"></div>
+        <div class="field"><label>Categoria</label>
+          <select id="ee-cat">
+            <option value="Chromebook">Chromebook</option>
+            <option value="Notebook">Notebook</option>
+            <option value="Microfone">Microfone</option>
+            <option value="Cabo HDMI">Cabo HDMI</option>
+            <option value="USB-C → HDMI">USB-C → HDMI</option>
+            <option value="HDMI → VGA">HDMI → VGA</option>
+            <option value="Projetor">Projetor</option>
+            <option value="Carregador">Carregador</option>
+            <option value="Outro">Outro</option>
+          </select>
+        </div>
+      </div>
+      <div class="field"><label>Nome / Modelo</label><input type="text" id="ee-nome" placeholder="Ex: Chromebook Lenovo 300e"></div>
+      <div class="frow">
+        <div class="field"><label>Unidade</label>
+          <select id="ee-uni">
+            <option value="aimores">UNA Aimorés</option>
+            <option value="liberdade">UNA Liberdade</option>
+          </select>
+        </div>
+        <div class="field"><label>Condição</label>
+          <select id="ee-cond">
+            <option value="otimo">✅ Ótimo</option>
+            <option value="bom">👍 Bom</option>
+            <option value="regular">⚠️ Regular</option>
+            <option value="danificado">❌ Danificado</option>
+          </select>
+        </div>
+      </div>
+      <div class="field" style="margin-bottom:0">
+        <label>Status</label>
+        <select id="ee-status">
+          <option value="disponivel">✅ Disponível</option>
+          <option value="em_uso">🔄 Em Uso</option>
+          <option value="manutencao">🔧 Em Manutenção</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-f">
+      <button class="bs ghost" onclick="closeOv('ov-edit-equip')">Cancelar</button>
+      <button class="bs blue" onclick="salvarEdicaoEquip()">💾 Salvar</button>
+    </div>
   </div>
 </div>
 
@@ -962,17 +1044,14 @@ let sbClient = null, sbOnline = false;
 async function sbInit(){
   try{
     await loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js');
-    if(SUPABASE_URL.includes('SEU_PROJETO')){ setSbStatus('err','Modo local'); return; }
-    // Cria cliente com opções mínimas para evitar DataCloneError com Headers/postMessage
     sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
       auth: { persistSession: false, autoRefreshToken: false },
       realtime: { params: { eventsPerSecond: 10 } }
     });
-    // Testa conexão com fetch simples em vez de usar o client (evita clonagem de Headers)
     const testRes = await fetch(`${SUPABASE_URL}/rest/v1/solicitacoes?select=id&limit=1`, {
       headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
     });
-    if(!testRes.ok && testRes.status !== 200 && testRes.status !== 406) throw new Error(`HTTP ${testRes.status}`);
+    if(!testRes.ok && testRes.status !== 406) throw new Error(`HTTP ${testRes.status}`);
     sbOnline = true;
     setSbStatus('ok','Supabase conectado · Tempo real');
     setupRealtime();
@@ -1004,9 +1083,226 @@ function setupRealtime(){
       updateBadges(); renderAll();
       showBanner('↩️',`Devolução Pendente: ${d.professor}`,`${(d.equipamentos||[]).join(', ')} · ${d.local_devolucao}`,'dev');
     })
+    .on('postgres_changes',{event:'*',schema:'public',table:'equipamentos'},()=>{
+      // Atualiza inventário e grid de solicitação em tempo real
+      carregarEquipamentos();
+      carregarEquipamentosForm();
+    })
     .subscribe();
 }
 
+/* ═══════════════════════════════════════
+   EQUIPAMENTOS — SUPABASE CRUD COMPLETO
+═══════════════════════════════════════ */
+let equipamentosCache = [];
+
+// Ícones por categoria
+const EQUIP_ICONS = {
+  'Chromebook':'💻','Notebook':'🖥️','Microfone':'🎙️',
+  'USB-C → HDMI':'🔌','HDMI → VGA':'📺','Carregador':'⚡',
+  'Cabo HDMI':'🔗','Projetor':'📽️','Outro':'📦'
+};
+
+const COND_LABEL = { otimo:'Ótimo', bom:'Bom', regular:'Regular', danificado:'Danificado' };
+const COND_COR   = { otimo:'var(--green)', bom:'#6ee7b7', regular:'var(--amber)', danificado:'var(--red)' };
+const STATUS_LABEL = { disponivel:'Disponível', em_uso:'Em Uso', manutencao:'Manutenção' };
+
+async function sbListarEquipamentos(){
+  if(!sbOnline||!sbClient) return {ok:false,data:[]};
+  const {data,error}=await sbClient.from('equipamentos')
+    .select('*').order('criado_em',{ascending:false});
+  return {ok:!error, data:data||[], error};
+}
+
+async function sbInserirEquipamento(e){
+  if(!sbOnline||!sbClient) return {ok:false};
+  const {data,error}=await sbClient.from('equipamentos').insert({
+    patrimonio: e.patrimonio,
+    nome:       e.nome,
+    categoria:  e.categoria,
+    unidade:    e.unidade,
+    condicao:   e.condicao,
+    status:     e.status||'disponivel',
+    criado_em:  new Date().toISOString()
+  }).select().single();
+  return {ok:!error, data, error};
+}
+
+async function sbAtualizarEquipamento(id, campos){
+  if(!sbOnline||!sbClient) return {ok:false};
+  const {error}=await sbClient.from('equipamentos').update({
+    ...campos, atualizado_em: new Date().toISOString()
+  }).eq('id',id);
+  return {ok:!error, error};
+}
+
+async function sbDeletarEquipamento(id){
+  if(!sbOnline||!sbClient) return {ok:false};
+  const {error}=await sbClient.from('equipamentos').delete().eq('id',id);
+  return {ok:!error, error};
+}
+
+// Carrega inventário e atualiza tabela + stats
+async function carregarEquipamentos(){
+  const tbody=document.getElementById('equip-tbody');
+  if(!tbody) return;
+
+  if(!sbOnline){
+    tbody.innerHTML=`<tr><td colspan="7" style="text-align:center;color:var(--amber);padding:1.5rem">⚠️ Supabase offline — não é possível carregar inventário</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML=`<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:1.5rem">⏳ Carregando…</td></tr>`;
+  const res=await sbListarEquipamentos();
+
+  if(!res.ok){
+    tbody.innerHTML=`<tr><td colspan="7" style="text-align:center;color:var(--red);padding:1.5rem">❌ Erro ao carregar. Verifique a tabela no Supabase.</td></tr>`;
+    return;
+  }
+
+  equipamentosCache=res.data;
+
+  // Atualiza stats
+  const total=res.data.length;
+  const disp=res.data.filter(e=>e.status==='disponivel').length;
+  const uso=res.data.filter(e=>e.status==='em_uso').length;
+  const manut=res.data.filter(e=>e.status==='manutencao').length;
+  document.getElementById('eq-stat-total').textContent=total;
+  document.getElementById('eq-stat-disp').textContent=disp;
+  document.getElementById('eq-stat-uso').textContent=uso;
+  document.getElementById('eq-stat-manut').textContent=manut;
+
+  if(!res.data.length){
+    tbody.innerHTML=`<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:2rem">📭 Nenhum equipamento cadastrado ainda.<br><small style="font-size:.7rem">Clique em "+ Cadastrar" para adicionar.</small></td></tr>`;
+    return;
+  }
+
+  const statusBdg={
+    disponivel:`<span class="bdg disp">Disponível</span>`,
+    em_uso:`<span class="bdg atr">Em Uso</span>`,
+    manutencao:`<span class="bdg manut">Manutenção</span>`
+  };
+  const condCor={ otimo:'var(--green)', bom:'#6ee7b7', regular:'var(--amber)', danificado:'var(--red)' };
+  const campusLabel={ aimores:'UNA Aimorés', liberdade:'UNA Liberdade' };
+
+  tbody.innerHTML=res.data.map((e,idx)=>`
+    <tr>
+      <td><span class="mono-sm" style="color:var(--muted)">${escHtml(e.patrimonio||'—')}</span></td>
+      <td><strong>${escHtml(e.nome||'—')}</strong></td>
+      <td>${escHtml(e.categoria||'—')}</td>
+      <td><span style="font-size:.7rem;color:${CAMPUS_COR[e.unidade]||'var(--muted)'}">🏫 ${escHtml(campusLabel[e.unidade]||e.unidade||'—')}</span></td>
+      <td style="color:${condCor[e.condicao]||'var(--muted)'};font-weight:600">${COND_LABEL[e.condicao]||escHtml(e.condicao||'—')}</td>
+      <td>${statusBdg[e.status]||`<span class="bdg">${escHtml(e.status||'—')}</span>`}</td>
+      <td style="display:flex;gap:.3rem;flex-wrap:wrap">
+        <button class="bs blue" style="font-size:.62rem" data-eq-idx="${idx}" onclick="openEditEquip(this.dataset.eqIdx)">✏️</button>
+        <button class="bs red"  style="font-size:.62rem" data-eq-id="${e.id}" onclick="deletarEquipamento(this.dataset.eqId)">🗑️</button>
+      </td>
+    </tr>`).join('');
+}
+
+// Carrega equipamentos no grid do formulário de solicitação (com disponibilidade real)
+async function carregarEquipamentosForm(){
+  const grid=document.getElementById('eq-grid');
+  if(!grid) return;
+
+  if(!sbOnline){
+    // Fallback estático se offline
+    grid.innerHTML=`
+      <div class="eq-item" data-nome="Chromebook" data-qid="cb-qty" onclick="toggleEq(this)"><span class="eq-icon">💻</span><div class="eq-name">Chromebook</div><div class="eq-avail ok">— disp.</div></div>
+      <div class="eq-item" data-nome="Notebook" data-qid="nb-qty" onclick="toggleEq(this)"><span class="eq-icon">🖥️</span><div class="eq-name">Notebook</div><div class="eq-avail ok">— disp.</div></div>
+      <div class="eq-item" data-nome="Microfone" onclick="toggleEq(this)"><span class="eq-icon">🎙️</span><div class="eq-name">Microfone</div><div class="eq-avail ok">— disp.</div></div>
+      <div class="eq-item" data-nome="USB-C → HDMI" onclick="toggleEq(this)"><span class="eq-icon">🔌</span><div class="eq-name">USB-C → HDMI</div><div class="eq-avail ok">— disp.</div></div>
+      <div class="eq-item" data-nome="HDMI → VGA" onclick="toggleEq(this)"><span class="eq-icon">📺</span><div class="eq-name">HDMI → VGA</div><div class="eq-avail ok">— disp.</div></div>
+      <div class="eq-item" data-nome="Carregador" onclick="toggleEq(this)"><span class="eq-icon">⚡</span><div class="eq-name">Carregador</div><div class="eq-avail ok">— disp.</div></div>
+      <div class="eq-item" data-nome="Cabo HDMI" onclick="toggleEq(this)"><span class="eq-icon">🔗</span><div class="eq-name">Cabo HDMI</div><div class="eq-avail ok">— disp.</div></div>`;
+    return;
+  }
+
+  grid.innerHTML=`<div class="empty" style="grid-column:1/-1"><i>⏳</i><p>Carregando…</p></div>`;
+  const res=await sbListarEquipamentos();
+  if(!res.ok||!res.data.length){
+    grid.innerHTML=`<div class="empty" style="grid-column:1/-1"><i>📭</i><p>Nenhum equipamento cadastrado ainda</p></div>`;
+    return;
+  }
+
+  // Agrupa por categoria e conta disponíveis
+  const grupos={};
+  res.data.forEach(e=>{
+    const cat=e.categoria||'Outro';
+    if(!grupos[cat]) grupos[cat]={total:0,disp:0};
+    grupos[cat].total++;
+    if(e.status==='disponivel') grupos[cat].disp++;
+  });
+
+  grid.innerHTML=Object.entries(grupos).map(([cat,g])=>{
+    const icon=EQUIP_ICONS[cat]||'📦';
+    const zero=g.disp===0;
+    const low=g.disp>0&&g.disp<=2;
+    const cls=zero?'zerado':'';
+    const availCls=zero?'zero':low?'low':'ok';
+    const qid=(cat==='Chromebook')?'cb-qty':(cat==='Notebook')?'nb-qty':'';
+    const qidAttr=qid?`data-qid="${qid}"`:'';
+    return `<div class="eq-item ${cls}" data-nome="${escHtml(cat)}" ${qidAttr} onclick="toggleEq(this)">
+      <span class="eq-icon">${icon}</span>
+      <div class="eq-name">${escHtml(cat)}</div>
+      <div class="eq-avail ${availCls}">${zero?'0 disp.':g.disp+' disp.'}</div>
+    </div>`;
+  }).join('');
+}
+
+function openEditEquip(idx){
+  const e=equipamentosCache[parseInt(idx)];
+  if(!e){ toast('❌','Erro','Equipamento não encontrado.','r'); return; }
+  document.getElementById('ee-id').value=e.id;
+  document.getElementById('ee-pat').value=e.patrimonio||'';
+  document.getElementById('ee-cat').value=e.categoria||'Chromebook';
+  document.getElementById('ee-nome').value=e.nome||'';
+  document.getElementById('ee-uni').value=e.unidade||'aimores';
+  document.getElementById('ee-cond').value=e.condicao||'bom';
+  document.getElementById('ee-status').value=e.status||'disponivel';
+  document.getElementById('ov-edit-equip').classList.add('open');
+}
+
+async function salvarEdicaoEquip(){
+  const id=document.getElementById('ee-id').value;
+  const campos={
+    patrimonio: document.getElementById('ee-pat').value.trim(),
+    nome:       document.getElementById('ee-nome').value.trim(),
+    categoria:  document.getElementById('ee-cat').value,
+    unidade:    document.getElementById('ee-uni').value,
+    condicao:   document.getElementById('ee-cond').value,
+    status:     document.getElementById('ee-status').value
+  };
+  if(!campos.nome||!campos.patrimonio){ toast('⚠️','Campos obrigatórios','Preencha patrimônio e nome.','w'); return; }
+  const res=await sbAtualizarEquipamento(id, campos);
+  if(!res.ok){ toast('❌','Erro ao salvar','Tente novamente.','r'); return; }
+  closeOv('ov-edit-equip');
+  await carregarEquipamentos();
+  await carregarEquipamentosForm();
+  toast('✅','Equipamento atualizado!',campos.nome);
+  addLog('m','Equipamento Editado',`${campos.patrimonio} — ${campos.nome}`);
+}
+
+async function deletarEquipamento(id){
+  const e=equipamentosCache.find(x=>String(x.id)===String(id));
+  const nome=e?e.nome:id;
+  if(!confirm(`Remover "${nome}" do inventário?\nEsta ação não pode ser desfeita.`)) return;
+  const res=await sbDeletarEquipamento(id);
+  if(!res.ok){ toast('❌','Erro ao remover','Tente novamente.','r'); return; }
+  await carregarEquipamentos();
+  await carregarEquipamentosForm();
+  toast('🗑️','Removido!',`${nome} removido do inventário.`,'r');
+  addLog('r','Equipamento Removido',`${nome} removido do inventário`);
+}
+
+function filterEquip(inp){
+  const q=inp.value.toLowerCase();
+  document.querySelectorAll('#equip-tbody tr').forEach(tr=>tr.style.display=tr.textContent.toLowerCase().includes(q)?'':'none');
+}
+
+/* ═══════════════════════════════════════
+   SUPABASE — demais funções
+═══════════════════════════════════════ */
 async function sbInsertSolicitacao(d){
   if(!sbOnline||!sbClient) return {ok:false};
   const {error}=await sbClient.from('solicitacoes').insert({
@@ -1056,9 +1352,6 @@ async function sbConfirmarDevolucao(id, d){
   return {ok:!error,error};
 }
 
-/* ═══════════════════════════════════════
-   TÉCNICOS — Supabase
-═══════════════════════════════════════ */
 async function sbBuscarTecnico(email, senha){
   if(!sbOnline||!sbClient){
     const u=USERS_LOCAL[email.toLowerCase()];
@@ -1141,11 +1434,7 @@ let logs = [
 let selEquips=[], tipoSolic='agora', profSig=null, tecSig=null, devProfSig=null;
 let protoSeq=4, localSelecionado='', localDevSelecionado='';
 let currentUser=null, _devBuscaResult=null, _cdSigProf=null, _cdDevId=null;
-let _meId=null;
-let _sigFullData=null;
-
-/* Armazena usuários para edição sem problema de escape JSON */
-let _editUserData = null;
+let _meId=null, _sigFullData=null, _editUserData=null;
 
 const USERS_LOCAL={
   'tecnico@una.edu.br':{senha:'1234',nome:'Bruno Técnico',role:'Técnico TI',av:'BT',nivel:'tecnico',email:'tecnico@una.edu.br',campus:'aimores'},
@@ -1158,24 +1447,12 @@ let tecUsers=[];
    HELPERS
 ═══════════════════════════════════════ */
 function _agora(){ const n=new Date(); return `${_p(n.getDate())}/${_p(n.getMonth()+1)} ${_p(n.getHours())}:${_p(n.getMinutes())}`; }
-function _agoraHora(){ const n=new Date(); return `${_p(n.getHours())}:${_p(n.getMinutes())}`; }
 function _p(v){ return String(v).padStart(2,'0'); }
-
-// Retorna true se o técnico logado pode ver este item pelo campus
-function _campusOk(uni){
-  if(!currentUser) return false;
-  if(currentUser.campus==='todos'||currentUser.nivel==='master') return true;
-  return (currentUser.campus||'').toLowerCase()===(uni||'').toLowerCase();
-}
-
+function _campusOk(uni){ if(!currentUser) return false; if(currentUser.campus==='todos'||currentUser.nivel==='master') return true; return (currentUser.campus||'').toLowerCase()===(uni||'').toLowerCase(); }
 const CAMPUS_LABEL={'aimores':'UNA Aimorés','liberdade':'UNA Liberdade','todos':'Todos os Campus'};
 const CAMPUS_COR={'aimores':'#4f8ef7','liberdade':'#9b72f7','todos':'#00d97e'};
-
-function show(id){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  window.scrollTo(0,0);
-}
+function escHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); window.scrollTo(0,0); }
 
 /* ═══════════════════════════════════════
    QR CODE / URL PARAMS
@@ -1183,35 +1460,26 @@ function show(id){
 function checkURLParams(){
   try{
     const p=new URLSearchParams(window.location.search);
-    const proto=p.get('proto');
-    const mode=p.get('mode');
+    const proto=p.get('proto'); const mode=p.get('mode');
     if(proto&&mode==='devolver'){
       abrirDevolucao(true);
-      setTimeout(()=>{
-        document.getElementById('dev-proto-inp').value=proto.toUpperCase();
-        document.getElementById('qr-detected-banner').style.display='flex';
-        buscarProtocolo();
-      },350);
+      setTimeout(()=>{ document.getElementById('dev-proto-inp').value=proto.toUpperCase(); document.getElementById('qr-detected-banner').style.display='flex'; buscarProtocolo(); },350);
     }
   }catch(e){}
 }
 
-function gerarQRUrl(proto){
-  const base=window.location.origin+window.location.pathname;
-  return `${base}?proto=${proto}&mode=devolver`;
-}
+function gerarQRUrl(proto){ const base=window.location.origin+window.location.pathname; return `${base}?proto=${proto}&mode=devolver`; }
 
 function renderQR(canvasId, proto){
   try{
-    const el=document.getElementById(canvasId);
-    if(!el) return;
+    const el=document.getElementById(canvasId); if(!el) return;
     el.innerHTML='';
     if(typeof QRCode!=='undefined'){
       new QRCode(el,{text:gerarQRUrl(proto),width:128,height:128,colorDark:'#1e293b',colorLight:'#ffffff'});
     } else {
       el.innerHTML=`<div style="width:128px;height:128px;background:#f8fafc;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:.3rem;border:1px solid #e2e8f0;font-size:.62rem;color:#64748b;text-align:center;padding:.5rem"><span style="font-size:1.8rem">📱</span><span>${proto}</span></div>`;
     }
-  }catch(e){ console.warn('QR error:',e); }
+  }catch(e){}
 }
 
 /* ═══════════════════════════════════════
@@ -1227,12 +1495,12 @@ function abrirFormulario(){
   clearSig('sig-p','sig-hp','sig-wp');
   setTipo('agora');
   show('s-prof');
+  carregarEquipamentosForm();
   setTimeout(()=>initSig('sig-p','sig-hp','sig-wp',v=>profSig=v),200);
 }
 
 function toggleEq(el){
-  const nome=el.dataset.nome;
-  const qid=el.dataset.qid;
+  const nome=el.dataset.nome; const qid=el.dataset.qid;
   el.classList.toggle('sel');
   const s=el.classList.contains('sel');
   if(s){ if(!selEquips.includes(nome)) selEquips.push(nome); }
@@ -1279,11 +1547,9 @@ async function submitProf(){
   document.getElementById('proto-sub').textContent=tipoSolic==='agora'?`${nome} · Sala ${sala} · Retirada imediata`:`${nome} · Sala ${sala} · Agendado ${agData||'—'} às ${agHora||'—'}`;
 
   btn.disabled=false; btn.textContent='📤 Enviar Solicitação';
-
   show('s-success');
   setTimeout(()=>renderQR('qr-canvas',proto),300);
 
-  // Notifica técnico se painel aberto
   setTimeout(()=>{
     if(document.getElementById('s-tec').classList.contains('active')){
       showBanner('🔔',`Nova Solicitação: ${nome}`,`${ef.join(', ')} · Sala ${sala}`,'new');
@@ -1322,21 +1588,17 @@ async function buscarProtocolo(){
   const proto=document.getElementById('dev-proto-inp').value.trim();
   if(!proto||proto.length<5){ toast('⚠️','Protocolo inválido','Digite um protocolo válido.','w'); return; }
   toast('🔍','Buscando…','Localizando empréstimo.','b');
-
   const res=await sbBuscarProtocolo(proto);
   if(!res.ok){ toast('❌','Não encontrado','Verifique o protocolo digitado.','r'); return; }
-
   _devBuscaResult=res.data;
   document.getElementById('dr-nome').textContent=res.data.professor||'—';
   document.getElementById('dr-sala').textContent=res.data.sala||'—';
   document.getElementById('dr-hora').textContent=res.data.hora||'—';
-
   const statusMap={pendente:'⏳ Aguardando aprovação',aprovado:'✅ Aprovado — aguardando retirada',retirado:'🔄 Em uso — pode devolver',cancelado:'❌ Cancelado'};
   const statusEl=document.getElementById('dr-status');
   statusEl.textContent=statusMap[res.data.status]||res.data.status||'—';
   const clrMap={pendente:'var(--amber)',aprovado:'var(--blue)',retirado:'var(--green)',cancelado:'var(--red)'};
   statusEl.style.color=clrMap[res.data.status]||'var(--text)';
-
   document.getElementById('dr-equips').innerHTML=(res.data.equipamentos||[]).map(e=>`<span class="dev-tag">${e}</span>`).join('');
   document.getElementById('proto-result').style.display='block';
   document.getElementById('dev-local-card').style.display='block';
@@ -1363,27 +1625,15 @@ async function submitDevolucao(){
   };
 
   await sbInsertDevolucao(dados);
-
   const nova={ id:Date.now(), ...dados, nova:true };
   devsPendentes.unshift(nova);
-
   const solOrig=solicitacoes.find(s=>s.proto===dados.protoOrig);
   if(solOrig) solOrig.status='devolucao_pendente';
-
   updateBadges(); addLog('v','Devolução Iniciada',`${dados.prof} → ${dados.equips.join(', ')} · ${localDevSelecionado} · ${_agora()}`);
-
   document.getElementById('dev-proto-num').textContent=protoD;
   document.getElementById('dev-proto-sub').textContent=`${dados.prof} · ${dados.equips.join(', ')} · ${localDevSelecionado} · ${_agora()}`;
-
   btn.disabled=false; btn.textContent='↩️ Registrar Devolução';
   show('s-dev-success');
-
-  setTimeout(()=>{
-    if(document.getElementById('s-tec').classList.contains('active')){
-      showBanner('↩️',`Devolução Pendente: ${dados.prof}`,`${dados.equips.join(', ')} · ${localDevSelecionado}`,'dev');
-      renderAll();
-    }
-  },500);
 }
 
 /* ═══════════════════════════════════════
@@ -1397,13 +1647,9 @@ async function doLogin(){
   if(!email||!senha){ err.style.display='block'; err.textContent='⚠️ Preencha e-mail e senha.'; return; }
   err.style.display='none';
   if(btn){ btn.disabled=true; btn.textContent='Verificando…'; }
-
   const res=await sbBuscarTecnico(email, senha);
-
   if(btn){ btn.disabled=false; btn.textContent='🔐 Entrar no Painel'; }
-
   if(!res.ok){ err.style.display='block'; err.textContent='⚠️ E-mail ou senha inválidos.'; return; }
-
   const u=res.data;
   currentUser={...u,email};
   document.getElementById('tc-nome').textContent=u.nome;
@@ -1412,7 +1658,6 @@ async function doLogin(){
   av.textContent=u.av||u.nome.split(' ').map(n=>n[0]).slice(0,2).join('').toUpperCase();
   av.className='sb-av'+(u.nivel==='master'?' master':'');
   document.getElementById('nav-usuarios').style.display=u.nivel==='master'?'flex':'none';
-  // Mostra badge do campus na sidebar
   const campusBadgeEl=document.getElementById('tc-campus-badge');
   if(campusBadgeEl){
     const campus=u.campus||'todos';
@@ -1428,10 +1673,7 @@ async function doLogin(){
   addLog('d','Login',`${u.nome} acessou o painel`);
   const tb=document.getElementById('access-log-tbody');
   if(tb){
-    // limpa linha vazia padrão
-    if(tb.children.length===1 && tb.children[0].cells[0].textContent==='Nenhum acesso registrado'){
-      tb.innerHTML='';
-    }
+    if(tb.children.length===1&&tb.children[0].cells[0].textContent==='Nenhum acesso registrado') tb.innerHTML='';
     const tr=document.createElement('tr');
     tr.innerHTML=`<td>${u.nome}</td><td style="color:var(--green)">Login</td><td style="color:var(--muted);font-family:'JetBrains Mono',monospace">${_agora()}</td>`;
     tb.prepend(tr);
@@ -1454,20 +1696,18 @@ function navTo(pid,btn){
   if(pid==='pg-usuarios') renderUsers();
   if(pid==='pg-aprov') renderAprovadosHoje();
   if(pid==='pg-emp') renderEmprestimos();
+  if(pid==='pg-equip') carregarEquipamentos(); // ← carrega do banco ao entrar na aba
 }
 
 /* ═══════════════════════════════════════
    RENDER FUNCTIONS
 ═══════════════════════════════════════ */
-function renderAll(){
-  renderDash(); renderSolics(); renderDevs(); renderAprovadosHoje(); renderEmprestimos();
-}
+function renderAll(){ renderDash(); renderSolics(); renderDevs(); renderAprovadosHoje(); renderEmprestimos(); }
 
 function solicCardHTML(s){
   const isAgendado=s.tipo==='agendar';
   const localTxt=s.local?`<span class="sc-local">📍 ${s.local}${s.localDet?' · '+s.localDet:''}</span>`:'';
   const agInfo=isAgendado&&s.agData?`<span style="font-size:.65rem;color:var(--blue);margin-top:.08rem;display:block">🗓️ Para ${s.agData} ${s.agHora?' às '+s.agHora:''}</span>`:'';
-  // Usa data-id para assinatura — sem JSON inline no onclick
   const sigBtn=s.sig
     ?`<button class="sc-sig-btn" data-sig-id="${s.id}" onclick="verAssinaturaPorId(this.dataset.sigId)">✍️ Ver Assinatura</button>`
     :`<span class="sc-no-sig">⚠️ Sem assinatura</span>`;
@@ -1511,9 +1751,8 @@ function aprovCardHTML(s){
       </div>
     </div>
     <div class="sc-tags">${s.equips.map(e=>`<span class="sc-tag">${escHtml(e)}</span>`).join('')}</div>
-    ${!isRetirado?`<div class="sc-acts">
-      <button class="bs blue" onclick="openMarcarEntregue(${s.id})">📦 Marcar como Entregue</button>
-    </div>`:`<div class="sc-acts"><span style="font-size:.68rem;color:var(--muted)">Técnico: ${escHtml(s.tecAprovador||'—')}</span></div>`}
+    ${!isRetirado?`<div class="sc-acts"><button class="bs blue" onclick="openMarcarEntregue(${s.id})">📦 Marcar como Entregue</button></div>`
+      :`<div class="sc-acts"><span style="font-size:.68rem;color:var(--muted)">Técnico: ${escHtml(s.tecAprovador||'—')}</span></div>`}
   </div>`;
 }
 
@@ -1543,27 +1782,16 @@ function devCardHTML(d){
   </div>`;
 }
 
-/* Helper para escapar HTML */
-function escHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-
 function renderDash(){
   const pendentes=solicitacoes.filter(s=>s.status==='pendente'&&_campusOk(s.uni));
   const aprovados=solicitacoes.filter(s=>s.status==='aprovado'&&_campusOk(s.uni));
-  // Devoluções: filtra pelo campus da solicitação original
-  const devsVisiveis=devsPendentes.filter(d=>{
-    const orig=solicitacoes.find(s=>s.proto===d.protoOrig);
-    return orig?_campusOk(orig.uni):_campusOk(d.uni||'');
-  });
-
+  const devsVisiveis=devsPendentes.filter(d=>{ const orig=solicitacoes.find(s=>s.proto===d.protoOrig); return orig?_campusOk(orig.uni):_campusOk(d.uni||''); });
   const sl=document.getElementById('dash-solic-list');
-  if(sl) sl.innerHTML=pendentes.length?pendentes.slice(0,2).map(s=>solicCardHTML(s)).join(''):`<div class="empty"><i>🔕</i><p>Nenhuma pendente${currentUser?.campus&&currentUser.campus!=='todos'?' para '+CAMPUS_LABEL[currentUser.campus]:''}</p></div>`;
-
+  if(sl) sl.innerHTML=pendentes.length?pendentes.slice(0,2).map(s=>solicCardHTML(s)).join(''):`<div class="empty"><i>🔕</i><p>Nenhuma pendente</p></div>`;
   const al=document.getElementById('dash-aprov-list');
   if(al) al.innerHTML=aprovados.length?aprovados.slice(0,2).map(s=>aprovCardHTML(s)).join(''):`<div class="empty"><i>📦</i><p>Sem aprovados aguardando</p></div>`;
-
   const dl=document.getElementById('dash-dev-list');
   if(dl) dl.innerHTML=devsVisiveis.length?devsVisiveis.slice(0,2).map(d=>devCardHTML(d)).join(''):`<div class="empty"><i>✅</i><p>Sem devoluções pendentes</p></div>`;
-
   const sp=document.getElementById('st-pend'); if(sp) sp.textContent=pendentes.length;
   const sa=document.getElementById('st-aprov'); if(sa) sa.textContent=aprovados.length;
   const sd=document.getElementById('st-devs'); if(sd) sd.textContent=devsVisiveis.length;
@@ -1573,16 +1801,12 @@ function renderDash(){
 function renderSolics(){
   const pendentes=solicitacoes.filter(s=>s.status==='pendente'&&_campusOk(s.uni));
   const el=document.getElementById('solics-list');
-  const campusTxt=currentUser?.campus&&currentUser.campus!=='todos'?` · ${CAMPUS_LABEL[currentUser.campus]||currentUser.campus}`:'';
-  if(el) el.innerHTML=pendentes.length?pendentes.map(s=>solicCardHTML(s)).join(''):`<div class="empty"><i>🔕</i><p>Nenhuma solicitação pendente${campusTxt}</p></div>`;
-  const ct=document.getElementById('solic-count'); if(ct) ct.textContent=pendentes.length?`${pendentes.length} solicitação(ões)${campusTxt}`:'';
+  if(el) el.innerHTML=pendentes.length?pendentes.map(s=>solicCardHTML(s)).join(''):`<div class="empty"><i>🔕</i><p>Nenhuma solicitação pendente</p></div>`;
+  const ct=document.getElementById('solic-count'); if(ct) ct.textContent=pendentes.length?`${pendentes.length} solicitação(ões)`:'';
 }
 
 function renderDevs(){
-  const devsVisiveis=devsPendentes.filter(d=>{
-    const orig=solicitacoes.find(s=>s.proto===d.protoOrig);
-    return orig?_campusOk(orig.uni):_campusOk(d.uni||'');
-  });
+  const devsVisiveis=devsPendentes.filter(d=>{ const orig=solicitacoes.find(s=>s.proto===d.protoOrig); return orig?_campusOk(orig.uni):true; });
   const el=document.getElementById('devs-list');
   if(el) el.innerHTML=devsVisiveis.length?devsVisiveis.map(d=>devCardHTML(d)).join(''):`<div class="empty"><i>✅</i><p>Nenhuma devolução pendente</p></div>`;
   const ct=document.getElementById('devs-count'); if(ct) ct.textContent=devsVisiveis.length?`${devsVisiveis.length} pendente(s)`:'';
@@ -1591,11 +1815,9 @@ function renderDevs(){
 function renderAprovadosHoje(){
   const aprovados=solicitacoes.filter(s=>s.status==='aprovado'&&_campusOk(s.uni));
   const retirados=solicitacoes.filter(s=>s.status==='retirado'&&_campusOk(s.uni));
-
   const pendEl=document.getElementById('aprov-pend-list');
   if(pendEl) pendEl.innerHTML=aprovados.length?aprovados.map(s=>aprovCardHTML(s)).join(''):`<div class="empty"><i>⏳</i><p>Nenhum aguardando retirada</p></div>`;
   const pendCt=document.getElementById('aprov-pend-count'); if(pendCt) pendCt.textContent=aprovados.length?`${aprovados.length} aguardando`:'';
-
   const retirEl=document.getElementById('aprov-retir-list');
   if(retirEl) retirEl.innerHTML=retirados.length?retirados.slice(0,5).map(s=>aprovCardHTML(s)).join(''):`<div class="empty"><i>📭</i><p>Nenhum entregue ainda hoje</p></div>`;
   const retirCt=document.getElementById('aprov-retir-count'); if(retirCt) retirCt.textContent=retirados.length?`${retirados.length} entregue(s)`:'';
@@ -1624,8 +1846,7 @@ function renderEmprestimos(){
    ACTIONS
 ═══════════════════════════════════════ */
 async function aprovar(id){
-  const s=solicitacoes.find(x=>x.id===id);
-  if(!s) return;
+  const s=solicitacoes.find(x=>x.id===id); if(!s) return;
   s.status='aprovado'; s.horaAprovacao=_agora(); s.tecAprovador=currentUser?.nome||'Técnico'; s.nova=false;
   await sbAprovar(id, currentUser?.nome||'Técnico');
   renderAll(); updateBadges();
@@ -1635,24 +1856,20 @@ async function aprovar(id){
 }
 
 function recusar(id){
-  const s=solicitacoes.find(x=>x.id===id);
-  if(!s) return;
+  const s=solicitacoes.find(x=>x.id===id); if(!s) return;
   if(!confirm(`Recusar a solicitação de ${s.prof}?\n${s.equips.join(', ')}`)) return;
   solicitacoes=solicitacoes.filter(x=>x.id!==id);
   renderAll(); updateBadges();
   toast('❌','Recusado','Solicitação removida.','r');
   addLog('r','Recusa',`${currentUser?.nome||'Técnico'} recusou ${s.proto} de ${s.prof}`);
-  showBanner('❌',`Solicitação Recusada`,`${s.prof} · ${s.equips.join(', ')}`,'warn');
 }
 
 function recusarDev(id){
-  const d=devsPendentes.find(x=>x.id===id);
-  if(!d) return;
+  const d=devsPendentes.find(x=>x.id===id); if(!d) return;
   if(!confirm(`Recusar devolução de ${d.prof}?`)) return;
   devsPendentes=devsPendentes.filter(x=>x.id!==id);
   renderAll(); updateBadges();
   toast('❌','Devolução recusada','Verifique com o professor.','r');
-  addLog('r','Dev. Recusada',`${currentUser?.nome||'Técnico'} recusou devolução de ${d.prof}`);
 }
 
 function markReadSolics(){ solicitacoes=solicitacoes.map(s=>({...s,nova:false})); updateBadges(); renderSolics(); }
@@ -1661,28 +1878,21 @@ function markReadDevs(){ devsPendentes=devsPendentes.map(d=>({...d,nova:false}))
 function updateBadges(){
   const pendentes=solicitacoes.filter(s=>s.status==='pendente'&&_campusOk(s.uni));
   const aprovados=solicitacoes.filter(s=>s.status==='aprovado'&&_campusOk(s.uni));
-  const devsVisiveis=devsPendentes.filter(d=>{
-    const orig=solicitacoes.find(s=>s.proto===d.protoOrig);
-    return orig?_campusOk(orig.uni):true;
-  });
+  const devsVisiveis=devsPendentes.filter(d=>{ const orig=solicitacoes.find(s=>s.proto===d.protoOrig); return orig?_campusOk(orig.uni):true; });
   const np=pendentes.filter(s=>s.nova).length;
   const nd=devsVisiveis.filter(d=>d.nova).length;
   const na=aprovados.length;
-
   const b=document.getElementById('bdg'); if(b){b.textContent=np;b.style.display=np?'flex':'none';}
   const bd=document.getElementById('bdg-dev'); if(bd){bd.textContent=nd;bd.style.display=nd?'flex':'none';}
   const ba=document.getElementById('bdg-aprov'); if(ba){ba.textContent=na;ba.style.display=na?'flex':'none';}
-
   const sp=document.getElementById('st-pend'); if(sp) sp.textContent=pendentes.length;
   const sa2=document.getElementById('st-aprov'); if(sa2) sa2.textContent=aprovados.length;
   const sd=document.getElementById('st-devs'); if(sd) sd.textContent=devsVisiveis.length;
   const sat=document.getElementById('st-ativos'); if(sat) sat.textContent=solicitacoes.filter(s=>s.status==='retirado'&&_campusOk(s.uni)).length;
 }
 
-/* MARCAR ENTREGUE */
 function openMarcarEntregue(id){
-  const s=solicitacoes.find(x=>x.id===id);
-  if(!s) return;
+  const s=solicitacoes.find(x=>x.id===id); if(!s) return;
   _meId=id;
   document.getElementById('me-proto').textContent=s.proto;
   document.getElementById('me-nome').textContent=s.prof;
@@ -1694,33 +1904,22 @@ function openMarcarEntregue(id){
 
 async function confirmarEntrega(){
   if(!_meId) return;
-  const s=solicitacoes.find(x=>x.id===_meId);
-  if(!s) return;
+  const s=solicitacoes.find(x=>x.id===_meId); if(!s) return;
   s.status='retirado'; s.horaRetirada=_agora();
   await sbMarcarRetirado(_meId);
   closeOv('ov-marcar-entregue');
   renderAll(); updateBadges();
   toast('📦','Entregue!',`${s.prof} retirou ${s.equips.join(', ')}`);
-  addLog('d','Equipamento Entregue',`${s.prof} retirou ${s.equips.join(', ')} · ${s.proto} · ${_agora()}`);
-  showBanner('✅',`Entregue: ${s.prof}`,`${s.equips.join(', ')} retirado`,'aprov');
+  addLog('d','Equipamento Entregue',`${s.prof} retirou ${s.equips.join(', ')} · ${s.proto}`);
 }
 
 function filterEmp(inp){ const q=inp.value.toLowerCase(); document.querySelectorAll('#emp-tbody tr').forEach(tr=>tr.style.display=tr.textContent.toLowerCase().includes(q)?'':'none'); }
 
 /* ═══════════════════════════════════════
-   ASSINATURA MODAL — sem JSON inline
+   ASSINATURA MODAL
 ═══════════════════════════════════════ */
-function verAssinaturaPorId(id){
-  const s=solicitacoes.find(x=>String(x.id)===String(id));
-  if(!s) return;
-  verAssinatura(s.sig, s.proto, s.prof, s.hora);
-}
-
-function verAssinaturaDevPorId(id){
-  const d=devsPendentes.find(x=>String(x.id)===String(id));
-  if(!d) return;
-  verAssinatura(d.sigProf, d.proto, d.prof, d.hora);
-}
+function verAssinaturaPorId(id){ const s=solicitacoes.find(x=>String(x.id)===String(id)); if(!s) return; verAssinatura(s.sig,s.proto,s.prof,s.hora); }
+function verAssinaturaDevPorId(id){ const d=devsPendentes.find(x=>String(x.id)===String(id)); if(!d) return; verAssinatura(d.sigProf,d.proto,d.prof,d.hora); }
 
 function verAssinatura(sigData,proto,nome,hora){
   document.getElementById('sig-modal-proto').textContent=proto||'—';
@@ -1730,8 +1929,7 @@ function verAssinatura(sigData,proto,nome,hora){
   const img=document.getElementById('sig-modal-img');
   const box=document.getElementById('sig-modal-img-box');
   if(sigData&&sigData!=='demo'&&sigData.length>100){
-    img.src=sigData; img.style.display='block'; _sigFullData=sigData;
-    box.style.background='#f8fafc';
+    img.src=sigData; img.style.display='block'; _sigFullData=sigData; box.style.background='#f8fafc';
   } else {
     img.style.display='none'; _sigFullData=null;
     box.innerHTML='<div style="padding:1.5rem;color:#94a3b8;font-size:.78rem;text-align:center;line-height:1.6">📝 Assinatura de demonstração<br><small>Na versão com Supabase, a imagem real aparece aqui</small></div>';
@@ -1740,28 +1938,19 @@ function verAssinatura(sigData,proto,nome,hora){
 }
 
 function verAssinaturaModal(){ const src=document.getElementById('cd-sig-prof-img').src; if(src&&src.length>100) verAssinatura(src,'','',''); }
-
-function expandSig(){
-  if(!_sigFullData) return;
-  const w=window.open('','_blank','width=620,height=420');
-  w.document.write(`<html><body style="margin:0;background:#f8fafc;display:flex;align-items:center;justify-content:center;min-height:100vh"><img src="${_sigFullData}" style="max-width:100%;max-height:100vh;border:1px solid #e2e8f0;border-radius:8px;padding:.5rem;background:#fff"></body></html>`);
-}
+function expandSig(){ if(!_sigFullData) return; const w=window.open('','_blank','width=620,height=420'); w.document.write(`<html><body style="margin:0;background:#f8fafc;display:flex;align-items:center;justify-content:center;min-height:100vh"><img src="${_sigFullData}" style="max-width:100%;max-height:100vh;border:1px solid #e2e8f0;border-radius:8px;padding:.5rem;background:#fff"></body></html>`); }
 
 /* ═══════════════════════════════════════
-   CONFIRMAR DEVOLUÇÃO (TÉCNICO) — sem JSON inline
+   CONFIRMAR DEVOLUÇÃO (TÉCNICO)
 ═══════════════════════════════════════ */
 function openConfirmarDevPorId(id){
-  const d=devsPendentes.find(x=>String(x.id)===String(id));
-  if(!d) return;
-  openConfirmarDev(d.protoOrig||d.proto, d.prof, d.sala, d.sigProf, d.id, d.equips, d.localDev);
+  const d=devsPendentes.find(x=>String(x.id)===String(id)); if(!d) return;
+  openConfirmarDev(d.protoOrig||d.proto,d.prof,d.sala,d.sigProf,d.id,d.equips,d.localDev);
 }
-
 function openConfirmarDevPorProto(proto){
-  const s=solicitacoes.find(x=>x.proto===proto);
-  if(!s) return;
-  openConfirmarDev(s.proto, s.prof, s.sala, s.sig, null, s.equips, s.local||'');
+  const s=solicitacoes.find(x=>x.proto===proto); if(!s) return;
+  openConfirmarDev(s.proto,s.prof,s.sala,s.sig,null,s.equips,s.local||'');
 }
-
 function openConfirmarDev(proto,nome,sala,sigProf,devId,equips,localDev){
   document.getElementById('cd-proto').textContent=proto||'—';
   document.getElementById('cd-nome').textContent=nome||'—';
@@ -1769,9 +1958,7 @@ function openConfirmarDev(proto,nome,sala,sigProf,devId,equips,localDev){
   document.getElementById('cd-local').textContent=localDev||'—';
   document.getElementById('cd-hora-real').textContent=_agora();
   _cdDevId=devId||null; _cdSigProf=sigProf;
-
   document.getElementById('cd-equips').innerHTML=(equips||[]).map(e=>`<span class="dev-tag">${escHtml(e)}</span>`).join('')||'<span style="font-size:.72rem;color:var(--muted)">—</span>';
-
   const imgEl=document.getElementById('cd-sig-prof-img');
   if(sigProf&&sigProf.length>100){
     imgEl.src=sigProf; imgEl.style.display='block';
@@ -1783,7 +1970,6 @@ function openConfirmarDev(proto,nome,sala,sigProf,devId,equips,localDev){
     document.getElementById('cd-sig-prof-box').style.display='block';
     document.getElementById('cd-no-sig-box').style.display='none';
   }
-
   document.getElementById('cd-cond').value='bom';
   document.getElementById('cd-obs').value='';
   tecSig=null; clearSig('sig-t','sig-ht','sig-wt');
@@ -1797,19 +1983,16 @@ async function confirmarDevTec(){
   const nome=document.getElementById('cd-nome').textContent;
   const cond=document.getElementById('cd-cond').value;
   const obs=document.getElementById('cd-obs').value;
-
   if(_cdDevId) await sbConfirmarDevolucao(_cdDevId,{sigTec:tecSig,tecNome:currentUser?.nome||'Técnico',cond,obs});
   if(_cdDevId){ devsPendentes=devsPendentes.filter(x=>x.id!==_cdDevId); }
-
   const s=solicitacoes.find(x=>x.proto===proto);
   if(s) s.status='devolvido_confirmado';
-
   closeOv('ov-confirmar-dev');
   renderAll(); updateBadges();
   const horaReal=_agora();
   toast('✅','Devolução Confirmada!',`${nome} · ${proto} · ${horaReal}`);
   addLog('d','Devolução Confirmada',`${currentUser?.nome||'Técnico'} confirmou ${proto} de ${nome} · ${horaReal} · ${cond}`);
-  showBanner('✅',`Devolução Confirmada`,`${nome} · ${proto}`,'aprov');
+  showBanner('✅','Devolução Confirmada',`${nome} · ${proto}`,'aprov');
 }
 
 /* ═══════════════════════════════════════
@@ -1828,33 +2011,22 @@ function renderLogs(){
 function filterLogs(inp){ const q=inp.value.toLowerCase(); document.querySelectorAll('#log-list .log-entry').forEach(e=>e.style.display=e.textContent.toLowerCase().includes(q)?'':'none'); }
 
 /* ═══════════════════════════════════════
-   USERS — CORRIGIDO: sem JSON inline no onclick
+   USERS
 ═══════════════════════════════════════ */
 async function renderUsers(){
   const el=document.getElementById('users-list'); if(!el) return;
   el.innerHTML='<div style="padding:1rem;color:var(--muted);font-size:.8rem">Carregando…</div>';
   const res=await sbListarTecnicos();
-  if(res.ok&&res.data.length){
-    tecUsers=res.data;
-  } else if(!sbOnline){
-    tecUsers=Object.entries(USERS_LOCAL).map(([email,u])=>({email,nome:u.nome,role:u.role,av:u.av,nivel:u.nivel,campus:u.campus||'aimores'}));
-  }
-
-  if(!tecUsers.length){
-    el.innerHTML='<div class="empty"><i>👥</i><p>Nenhum técnico cadastrado</p></div>';
-    return;
-  }
-
+  if(res.ok&&res.data.length){ tecUsers=res.data; }
+  else if(!sbOnline){ tecUsers=Object.entries(USERS_LOCAL).map(([email,u])=>({email,nome:u.nome,role:u.role,av:u.av,nivel:u.nivel,campus:u.campus||'aimores'})); }
+  if(!tecUsers.length){ el.innerHTML='<div class="empty"><i>👥</i><p>Nenhum técnico cadastrado</p></div>'; return; }
   el.innerHTML=tecUsers.map((u,idx)=>{
-    const camp=u.campus||'aimores';
-    const cor=CAMPUS_COR[camp]||'#526080';
-    return `
-    <div class="user-card">
+    const camp=u.campus||'aimores'; const cor=CAMPUS_COR[camp]||'#526080';
+    return `<div class="user-card">
       <div class="u-av${u.nivel==='master'?' master':''}">${escHtml(u.av||u.nome.split(' ').map(n=>n[0]).slice(0,2).join('').toUpperCase())}</div>
       <div style="flex:1;min-width:0">
         <div class="u-name">${escHtml(u.nome)}</div>
-        <div class="u-info">${escHtml(u.email)} · ${escHtml(u.role||u.nivel)}${u.ultimo_acesso?` · Último acesso: ${new Date(u.ultimo_acesso).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}`:''}
-        </div>
+        <div class="u-info">${escHtml(u.email)} · ${escHtml(u.role||u.nivel)}</div>
         <span style="display:inline-flex;align-items:center;gap:.25rem;margin-top:.28rem;font-size:.6rem;font-weight:700;padding:.12rem .42rem;border-radius:5px;text-transform:uppercase;letter-spacing:.3px;background:${cor}22;color:${cor};border:1px solid ${cor}44">🏫 ${escHtml(CAMPUS_LABEL[camp]||camp)}</span>
       </div>
       <div class="u-actions">
@@ -1865,13 +2037,7 @@ async function renderUsers(){
   }).join('');
 }
 
-/* ★ CORREÇÃO PRINCIPAL: usa índice para buscar o objeto, sem JSON inline ★ */
-function openEditUserByIdx(idx){
-  const u=tecUsers[parseInt(idx)];
-  if(!u){ toast('❌','Erro','Usuário não encontrado.','r'); return; }
-  openEditUser(u);
-}
-
+function openEditUserByIdx(idx){ const u=tecUsers[parseInt(idx)]; if(!u){ toast('❌','Erro','Usuário não encontrado.','r'); return; } openEditUser(u); }
 function openEditUser(u){
   _editUserData=u;
   document.getElementById('eu-email-orig').value=u.email;
@@ -1884,11 +2050,7 @@ function openEditUser(u){
   document.getElementById('ov-edit-user').classList.add('open');
 }
 
-function openNovoUserModal(){
-  ['nu-nome','nu-email','nu-senha'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('nu-role').value='tecnico';
-  document.getElementById('ov-new-user').classList.add('open');
-}
+function openNovoUserModal(){ ['nu-nome','nu-email','nu-senha'].forEach(id=>document.getElementById(id).value=''); document.getElementById('nu-role').value='tecnico'; document.getElementById('ov-new-user').classList.add('open'); }
 
 async function criarUsuario(){
   const nome=document.getElementById('nu-nome').value.trim();
@@ -1908,8 +2070,7 @@ async function criarUsuario(){
   if(btn){ btn.disabled=false; btn.textContent='✓ Criar'; }
   if(!res.ok&&sbOnline){ toast('❌','Erro ao criar','E-mail já cadastrado ou erro de conexão.','r'); return; }
   USERS_LOCAL[email.toLowerCase()]={senha,nome,role:roleLabel,av,nivel:nivelLabel,email:email.toLowerCase(),campus:campusVal};
-  closeOv('ov-new-user');
-  await renderUsers();
+  closeOv('ov-new-user'); await renderUsers();
   toast('✅','Técnico Criado!',`${nome} já pode fazer login.`);
   addLog('m','Usuário Criado',`Master criou: ${nome} (${email})`);
 }
@@ -1920,60 +2081,33 @@ async function deleteUser(email){
   const u=tecUsers.find(x=>x.email.toLowerCase()===email.toLowerCase());
   const nome=u?u.nome:email;
   if(!confirm(`Remover ${nome} (${email})?\nO técnico perderá acesso imediatamente.`)) return;
-  const res=await sbDeletarTecnico(email);
+  await sbDeletarTecnico(email);
   delete USERS_LOCAL[email.toLowerCase()];
   await renderUsers();
   toast('🗑️','Removido',`${nome} removido.`,'r');
   addLog('r','Usuário Removido',`Master removeu: ${email}`);
-  showBanner('🗑️',`Usuário Removido`,`${nome} foi removido do sistema`,'warn');
 }
 
-function openNovoEquipModal(){ document.getElementById('ov-new-equip').classList.add('open'); }
-function salvarEquipamento(){
-  const pat=document.getElementById('ne-pat').value.trim();
-  const nome=document.getElementById('ne-nome').value.trim();
-  if(!pat||!nome){ toast('⚠️','Campos obrigatórios','Preencha tudo.','w'); return; }
-  closeOv('ov-new-equip');
-  toast('✅','Cadastrado!','Equipamento adicionado ao inventário.');
-  addLog('m','Equipamento Cadastrado',`${pat} — ${nome}`);
-}
-
-/* ═══════════════════════════════════════
-   SALVAR EDIÇÃO USUÁRIO — CORRIGIDO
-═══════════════════════════════════════ */
 async function salvarEdicaoUser(){
   const emailOrig=document.getElementById('eu-email-orig').value;
   const nome=document.getElementById('eu-nome').value.trim();
   const roleVal=document.getElementById('eu-role').value;
   const senha=document.getElementById('eu-senha').value;
   const senha2=document.getElementById('eu-senha2').value;
-
   if(!nome){ toast('⚠️','Nome obrigatório','Informe o nome do técnico.','w'); return; }
   if(senha&&senha.length<6){ toast('⚠️','Senha fraca','Mínimo 6 caracteres.','w'); return; }
   if(senha&&senha!==senha2){ toast('⚠️','Senhas diferentes','A confirmação não confere.','w'); return; }
-
   const roleLabel=roleVal==='master'?'Master':roleVal==='senior'?'Técnico Sênior':'Técnico TI';
   const av=nome.split(' ').map(n=>n[0]).slice(0,2).join('').toUpperCase();
   const campusVal=document.getElementById('eu-campus').value||'aimores';
   const dados={nome,nivel:roleVal,role:roleLabel,av,campus:campusVal};
   if(senha) dados.senha=senha;
-
-  const btn=document.getElementById('eu-save-btn');
-  btn.disabled=true; btn.textContent='Salvando…';
-
+  const btn=document.getElementById('eu-save-btn'); btn.disabled=true; btn.textContent='Salvando…';
   const res=await sbEditarTecnico(emailOrig,dados);
   btn.disabled=false; btn.textContent='💾 Salvar Alterações';
-
   if(!res.ok&&sbOnline){ toast('❌','Erro ao salvar','Tente novamente.','r'); return; }
-
-  // Atualiza fallback local
   const emailKey=emailOrig.toLowerCase();
-  if(USERS_LOCAL[emailKey]){
-    USERS_LOCAL[emailKey]={...USERS_LOCAL[emailKey],...dados};
-    if(dados.senha) USERS_LOCAL[emailKey].senha=dados.senha;
-  }
-
-  // Se editou o próprio usuário logado
+  if(USERS_LOCAL[emailKey]){ USERS_LOCAL[emailKey]={...USERS_LOCAL[emailKey],...dados}; if(dados.senha) USERS_LOCAL[emailKey].senha=dados.senha; }
   if(currentUser&&currentUser.email.toLowerCase()===emailKey){
     currentUser={...currentUser,...dados};
     document.getElementById('tc-nome').textContent=nome;
@@ -1981,22 +2115,57 @@ async function salvarEdicaoUser(){
     const av2=document.getElementById('tc-av');
     if(av2){ av2.textContent=av; av2.className='sb-av'+(roleVal==='master'?' master':''); }
     document.getElementById('nav-usuarios').style.display=roleVal==='master'?'flex':'none';
-    // Atualiza badge de campus
-    const campusBadgeEl=document.getElementById('tc-campus-badge');
-    if(campusBadgeEl){
-      const cor=CAMPUS_COR[campusVal]||'#526080';
-      campusBadgeEl.textContent=CAMPUS_LABEL[campusVal]||campusVal;
-      campusBadgeEl.style.background=`${cor}22`;
-      campusBadgeEl.style.color=cor;
-      campusBadgeEl.style.border=`1px solid ${cor}44`;
-    }
+  }
+  closeOv('ov-edit-user'); await renderUsers();
+  toast('✅','Alterado!',`${nome} atualizado com sucesso.`);
+  addLog('m','Técnico Editado',`Master editou: ${nome} (${emailOrig})`);
+}
+
+/* ═══════════════════════════════════════
+   EQUIPAMENTO — CADASTRAR (SALVA NO BANCO)
+═══════════════════════════════════════ */
+function openNovoEquipModal(){
+  ['ne-pat','ne-nome'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('ne-cat').value='Chromebook';
+  document.getElementById('ne-uni').value='aimores';
+  document.getElementById('ne-cond').value='bom';
+  document.getElementById('ne-status').value='disponivel';
+  document.getElementById('ov-new-equip').classList.add('open');
+}
+
+async function salvarEquipamento(){
+  const pat=document.getElementById('ne-pat').value.trim();
+  const nome=document.getElementById('ne-nome').value.trim();
+  const cat=document.getElementById('ne-cat').value;
+  const uni=document.getElementById('ne-uni').value;
+  const cond=document.getElementById('ne-cond').value;
+  const status=document.getElementById('ne-status').value;
+
+  if(!pat||!nome){ toast('⚠️','Campos obrigatórios','Preencha patrimônio e nome.','w'); return; }
+
+  if(!sbOnline){ toast('⚠️','Supabase offline','Não é possível cadastrar sem conexão.','w'); return; }
+
+  const btn=document.getElementById('ne-save-btn');
+  btn.disabled=true; btn.textContent='Salvando…';
+
+  const res=await sbInserirEquipamento({patrimonio:pat,nome,categoria:cat,unidade:uni,condicao:cond,status});
+
+  btn.disabled=false; btn.textContent='✓ Cadastrar';
+
+  if(!res.ok){
+    toast('❌','Erro ao cadastrar','Verifique se o patrimônio já existe ou há erro de conexão.','r');
+    return;
   }
 
-  closeOv('ov-edit-user');
-  await renderUsers();
-  toast('✅','Alterado!',`${nome} atualizado com sucesso.`);
-  addLog('m','Técnico Editado',`Master editou: ${nome} (${emailOrig})${senha?' — senha alterada':''}`);
-  showBanner('✏️',`Técnico Editado`,`${nome} foi atualizado`,'aprov');
+  closeOv('ov-new-equip');
+
+  // Recarrega inventário e grid do formulário
+  await carregarEquipamentos();
+  await carregarEquipamentosForm();
+
+  toast('✅','Equipamento Cadastrado!',`${pat} — ${nome} adicionado ao inventário.`);
+  addLog('m','Equipamento Cadastrado',`${pat} — ${nome} · ${cat} · ${CAMPUS_LABEL[uni]||uni}`);
+  showBanner('💻','Novo Equipamento',`${nome} (${pat}) adicionado ao inventário`,'aprov');
 }
 
 /* ═══════════════════════════════════════
@@ -2008,9 +2177,7 @@ function closeOv(id){ document.getElementById(id).classList.remove('open'); }
    BANNERS & TOASTS
 ═══════════════════════════════════════ */
 function showBanner(ico,titulo,detalhe,tipo){
-  // Remove banners existentes para não acumular
   document.querySelectorAll('.notif-banner').forEach(b=>b.remove());
-
   const b=document.createElement('div');
   const cls={new:'',dev:' dev',aprov:' aprov',warn:' warn'}[tipo]||'';
   b.className=`notif-banner${cls}`;
@@ -2031,49 +2198,23 @@ function toast(icon,title,msg='',type=''){
    SIGNATURE ENGINE
 ═══════════════════════════════════════ */
 const _sigState={};
-
 function initSig(cid,hid,wid,cb){
   const old=document.getElementById(cid); if(!old) return;
-  const fresh=old.cloneNode(false);
-  old.parentNode.replaceChild(fresh,old);
+  const fresh=old.cloneNode(false); old.parentNode.replaceChild(fresh,old);
   const c=document.getElementById(cid);
   const ctx=c.getContext('2d');
   ctx.fillStyle='#fff'; ctx.fillRect(0,0,c.width,c.height);
   ctx.strokeStyle='#0f172a'; ctx.lineWidth=3.5; ctx.lineCap='round'; ctx.lineJoin='round';
   _sigState[cid]={drawing:false,hasSig:false,lastX:0,lastY:0};
-
-  function getPos(e){
-    const rect=c.getBoundingClientRect();
-    const sx=c.width/rect.width, sy=c.height/rect.height;
-    const src=(e.touches&&e.touches.length>0)?e.touches[0]:(e.changedTouches&&e.changedTouches.length>0)?e.changedTouches[0]:e;
-    return{x:(src.clientX-rect.left)*sx,y:(src.clientY-rect.top)*sy};
-  }
+  function getPos(e){ const rect=c.getBoundingClientRect(); const sx=c.width/rect.width,sy=c.height/rect.height; const src=(e.touches&&e.touches.length>0)?e.touches[0]:(e.changedTouches&&e.changedTouches.length>0)?e.changedTouches[0]:e; return{x:(src.clientX-rect.left)*sx,y:(src.clientY-rect.top)*sy}; }
   function onStart(e){e.preventDefault();e.stopPropagation();const st=_sigState[cid];st.drawing=true;const p=getPos(e);st.lastX=p.x;st.lastY=p.y;ctx.beginPath();ctx.moveTo(p.x,p.y);}
-  function onMove(e){
-    e.preventDefault();e.stopPropagation();const st=_sigState[cid];if(!st.drawing)return;
-    const p=getPos(e);const mx=(st.lastX+p.x)/2,my=(st.lastY+p.y)/2;
-    ctx.quadraticCurveTo(st.lastX,st.lastY,mx,my);ctx.stroke();ctx.beginPath();ctx.moveTo(mx,my);
-    st.lastX=p.x;st.lastY=p.y;
-    if(!st.hasSig){st.hasSig=true;const h=document.getElementById(hid);if(h)h.style.display='none';const w=document.getElementById(wid);if(w)w.classList.add('has');}
-    if(cb)cb(c.toDataURL('image/png'));
-  }
+  function onMove(e){e.preventDefault();e.stopPropagation();const st=_sigState[cid];if(!st.drawing)return;const p=getPos(e);const mx=(st.lastX+p.x)/2,my=(st.lastY+p.y)/2;ctx.quadraticCurveTo(st.lastX,st.lastY,mx,my);ctx.stroke();ctx.beginPath();ctx.moveTo(mx,my);st.lastX=p.x;st.lastY=p.y;if(!st.hasSig){st.hasSig=true;const h=document.getElementById(hid);if(h)h.style.display='none';const w=document.getElementById(wid);if(w)w.classList.add('has');}if(cb)cb(c.toDataURL('image/png'));}
   function onEnd(e){e.preventDefault();e.stopPropagation();const st=_sigState[cid];if(!st.drawing)return;st.drawing=false;ctx.beginPath();if(cb)cb(c.toDataURL('image/png'));}
-
-  c.addEventListener('mousedown',onStart,false);c.addEventListener('mousemove',onMove,false);
-  c.addEventListener('mouseup',onEnd,false);c.addEventListener('mouseleave',onEnd,false);
-  c.addEventListener('touchstart',onStart,{passive:false});c.addEventListener('touchmove',onMove,{passive:false});
-  c.addEventListener('touchend',onEnd,{passive:false});c.addEventListener('touchcancel',onEnd,{passive:false});
+  c.addEventListener('mousedown',onStart,false);c.addEventListener('mousemove',onMove,false);c.addEventListener('mouseup',onEnd,false);c.addEventListener('mouseleave',onEnd,false);
+  c.addEventListener('touchstart',onStart,{passive:false});c.addEventListener('touchmove',onMove,{passive:false});c.addEventListener('touchend',onEnd,{passive:false});c.addEventListener('touchcancel',onEnd,{passive:false});
   c.style.touchAction='none';c.style.userSelect='none';c.style.webkitUserSelect='none';
 }
-
-function clearSig(cid,hid,wid){
-  const c=document.getElementById(cid); if(!c)return;
-  const ctx=c.getContext('2d');
-  ctx.fillStyle='#fff';ctx.fillRect(0,0,c.width,c.height);
-  const h=document.getElementById(hid);if(h)h.style.display='flex';
-  const w=document.getElementById(wid);if(w)w.classList.remove('has');
-  const st=_sigState[cid];if(st)st.hasSig=false;
-}
+function clearSig(cid,hid,wid){ const c=document.getElementById(cid); if(!c)return; const ctx=c.getContext('2d'); ctx.fillStyle='#fff';ctx.fillRect(0,0,c.width,c.height); const h=document.getElementById(hid);if(h)h.style.display='flex'; const w=document.getElementById(wid);if(w)w.classList.remove('has'); const st=_sigState[cid];if(st)st.hasSig=false; }
 
 /* ═══════════════════════════════════════
    INIT
@@ -2083,153 +2224,48 @@ document.addEventListener('DOMContentLoaded',()=>{
   checkURLParams();
 });
 </script>
-  
-<!--  
--- ═══════════════════════════════════════════
---  TechLocker UNA — Schema SQL Completo v12
--- ═══════════════════════════════════════════
 
--- ═══════════════════════════════════════════
---  TABELA: tecnicos
--- ═══════════════════════════════════════════
-CREATE TABLE IF NOT EXISTS tecnicos (
-  id            BIGSERIAL PRIMARY KEY,
-  email         TEXT UNIQUE NOT NULL,
-  senha         TEXT NOT NULL,
-  nome          TEXT NOT NULL,
-  nivel         TEXT DEFAULT 'tecnico',
-  role          TEXT DEFAULT 'Técnico TI',
-  av            TEXT,
-  ativo         BOOLEAN DEFAULT true,
-  criado_em     TIMESTAMPTZ DEFAULT NOW(),
-  ultimo_acesso TIMESTAMPTZ
+<!--
+═══════════════════════════════════════════
+  SCHEMA SQL — TABELA EQUIPAMENTOS (NOVA)
+  Execute no Supabase SQL Editor:
+═══════════════════════════════════════════
+
+CREATE TABLE IF NOT EXISTS equipamentos (
+  id           BIGSERIAL PRIMARY KEY,
+  patrimonio   TEXT UNIQUE NOT NULL,
+  nome         TEXT NOT NULL,
+  categoria    TEXT NOT NULL,
+  unidade      TEXT DEFAULT 'aimores',
+  condicao     TEXT DEFAULT 'bom',
+  status       TEXT DEFAULT 'disponivel',
+  criado_em    TIMESTAMPTZ DEFAULT NOW(),
+  atualizado_em TIMESTAMPTZ
 );
 
-ALTER TABLE tecnicos
-  ADD COLUMN IF NOT EXISTS campus TEXT DEFAULT 'aimores';
-
-INSERT INTO tecnicos (email, senha, nome, nivel, role, av, campus) VALUES
-  ('tecnico@una.edu.br', '1234',      'Bruno Técnico', 'tecnico', 'Técnico TI', 'BT', 'aimores'),
-  ('admin@una.edu.br',   'admin',     'Admin TI',      'tecnico', 'Técnico TI', 'AD', 'liberdade'),
-  ('master@una.edu.br',  'master123', 'Admin Master',  'master',  'Master',     'MA', 'todos')
-ON CONFLICT (email) DO NOTHING;
-
-ALTER TABLE tecnicos ENABLE ROW LEVEL SECURITY;
+ALTER TABLE equipamentos ENABLE ROW LEVEL SECURITY;
 
 DO $$ BEGIN
   IF NOT EXISTS (
     SELECT 1 FROM pg_policies
-    WHERE tablename = 'tecnicos' AND policyname = 'allow_all_tecnicos'
+    WHERE tablename = 'equipamentos' AND policyname = 'allow_all_equipamentos'
   ) THEN
-    CREATE POLICY "allow_all_tecnicos" ON tecnicos FOR ALL USING (true) WITH CHECK (true);
+    CREATE POLICY "allow_all_equipamentos" ON equipamentos FOR ALL USING (true) WITH CHECK (true);
   END IF;
 END $$;
 
 DO $$ BEGIN
   IF NOT EXISTS (
     SELECT 1 FROM pg_publication_tables
-    WHERE pubname = 'supabase_realtime' AND tablename = 'tecnicos'
+    WHERE pubname = 'supabase_realtime' AND tablename = 'equipamentos'
   ) THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE tecnicos;
+    ALTER PUBLICATION supabase_realtime ADD TABLE equipamentos;
   END IF;
 END $$;
 
--- ═══════════════════════════════════════════
---  TABELA: solicitacoes
--- ═══════════════════════════════════════════
-CREATE TABLE IF NOT EXISTS solicitacoes (
-  id                BIGSERIAL PRIMARY KEY,
-  protocolo         TEXT UNIQUE NOT NULL,
-  professor         TEXT NOT NULL,
-  sala              TEXT NOT NULL,
-  unidade           TEXT,
-  equipamentos      JSONB DEFAULT '[]',
-  observacao        TEXT,
-  tipo              TEXT DEFAULT 'agora',
-  ag_data           DATE,
-  ag_hora           TIME,
-  assinatura_prof   TEXT,
-  local_devolucao   TEXT,
-  local_detalhe     TEXT,
-  data_solicitacao  TIMESTAMPTZ DEFAULT NOW(),
-  status            TEXT DEFAULT 'pendente',
-  tecnico_aprovador TEXT,
-  data_aprovacao    TIMESTAMPTZ,
-  hora_aprovacao    TEXT,
-  data_retirada     TIMESTAMPTZ,
-  hora_retirada     TEXT
-);
-
-ALTER TABLE solicitacoes ENABLE ROW LEVEL SECURITY;
-
-DO $$ BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_policies
-    WHERE tablename = 'solicitacoes' AND policyname = 'allow_all_solicitacoes'
-  ) THEN
-    CREATE POLICY "allow_all_solicitacoes" ON solicitacoes FOR ALL USING (true) WITH CHECK (true);
-  END IF;
-END $$;
-
-DO $$ BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_publication_tables
-    WHERE pubname = 'supabase_realtime' AND tablename = 'solicitacoes'
-  ) THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE solicitacoes;
-  END IF;
-END $$;
-
-CREATE INDEX IF NOT EXISTS idx_solic_status ON solicitacoes(status);
-CREATE INDEX IF NOT EXISTS idx_solic_proto  ON solicitacoes(protocolo);
-
--- ═══════════════════════════════════════════
---  TABELA: devolucoes
--- ═══════════════════════════════════════════
-CREATE TABLE IF NOT EXISTS devolucoes (
-  id                  BIGSERIAL PRIMARY KEY,
-  protocolo           TEXT UNIQUE NOT NULL,
-  protocolo_original  TEXT,
-  professor           TEXT NOT NULL,
-  sala                TEXT,
-  equipamentos        JSONB DEFAULT '[]',
-  assinatura_prof     TEXT,
-  local_devolucao     TEXT NOT NULL,
-  local_detalhe       TEXT,
-  condicao            TEXT DEFAULT 'bom',
-  observacao          TEXT,
-  data_devolucao      TIMESTAMPTZ DEFAULT NOW(),
-  status              TEXT DEFAULT 'aguardando_tecnico',
-  assinatura_tec      TEXT,
-  tecnico_nome        TEXT,
-  condicao_retorno    TEXT,
-  observacao_tec      TEXT,
-  data_confirmacao    TIMESTAMPTZ,
-  hora_confirmacao    TEXT
-);
-
-ALTER TABLE devolucoes ENABLE ROW LEVEL SECURITY;
-
-DO $$ BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_policies
-    WHERE tablename = 'devolucoes' AND policyname = 'allow_all_devolucoes'
-  ) THEN
-    CREATE POLICY "allow_all_devolucoes" ON devolucoes FOR ALL USING (true) WITH CHECK (true);
-  END IF;
-END $$;
-
-DO $$ BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_publication_tables
-    WHERE pubname = 'supabase_realtime' AND tablename = 'devolucoes'
-  ) THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE devolucoes;
-  END IF;
-END $$;
-
-CREATE INDEX IF NOT EXISTS idx_dev_proto  ON devolucoes(protocolo_original);
-CREATE INDEX IF NOT EXISTS idx_dev_status ON devolucoes(status);
+CREATE INDEX IF NOT EXISTS idx_equip_status    ON equipamentos(status);
+CREATE INDEX IF NOT EXISTS idx_equip_categoria ON equipamentos(categoria);
+CREATE INDEX IF NOT EXISTS idx_equip_unidade   ON equipamentos(unidade);
 -->
 </body>
 </html>
