@@ -1,0 +1,2024 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>TechLocker UNA</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
+<style>
+/* ══════════════════════════════════════════
+   TOKENS & RESET
+══════════════════════════════════════════ */
+:root{
+  --bg:#040810;--surf:#080d1c;--card:#0c1225;--card2:#10172e;
+  --bdr:#182040;--bdr2:#1e2a50;--bdr3:#253060;
+
+  --blue:#4f8ef7;--blue2:#2563eb;--blueg:rgba(79,142,247,.12);--bluebg:rgba(79,142,247,.05);
+  --green:#00d97e;--green2:#00b866;--greeng:rgba(0,217,126,.12);--greenbg:rgba(0,217,126,.05);
+  --amber:#ffb547;--amber2:#f59e0b;--amberg:rgba(255,181,71,.12);--amberbg:rgba(255,181,71,.05);
+  --red:#ff4d6d;--red2:#e11d48;--redg:rgba(255,77,109,.12);--redbg:rgba(255,77,109,.05);
+  --purple:#9b72f7;--purpleg:rgba(155,114,247,.12);
+
+  --text:#ecf0fb;--text2:#b8c6e0;--muted:#526080;--muted2:#384060;
+
+  --r:14px;--rs:10px;--rl:20px;--rxl:26px;
+  --sh:0 4px 28px rgba(0,0,0,.45);--shl:0 16px 60px rgba(0,0,0,.55);
+  --gblue:0 0 40px rgba(79,142,247,.18);--ggreen:0 0 40px rgba(0,217,126,.18);
+  --gamber:0 0 40px rgba(255,181,71,.14);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow-x:hidden}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;line-height:1.5}
+h1,h2,h3,h4{font-family:'Syne',sans-serif;line-height:1.15}
+code,.mono{font-family:'JetBrains Mono',monospace}
+.screen{display:none;min-height:100dvh;flex-direction:column}
+.screen.active{display:flex}
+
+/* ══════════════════════════════════════════
+   BG EFFECTS
+══════════════════════════════════════════ */
+.bg-fx{
+  position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse 60% 50% at 15% 10%,rgba(79,142,247,.07) 0%,transparent 60%),
+    radial-gradient(ellipse 50% 40% at 85% 80%,rgba(0,217,126,.05) 0%,transparent 55%),
+    radial-gradient(ellipse 80% 40% at 50% 50%,rgba(155,114,247,.03) 0%,transparent 70%);
+}
+.grid-bg{
+  position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.035;
+  background-image:linear-gradient(rgba(255,255,255,.5) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.5) 1px,transparent 1px);
+  background-size:44px 44px;
+}
+
+/* ══════════════════════════════════════════
+   HOME
+══════════════════════════════════════════ */
+#s-home{align-items:center;justify-content:center;padding:clamp(1.5rem,5vw,3rem);gap:clamp(1.5rem,4vh,2.5rem);position:relative}
+.home-logo{text-align:center;position:relative;z-index:1}
+.home-mark{
+  width:clamp(68px,15vw,84px);height:clamp(68px,15vw,84px);
+  background:linear-gradient(135deg,rgba(79,142,247,.18),rgba(0,217,126,.1));
+  border:1px solid rgba(79,142,247,.28);border-radius:24px;
+  display:inline-flex;align-items:center;justify-content:center;
+  font-size:clamp(1.5rem,5vw,2rem);margin-bottom:1rem;
+  box-shadow:var(--gblue),inset 0 1px 0 rgba(255,255,255,.06);
+  position:relative;
+}
+.home-mark::after{content:'';position:absolute;inset:-1px;border-radius:25px;background:linear-gradient(135deg,rgba(79,142,247,.3),rgba(0,217,126,.15),transparent);z-index:-1;opacity:0;transition:.3s}
+.home-mark:hover::after{opacity:1}
+.home-wordmark{font-family:'Syne',sans-serif;font-size:clamp(2rem,7vw,2.8rem);font-weight:800;letter-spacing:-2.5px;line-height:1;color:#fff}
+.home-wordmark em{color:var(--blue);font-style:normal}
+.home-sub{font-size:clamp(.58rem,1.8vw,.68rem);letter-spacing:3.5px;text-transform:uppercase;color:var(--muted);margin-top:.55rem;font-weight:500}
+.home-btns{display:flex;flex-direction:column;gap:.82rem;width:100%;max-width:400px;position:relative;z-index:1}
+.hbtn{
+  width:100%;padding:clamp(1rem,3vw,1.2rem) clamp(1.1rem,3vw,1.4rem);
+  border-radius:var(--rl);display:flex;align-items:center;gap:1rem;
+  cursor:pointer;transition:all .22s;text-align:left;user-select:none;
+  border:1px solid transparent;position:relative;overflow:hidden;
+}
+.hbtn::before{content:'';position:absolute;inset:0;opacity:0;transition:.22s;background:rgba(255,255,255,.03)}
+.hbtn:hover::before{opacity:1}
+.hbtn:active{transform:scale(.97)}
+.hbtn-green{background:linear-gradient(135deg,rgba(0,217,126,.1),rgba(0,217,126,.04));border-color:rgba(0,217,126,.25)}
+.hbtn-green:hover{border-color:rgba(0,217,126,.5);box-shadow:0 8px 32px rgba(0,217,126,.12);transform:translateY(-2px)}
+.hbtn-amber{background:linear-gradient(135deg,rgba(255,181,71,.1),rgba(255,181,71,.04));border-color:rgba(255,181,71,.25)}
+.hbtn-amber:hover{border-color:rgba(255,181,71,.5);box-shadow:0 8px 32px rgba(255,181,71,.1);transform:translateY(-2px)}
+.hbtn-blue{background:rgba(255,255,255,.025);border-color:var(--bdr2)}
+.hbtn-blue:hover{border-color:rgba(79,142,247,.4);box-shadow:0 8px 32px rgba(79,142,247,.08);transform:translateY(-2px)}
+.hbtn-icon{
+  width:clamp(44px,10vw,52px);height:clamp(44px,10vw,52px);flex-shrink:0;
+  border-radius:var(--r);display:flex;align-items:center;justify-content:center;font-size:clamp(1.1rem,3.5vw,1.35rem);
+}
+.hbtn-ig{background:rgba(0,217,126,.12);border:1px solid rgba(0,217,126,.22)}
+.hbtn-ia{background:rgba(255,181,71,.1);border:1px solid rgba(255,181,71,.2)}
+.hbtn-ib{background:rgba(79,142,247,.1);border:1px solid rgba(79,142,247,.18)}
+.hbtn-txt h3{font-family:'Syne',sans-serif;font-size:clamp(.9rem,2.8vw,1.05rem);font-weight:700;color:#fff;margin-bottom:.1rem}
+.hbtn-txt p{font-size:clamp(.62rem,1.8vw,.72rem);color:var(--muted);line-height:1.35}
+.home-note{font-size:clamp(.6rem,1.7vw,.68rem);color:var(--muted);text-align:center;max-width:300px;line-height:1.7;padding:.62rem 1rem;background:rgba(255,255,255,.018);border:1px solid var(--bdr);border-radius:var(--r);position:relative;z-index:1}
+
+/* ══════════════════════════════════════════
+   FORM WRAPPER (shared professor screens)
+══════════════════════════════════════════ */
+#s-prof,#s-dev-prof{align-items:center;padding:clamp(.9rem,3vw,1.5rem);padding-bottom:max(2rem,env(safe-area-inset-bottom));position:relative}
+.pf-wrap{width:100%;max-width:560px;display:flex;flex-direction:column;gap:.82rem;padding-bottom:1rem;position:relative;z-index:1}
+
+/* TOP BAR */
+.pf-topbar{display:flex;align-items:center;gap:.82rem;padding:.72rem 1rem;background:rgba(255,255,255,.028);border:1px solid var(--bdr);border-radius:var(--rl);backdrop-filter:blur(12px)}
+.btn-back{width:36px;height:36px;flex-shrink:0;background:rgba(255,255,255,.05);border:1px solid var(--bdr2);border-radius:var(--rs);color:var(--text2);font-size:1rem;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.15s}
+.btn-back:hover{background:rgba(79,142,247,.1);border-color:rgba(79,142,247,.3)}
+.tb-title{font-family:'Syne',sans-serif;font-weight:700;font-size:clamp(.88rem,2.7vw,1.05rem);color:#fff}
+.tb-sub{font-size:clamp(.58rem,1.7vw,.68rem);color:var(--muted);margin-top:.06rem}
+
+/* FLOW STEPS */
+.flow-steps{display:flex;gap:.4rem;overflow-x:auto;padding-bottom:.2rem}
+.flow-step{display:flex;align-items:center;gap:.35rem;flex-shrink:0}
+.flow-num{width:22px;height:22px;border-radius:50%;font-size:.6rem;font-weight:700;display:flex;align-items:center;justify-content:center}
+.flow-num.done{background:var(--green);color:#000}
+.flow-num.cur{background:var(--blue);color:#fff;box-shadow:0 0 12px rgba(79,142,247,.4)}
+.flow-num.nxt{background:var(--bdr2);color:var(--muted)}
+.flow-lbl{font-size:clamp(.6rem,1.7vw,.68rem);color:var(--muted);white-space:nowrap}
+.flow-lbl.cur{color:var(--text2);font-weight:600}
+.flow-arr{color:var(--bdr2);font-size:.75rem}
+
+/* CARDS */
+.fcard{
+  background:var(--card);border:1px solid var(--bdr);border-radius:var(--rl);
+  padding:clamp(.88rem,2.7vw,1.2rem);position:relative;overflow:hidden;
+}
+.fcard::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.06),transparent)}
+.fc-title{font-family:'Syne',sans-serif;font-size:.62rem;text-transform:uppercase;letter-spacing:2.5px;color:var(--blue);margin-bottom:.85rem;display:flex;align-items:center;gap:.45rem;padding-bottom:.65rem;border-bottom:1px solid var(--bdr)}
+.fc-title.warn{color:var(--amber)}
+.fc-title.green{color:var(--green)}
+
+/* FIELDS */
+.field{display:flex;flex-direction:column;gap:.28rem;margin-bottom:.75rem}
+.field:last-child{margin-bottom:0}
+.field label{font-size:clamp(.64rem,1.9vw,.72rem);color:var(--muted);font-weight:600;letter-spacing:.3px}
+.req{color:var(--red)}
+.opt-tag{font-size:.58rem;background:rgba(82,96,128,.15);color:var(--muted);padding:.08rem .32rem;border-radius:4px;margin-left:.3rem;letter-spacing:.5px}
+.field input,.field select,.field textarea{
+  background:var(--surf);border:1.5px solid var(--bdr2);border-radius:var(--r);
+  padding:clamp(.62rem,2vw,.8rem) clamp(.78rem,2.3vw,.96rem);
+  color:var(--text);font-family:'Outfit',sans-serif;font-size:clamp(.83rem,2.5vw,.92rem);
+  outline:none;width:100%;transition:.18s;-webkit-appearance:none;appearance:none;
+}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(79,142,247,.12)}
+.field input::placeholder{color:var(--muted2)}
+.field textarea{resize:vertical;min-height:68px;line-height:1.55}
+.field select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23526080' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:2.4rem;cursor:pointer}
+.field select option{background:var(--card)}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:.7rem}
+@media(max-width:360px){.frow{grid-template-columns:1fr}}
+
+/* EQUIPMENT GRID */
+.eq-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(108px,42%),1fr));gap:.52rem}
+.eq-item{background:var(--surf);border:2px solid var(--bdr2);border-radius:var(--r);padding:clamp(.6rem,2vw,.82rem);cursor:pointer;transition:all .18s;user-select:none;position:relative;text-align:center}
+.eq-item:hover:not(.zerado){border-color:rgba(79,142,247,.3);transform:translateY(-1px)}
+.eq-item:active{transform:scale(.93)}
+.eq-item.sel{border-color:var(--green);background:rgba(0,217,126,.06);box-shadow:0 0 0 3px rgba(0,217,126,.06),0 4px 16px rgba(0,217,126,.08)}
+.eq-item.sel::after{content:'✓';position:absolute;top:5px;right:7px;font-size:.55rem;font-weight:700;color:var(--green);background:rgba(0,217,126,.12);border-radius:50%;width:14px;height:14px;display:flex;align-items:center;justify-content:center}
+.eq-item.zerado{opacity:.35;cursor:not-allowed;pointer-events:none}
+.eq-icon{font-size:clamp(1.1rem,3.5vw,1.35rem);margin-bottom:.3rem;display:block}
+.eq-name{font-size:clamp(.65rem,2vw,.74rem);font-weight:600;line-height:1.2;color:var(--text2)}
+.eq-avail{font-size:clamp(.54rem,1.5vw,.62rem);margin-top:.15rem;font-weight:700;letter-spacing:.2px}
+.eq-avail.ok{color:var(--green)}.eq-avail.low{color:var(--amber)}.eq-avail.zero{color:var(--red)}
+.qty-row{display:flex;align-items:center;gap:.75rem;margin-top:.55rem;padding:.6rem .82rem;background:rgba(0,217,126,.04);border:1px solid rgba(0,217,126,.14);border-radius:var(--rs)}
+.qty-lbl{font-size:clamp(.68rem,2vw,.76rem);color:var(--muted);flex:1}
+.qty-ctrl{display:flex;align-items:center;gap:.5rem}
+.qty-btn{width:30px;height:30px;background:var(--surf);border:1px solid var(--bdr2);border-radius:8px;color:var(--text);font-size:1.1rem;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.14s;user-select:none}
+.qty-btn:hover{border-color:var(--blue);color:var(--blue)}
+.qty-v{font-weight:700;min-width:22px;text-align:center;font-size:.92rem;color:#fff}
+
+/* TIPO */
+.tipo-row{display:grid;grid-template-columns:1fr 1fr;gap:.7rem}
+.tipo-btn{background:var(--surf);border:2px solid var(--bdr2);border-radius:var(--r);padding:clamp(.75rem,2.5vw,.95rem);cursor:pointer;text-align:center;transition:all .18s;user-select:none}
+.tipo-btn.sel{border-color:var(--blue);background:rgba(79,142,247,.07)}
+.tipo-btn i{font-size:clamp(1.1rem,3.5vw,1.35rem);display:block;margin-bottom:.32rem}
+.tipo-btn span{font-size:clamp(.7rem,2vw,.8rem);font-weight:700;display:block;color:var(--text2)}
+.tipo-btn.sel span{color:#fff}
+.tipo-btn small{font-size:clamp(.56rem,1.6vw,.64rem);color:var(--muted);margin-top:.1rem;display:block}
+#agendar-block{display:none;margin-top:.65rem;padding:.75rem;background:rgba(79,142,247,.04);border:1px solid rgba(79,142,247,.12);border-radius:var(--rs)}
+
+/* LOCAL */
+.local-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.65rem}
+.local-opt{background:var(--surf);border:2px solid var(--bdr2);border-radius:var(--r);padding:.65rem .78rem;cursor:pointer;transition:all .18s;user-select:none;display:flex;align-items:center;gap:.5rem}
+.local-opt:active{transform:scale(.96)}
+.local-opt.sel{border-color:var(--purple);background:rgba(155,114,247,.07);box-shadow:0 0 0 3px rgba(155,114,247,.06)}
+.local-opt i{font-size:.98rem;flex-shrink:0}
+.local-opt span{font-size:clamp(.65rem,1.9vw,.74rem);font-weight:600;color:var(--text2)}
+.local-opt.sel span{color:#fff}
+@media(max-width:380px){.local-grid{grid-template-columns:1fr}.tipo-row{grid-template-columns:1fr}}
+
+/* SIGNATURE */
+.sig-wrap{background:#fff;border:2px dashed #cbd5e1;border-radius:var(--r);overflow:hidden;position:relative;transition:.2s}
+.sig-wrap.has{border-color:var(--green);border-style:solid;box-shadow:0 0 0 3px rgba(0,217,126,.08)}
+.sig-canvas{display:block;width:100%;height:clamp(110px,20vh,148px);cursor:crosshair;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.sig-hint{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:.35rem;color:#94a3b8;font-size:clamp(.68rem,2vw,.76rem);pointer-events:none}
+.sig-hint i{font-size:clamp(1.2rem,4vw,1.5rem);opacity:.28}
+.sig-acts{display:flex;justify-content:flex-end;padding:.3rem .5rem;border-top:1px solid #e5e7eb;background:#f9fafb}
+.sig-clr{background:none;border:1px solid #d1d5db;border-radius:7px;padding:.24rem .65rem;font-size:clamp(.62rem,1.8vw,.7rem);color:#6b7280;cursor:pointer;transition:.14s;font-family:'Outfit',sans-serif}
+.sig-clr:hover{border-color:var(--red);color:var(--red)}
+
+/* BUTTONS */
+.btn-main{width:100%;background:var(--blue);border:none;border-radius:var(--r);padding:clamp(.88rem,2.7vw,1.05rem);color:#fff;font-family:'Syne',sans-serif;font-size:clamp(.87rem,2.6vw,.98rem);font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:.5rem;letter-spacing:.2px}
+.btn-main:hover{background:var(--blue2);transform:translateY(-1px);box-shadow:0 10px 28px rgba(37,99,235,.3)}
+.btn-main:active{transform:scale(.98)}
+.btn-main.g{background:var(--green);color:#000}.btn-main.g:hover{background:var(--green2);box-shadow:0 8px 24px rgba(0,217,126,.3);color:#000}
+.btn-main.a{background:var(--amber);color:#000}.btn-main.a:hover{background:var(--amber2)}
+.btn-main:disabled{opacity:.45;cursor:not-allowed;transform:none !important;box-shadow:none !important}
+.btn-ghost{width:100%;background:none;border:1.5px solid var(--bdr2);border-radius:var(--r);padding:clamp(.8rem,2.4vw,.95rem);color:var(--muted);font-family:'Outfit',sans-serif;font-size:clamp(.8rem,2.3vw,.9rem);cursor:pointer;transition:.17s}
+.btn-ghost:hover{border-color:rgba(79,142,247,.3);color:var(--text)}
+
+/* ══════════════════════════════════════════
+   SUCCESS SCREENS
+══════════════════════════════════════════ */
+#s-success,#s-dev-success{align-items:center;justify-content:center;padding:clamp(1.5rem,5vw,2.5rem);text-align:center;position:relative}
+.suc-wrap{max-width:400px;width:100%;display:flex;flex-direction:column;align-items:center;gap:1rem;position:relative;z-index:1}
+.suc-circle{width:clamp(72px,14vw,88px);height:clamp(72px,14vw,88px);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:clamp(1.9rem,5vw,2.5rem);animation:pop .42s cubic-bezier(.175,.885,.32,1.275)}
+.suc-circle.blue{background:rgba(79,142,247,.12);border:2px solid rgba(79,142,247,.28);box-shadow:var(--gblue)}
+.suc-circle.green{background:rgba(0,217,126,.12);border:2px solid rgba(0,217,126,.28);box-shadow:var(--ggreen)}
+.suc-circle.amber{background:rgba(255,181,71,.12);border:2px solid rgba(255,181,71,.28);box-shadow:var(--gamber)}
+@keyframes pop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+.suc-wrap h1{font-size:clamp(1.3rem,4.5vw,1.6rem);color:#fff}
+.suc-wrap>p{color:var(--muted);font-size:clamp(.75rem,2.2vw,.88rem);line-height:1.65;max-width:320px}
+.proto-card{background:var(--card);border:1px solid var(--bdr);border-radius:var(--rl);padding:clamp(.9rem,2.7vw,1.2rem) clamp(1.1rem,3vw,1.5rem);width:100%;position:relative;overflow:hidden}
+.proto-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--blue),var(--green))}
+.proto-lbl{font-size:.58rem;text-transform:uppercase;letter-spacing:2.5px;color:var(--muted);margin-bottom:.3rem}
+.proto-num{font-family:'JetBrains Mono',monospace;font-size:clamp(1.15rem,4.5vw,1.45rem);font-weight:700;color:var(--blue);letter-spacing:4px;word-break:break-all}
+.proto-sub{font-size:clamp(.62rem,1.8vw,.7rem);color:var(--muted);margin-top:.28rem;line-height:1.5}
+.qr-section{background:var(--card);border:1px solid var(--bdr);border-radius:var(--rl);padding:1.1rem;width:100%;display:flex;flex-direction:column;align-items:center;gap:.75rem}
+.qr-lbl{font-size:clamp(.6rem,1.7vw,.68rem);color:var(--muted);text-align:center;line-height:1.55;max-width:260px}
+.qr-lbl strong{color:var(--text2)}
+#qr-canvas,#qr-canvas2{border-radius:8px;overflow:hidden}
+.qr-badge{display:inline-flex;align-items:center;gap:.38rem;font-size:.62rem;color:var(--amber);background:rgba(255,181,71,.08);border:1px solid rgba(255,181,71,.18);padding:.28rem .62rem;border-radius:99px}
+.suc-info{width:100%;background:rgba(255,181,71,.04);border:1px solid rgba(255,181,71,.16);border-radius:var(--r);padding:.85rem 1rem;font-size:clamp(.7rem,2vw,.78rem);color:#fbbf24;line-height:1.65;text-align:left}
+.suc-info strong{display:block;margin-bottom:.22rem;font-size:clamp(.76rem,2.2vw,.86rem)}
+
+/* ══════════════════════════════════════════
+   DEVOLUÇÃO PROFESSOR
+══════════════════════════════════════════ */
+.proto-search-bar{display:flex;gap:.55rem;align-items:stretch}
+.proto-inp{flex:1;background:var(--surf);border:1.5px solid var(--bdr2);border-radius:var(--r);padding:.75rem 1rem;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.88rem;outline:none;transition:.18s;letter-spacing:1.5px;text-transform:uppercase}
+.proto-inp:focus{border-color:var(--amber);box-shadow:0 0 0 3px rgba(255,181,71,.1)}
+.proto-inp::placeholder{color:var(--muted2);letter-spacing:0;font-family:'Outfit',sans-serif;font-size:.84rem}
+.proto-search-btn{background:rgba(255,181,71,.1);border:1.5px solid rgba(255,181,71,.28);border-radius:var(--r);padding:.75rem 1.2rem;color:var(--amber);font-weight:700;font-size:.88rem;cursor:pointer;transition:.15s;white-space:nowrap;font-family:'Syne',sans-serif}
+.proto-search-btn:hover{background:rgba(255,181,71,.2);border-color:rgba(255,181,71,.55)}
+.proto-result{display:none;background:rgba(255,181,71,.03);border:1px solid rgba(255,181,71,.18);border-radius:var(--r);padding:.95rem;margin-top:.75rem}
+.result-title{font-family:'Syne',sans-serif;font-size:.62rem;text-transform:uppercase;letter-spacing:2.5px;color:var(--amber);margin-bottom:.75rem;padding-bottom:.6rem;border-bottom:1px solid rgba(255,181,71,.12);display:flex;align-items:center;gap:.4rem}
+.dr-row{display:flex;gap:.65rem;margin-bottom:.5rem}
+.dr-row:last-child{margin-bottom:0}
+.dr-lbl{font-size:clamp(.62rem,1.8vw,.7rem);color:var(--muted);width:90px;flex-shrink:0;margin-top:.05rem}
+.dr-val{font-size:clamp(.76rem,2.2vw,.84rem);font-weight:600;color:var(--text2);flex:1}
+.dev-tags{display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.08rem}
+.dev-tag{background:rgba(79,142,247,.08);border:1px solid rgba(79,142,247,.15);color:#93c5fd;font-size:clamp(.6rem,1.7vw,.67rem);padding:.14rem .45rem;border-radius:5px}
+/* QR detected banner */
+.qr-detected{background:rgba(0,217,126,.06);border:1px solid rgba(0,217,126,.2);border-radius:var(--r);padding:.82rem 1rem;display:flex;align-items:center;gap:.75rem;font-size:clamp(.72rem,2vw,.8rem);color:#6ee7b7}
+.qr-detected i{font-size:1.5rem;flex-shrink:0}
+
+/* ══════════════════════════════════════════
+   LOGIN
+══════════════════════════════════════════ */
+#s-login{align-items:center;justify-content:center;padding:clamp(1.5rem,5vw,2.5rem);position:relative}
+.l-card{background:var(--card);border:1px solid var(--bdr);border-radius:var(--rxl);padding:clamp(2rem,5vw,2.7rem) clamp(1.4rem,4vw,2.1rem);width:100%;max-width:400px;position:relative;overflow:hidden;z-index:1}
+.l-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--blue),var(--purple),var(--blue))}
+.l-top{text-align:center;margin-bottom:clamp(1.5rem,4vw,2rem)}
+.l-icon{width:clamp(54px,12vw,66px);height:clamp(54px,12vw,66px);background:rgba(79,142,247,.1);border:1px solid rgba(79,142,247,.2);border-radius:var(--rl);display:flex;align-items:center;justify-content:center;font-size:clamp(1.3rem,4vw,1.7rem);margin:0 auto clamp(.75rem,2.5vw,1rem);box-shadow:var(--gblue)}
+.l-top h2{font-size:clamp(1.1rem,3.8vw,1.4rem);margin-bottom:.3rem}
+.l-top p{font-size:clamp(.68rem,2vw,.78rem);color:var(--muted)}
+.l-err{background:rgba(255,77,109,.07);border:1px solid rgba(255,77,109,.2);border-radius:var(--rs);padding:.65rem .95rem;font-size:clamp(.71rem,2vw,.8rem);color:#fca5a5;margin-bottom:1rem;display:none}
+.l-foot{margin-top:1.1rem;text-align:center;font-size:.63rem;color:var(--muted);line-height:1.8}
+.l-foot code{background:rgba(255,255,255,.06);padding:.07rem .35rem;border-radius:4px;font-size:.88em;font-family:'JetBrains Mono',monospace}
+
+/* ══════════════════════════════════════════
+   TECHNICIAN PANEL
+══════════════════════════════════════════ */
+#s-tec{flex-direction:row;height:100dvh;overflow:hidden}
+.sb{width:224px;flex-shrink:0;background:var(--card);border-right:1px solid var(--bdr);display:flex;flex-direction:column;padding:1.2rem .9rem;overflow-y:auto}
+.sb-logo{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;padding:.2rem .4rem 1.2rem;border-bottom:1px solid var(--bdr);margin-bottom:1.2rem;letter-spacing:-.8px;display:flex;align-items:center;gap:.45rem}
+.sb-logo em{color:var(--blue);font-style:normal}
+.sb-logo-icon{width:28px;height:28px;background:rgba(79,142,247,.14);border:1px solid rgba(79,142,247,.22);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.82rem;flex-shrink:0}
+.sb-section{font-size:.56rem;text-transform:uppercase;letter-spacing:2.5px;color:var(--muted);padding:0 .38rem;margin:.55rem 0 .28rem;font-weight:600}
+.nav-btn{display:flex;align-items:center;gap:.65rem;padding:.58rem .72rem;border-radius:var(--rs);cursor:pointer;font-size:.81rem;color:var(--muted);transition:.14s;border:1px solid transparent;margin-bottom:.12rem;user-select:none;position:relative}
+.nav-btn:hover{background:rgba(255,255,255,.035);color:var(--text)}
+.nav-btn.on{background:rgba(79,142,247,.1);color:#93c5fd;border-color:rgba(79,142,247,.18)}
+.nb-icon{width:17px;text-align:center;font-size:.9rem;flex-shrink:0}
+.nb-badge{margin-left:auto;background:var(--red);color:#fff;font-size:.57rem;font-weight:700;min-width:18px;height:18px;border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 .28rem;animation:pulse 2s infinite}
+.nb-badge.amber{background:var(--amber);color:#000}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,77,109,.5)}50%{box-shadow:0 0 0 5px rgba(255,77,109,0)}}
+.sb-foot{margin-top:auto;padding-top:.95rem;border-top:1px solid var(--bdr)}
+.sb-user{display:flex;align-items:center;gap:.65rem;padding:.38rem .2rem;margin-bottom:.48rem}
+.sb-av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--purple));display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;flex-shrink:0}
+.sb-av.master{background:linear-gradient(135deg,var(--amber),#f97316)}
+.sb-uname{font-size:.8rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-role{font-size:.62rem;color:var(--muted)}
+.sb-logout{width:100%;background:none;border:1px solid var(--bdr);border-radius:var(--rs);padding:.44rem .72rem;color:var(--muted);font-size:.74rem;cursor:pointer;transition:.14s;display:flex;align-items:center;gap:.45rem;font-family:'Outfit',sans-serif}
+.sb-logout:hover{border-color:rgba(255,77,109,.4);color:var(--red)}
+
+/* MAIN AREA */
+.tec-main{flex:1;overflow-y:auto;overflow-x:hidden;padding:clamp(1.1rem,3vw,1.65rem) clamp(.9rem,2.5vw,1.85rem);display:flex;flex-direction:column;gap:clamp(.9rem,2.5vw,1.4rem)}
+.tec-page{display:none;flex-direction:column;gap:clamp(.88rem,2.5vw,1.35rem)}
+.tec-page.on{display:flex}
+.pg-head{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.pg-head h1{font-size:clamp(1.15rem,4vw,1.5rem);font-weight:800;line-height:1.1}
+.pg-head p{font-size:clamp(.67rem,2vw,.77rem);color:var(--muted);margin-top:.2rem}
+.live-pill{display:flex;align-items:center;gap:.4rem;font-size:clamp(.6rem,1.8vw,.68rem);color:var(--green);background:rgba(0,217,126,.07);border:1px solid rgba(0,217,126,.18);padding:.3rem .7rem;border-radius:99px;white-space:nowrap;flex-shrink:0}
+.live-pill::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);animation:glow 1.5s infinite}
+@keyframes glow{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(0,217,126,.6)}50%{opacity:.6;box-shadow:0 0 0 4px rgba(0,217,126,0)}}
+
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(150px,45%),1fr));gap:clamp(.65rem,2vw,.95rem)}
+.stat-c{background:var(--card);border:1px solid var(--bdr);border-radius:var(--rl);padding:clamp(.9rem,2.5vw,1.12rem) clamp(.95rem,2.5vw,1.28rem);position:relative;overflow:hidden;transition:.2s}
+.stat-c:hover{border-color:var(--bdr3);transform:translateY(-1px)}
+.stat-c::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--accent-grad,linear-gradient(90deg,var(--blue),var(--purple)))}
+.stat-c::after{content:attr(data-ico);position:absolute;bottom:-10px;right:-10px;font-size:3.5rem;opacity:.04;line-height:1}
+.s-lbl{font-size:clamp(.56rem,1.6vw,.63rem);text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:.25rem;font-weight:600}
+.s-val{font-family:'Syne',sans-serif;font-size:clamp(1.6rem,5.5vw,2.1rem);font-weight:800;line-height:1;color:var(--stat-clr,var(--text))}
+.s-trend{font-size:clamp(.57rem,1.7vw,.64rem);color:var(--muted);margin-top:.25rem}
+
+/* TABLE CARD */
+.tc{background:var(--card);border:1px solid var(--bdr);border-radius:var(--rl);overflow:hidden}
+.tc-head{padding:clamp(.78rem,2vw,.98rem) clamp(.9rem,2.5vw,1.28rem);border-bottom:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-between;gap:.7rem;flex-wrap:wrap}
+.tc-title{font-family:'Syne',sans-serif;font-size:clamp(.78rem,2.5vw,.9rem);font-weight:700}
+.sinp{background:var(--surf);border:1px solid var(--bdr2);border-radius:var(--rs);padding:.38rem .78rem;color:var(--text);font-size:clamp(.72rem,2vw,.78rem);outline:none;transition:.17s;min-width:0;flex:1;max-width:210px;font-family:'Outfit',sans-serif}
+.sinp:focus{border-color:var(--blue)}
+.tbl-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;min-width:460px}
+thead th{text-align:left;padding:.6rem clamp(.75rem,2vw,.98rem);font-size:clamp(.56rem,1.6vw,.62rem);font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);background:rgba(255,255,255,.015);border-bottom:1px solid var(--bdr);white-space:nowrap}
+tbody td{padding:clamp(.62rem,2vw,.82rem) clamp(.75rem,2vw,.98rem);font-size:clamp(.74rem,2vw,.82rem);border-bottom:1px solid rgba(255,255,255,.022);vertical-align:middle}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:rgba(255,255,255,.012)}
+.mono-sm{font-family:'JetBrains Mono',monospace;font-size:.82em}
+
+/* BADGES */
+.bdg{display:inline-flex;align-items:center;gap:.28rem;font-size:clamp(.54rem,1.6vw,.61rem);font-weight:700;padding:.18rem .55rem;border-radius:99px;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap}
+.bdg::before{content:'';width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.bdg.pend{background:rgba(255,181,71,.1);color:var(--amber);border:1px solid rgba(255,181,71,.2)}.bdg.pend::before{background:var(--amber)}
+.bdg.aprov{background:rgba(79,142,247,.1);color:var(--blue);border:1px solid rgba(79,142,247,.2)}.bdg.aprov::before{background:var(--blue)}
+.bdg.retir{background:rgba(0,217,126,.1);color:var(--green);border:1px solid rgba(0,217,126,.2)}.bdg.retir::before{background:var(--green)}
+.bdg.devpend{background:rgba(255,181,71,.1);color:var(--amber);border:1px solid rgba(255,181,71,.2)}.bdg.devpend::before{background:var(--amber);animation:pulse 1.5s infinite}
+.bdg.dev{background:rgba(82,96,128,.1);color:var(--muted);border:1px solid rgba(82,96,128,.2)}.bdg.dev::before{background:var(--muted)}
+.bdg.atr{background:rgba(255,77,109,.1);color:var(--red);border:1px solid rgba(255,77,109,.2)}.bdg.atr::before{background:var(--red);animation:pulse 1s infinite}
+
+/* MINI BUTTONS */
+.bs{font-size:clamp(.65rem,1.9vw,.73rem);font-weight:600;padding:clamp(.28rem,1vw,.38rem) clamp(.6rem,1.8vw,.88rem);border-radius:var(--rs);cursor:pointer;transition:.14s;border:none;white-space:nowrap;font-family:'Outfit',sans-serif}
+.bs.blue{background:var(--blue);color:#fff}.bs.blue:hover{background:var(--blue2)}
+.bs.green{background:rgba(0,217,126,.1);color:var(--green);border:1px solid rgba(0,217,126,.18)}.bs.green:hover{background:rgba(0,217,126,.2)}
+.bs.red{background:rgba(255,77,109,.08);color:var(--red);border:1px solid rgba(255,77,109,.18)}.bs.red:hover{background:rgba(255,77,109,.18)}
+.bs.ghost{background:rgba(255,255,255,.04);color:var(--muted);border:1px solid var(--bdr)}.bs.ghost:hover{color:var(--text)}
+.bs.amber{background:rgba(255,181,71,.1);color:var(--amber);border:1px solid rgba(255,181,71,.2)}.bs.amber:hover{background:rgba(255,181,71,.2)}
+.bs.purple{background:rgba(155,114,247,.1);color:var(--purple);border:1px solid rgba(155,114,247,.2)}.bs.purple:hover{background:rgba(155,114,247,.2)}
+
+/* ══════════════════════════════════════════
+   SOLICITAÇÃO CARDS
+══════════════════════════════════════════ */
+.solic-list{padding:clamp(.72rem,2vw,.95rem);display:flex;flex-direction:column;gap:.72rem}
+.sc{background:var(--surf);border:1px solid var(--bdr);border-radius:var(--rl);padding:clamp(.88rem,2.5vw,1.05rem) clamp(.9rem,2.5vw,1.18rem);display:flex;flex-direction:column;gap:.65rem;transition:border-color .25s,box-shadow .25s;position:relative;overflow:hidden}
+.sc::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:99px 0 0 99px;background:var(--sc-accent,var(--bdr))}
+.sc.nova{border-color:rgba(0,217,126,.25);box-shadow:0 0 22px rgba(0,217,126,.07);animation:arrive .35s ease}
+.sc.nova::before{background:var(--green)}
+.sc.devpend{border-color:rgba(255,181,71,.22);box-shadow:0 0 18px rgba(255,181,71,.06)}
+.sc.devpend::before{background:var(--amber)}
+.sc.aprov{border-color:rgba(79,142,247,.2)}
+.sc.aprov::before{background:var(--blue)}
+.sc.retir::before{background:var(--green)}
+@keyframes arrive{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+.sc-top{display:flex;align-items:flex-start;justify-content:space-between;gap:.5rem;flex-wrap:wrap}
+.sc-name{font-family:'Syne',sans-serif;font-weight:700;font-size:clamp(.86rem,2.5vw,.95rem)}
+.sc-meta{font-size:clamp(.6rem,1.8vw,.68rem);color:var(--muted);margin-top:.1rem;line-height:1.4}
+.sc-time{font-size:clamp(.58rem,1.7vw,.65rem);color:var(--muted);white-space:nowrap;text-align:right}
+.sc-local{display:inline-flex;align-items:center;gap:.28rem;font-size:clamp(.6rem,1.7vw,.67rem);color:#c4b5fd;background:rgba(155,114,247,.07);border:1px solid rgba(155,114,247,.14);padding:.15rem .5rem;border-radius:5px;margin-top:.1rem}
+.sc-tags{display:flex;flex-wrap:wrap;gap:.3rem}
+.sc-tag{background:rgba(79,142,247,.07);border:1px solid rgba(79,142,247,.14);color:#93c5fd;font-size:clamp(.6rem,1.7vw,.67rem);padding:.14rem .46rem;border-radius:5px}
+.sc-acts{display:flex;gap:.38rem;flex-wrap:wrap;align-items:center}
+.sc-sig-btn{display:inline-flex;align-items:center;gap:.28rem;font-size:clamp(.6rem,1.7vw,.67rem);color:var(--green);background:rgba(0,217,126,.06);border:1px solid rgba(0,217,126,.16);padding:.17rem .55rem;border-radius:6px;cursor:pointer;transition:.14s;font-family:'Outfit',sans-serif}
+.sc-sig-btn:hover{background:rgba(0,217,126,.14)}
+.sc-no-sig{display:inline-flex;align-items:center;gap:.28rem;font-size:clamp(.6rem,1.7vw,.67rem);color:var(--muted);font-style:italic}
+
+/* LOAN LIFECYCLE BADGE */
+.lifecycle{display:flex;align-items:center;gap:.3rem;flex-wrap:wrap;padding:.5rem .75rem;background:rgba(255,255,255,.018);border-radius:var(--rs);border:1px solid var(--bdr)}
+.lc-step{display:flex;align-items:center;gap:.28rem;font-size:.62rem;font-weight:600}
+.lc-step i{font-size:.65rem}
+.lc-step.done{color:var(--green)}
+.lc-step.cur{color:var(--blue)}
+.lc-step.nxt{color:var(--muted2)}
+.lc-arrow{color:var(--muted2);font-size:.65rem;margin:0 .08rem}
+
+/* APROVADOS HOJE */
+.aprov-section{display:flex;flex-direction:column;gap:.72rem}
+.aprov-header{display:flex;align-items:center;justify-content:space-between;gap:.75rem;flex-wrap:wrap}
+.aprov-header h3{font-family:'Syne',sans-serif;font-size:clamp(.85rem,2.5vw,.95rem);font-weight:700}
+.day-badge{display:flex;align-items:center;gap:.38rem;font-size:.65rem;color:var(--muted);background:rgba(255,255,255,.03);border:1px solid var(--bdr);padding:.28rem .65rem;border-radius:99px}
+.aprov-empty{text-align:center;padding:2.5rem 1rem;color:var(--muted)}
+.aprov-empty i{font-size:1.8rem;display:block;margin-bottom:.6rem;opacity:.18}
+.aprov-empty p{font-size:.82rem}
+
+/* AGUARDA RETIRADA indicator */
+.pickup-timer{display:flex;align-items:center;gap:.35rem;font-size:.65rem;color:var(--amber);margin-top:.05rem}
+.pickup-timer::before{content:'⏳';font-size:.7rem}
+
+/* ══════════════════════════════════════════
+   LOG
+══════════════════════════════════════════ */
+.log-entry{display:flex;align-items:flex-start;gap:.75rem;padding:.75rem clamp(.88rem,2.5vw,1.1rem);border-bottom:1px solid rgba(255,255,255,.022)}
+.log-entry:last-child{border-bottom:none}
+.log-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:.3rem}
+.log-dot.e{background:var(--green)}.log-dot.d{background:var(--blue)}.log-dot.r{background:var(--red)}.log-dot.a{background:var(--amber)}.log-dot.m{background:var(--purple)}.log-dot.v{background:var(--amber)}
+.log-txt{flex:1;min-width:0}
+.log-action{font-size:clamp(.72rem,2vw,.8rem);font-weight:600;color:var(--text2)}
+.log-detail{font-size:clamp(.61rem,1.8vw,.68rem);color:var(--muted);margin-top:.08rem}
+.log-time{font-size:clamp(.58rem,1.7vw,.65rem);color:var(--muted);white-space:nowrap;flex-shrink:0;font-family:'JetBrains Mono',monospace}
+.empty{text-align:center;padding:clamp(1.8rem,5vw,2.8rem) 1rem;color:var(--muted)}
+.empty i{font-size:clamp(1.5rem,4vw,2rem);display:block;margin-bottom:.6rem;opacity:.18}
+.empty p{font-size:clamp(.74rem,2vw,.84rem)}
+
+/* ══════════════════════════════════════════
+   MODALS
+══════════════════════════════════════════ */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(10px);z-index:300;display:none;align-items:center;justify-content:center;padding:clamp(1rem,3vw,1.5rem);padding-bottom:max(clamp(1rem,3vw,1.5rem),env(safe-area-inset-bottom))}
+.overlay.open{display:flex}
+.modal{background:var(--card);border:1px solid var(--bdr);border-radius:var(--rxl);width:100%;max-width:520px;max-height:92dvh;overflow-y:auto;animation:mdin .2s ease;box-shadow:var(--shl);position:relative}
+.modal::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:var(--rxl) var(--rxl) 0 0;background:linear-gradient(90deg,var(--blue),var(--purple))}
+@keyframes mdin{from{opacity:0;transform:scale(.94) translateY(10px)}to{opacity:1;transform:scale(1)}}
+.modal-h{padding:clamp(.95rem,3vw,1.3rem) clamp(1.05rem,3vw,1.45rem);border-bottom:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--card);z-index:1}
+.modal-h h3{font-family:'Syne',sans-serif;font-size:clamp(.88rem,2.5vw,1.02rem);font-weight:700}
+.modal-x{background:none;border:none;color:var(--muted);font-size:1.2rem;cursor:pointer;padding:.18rem;transition:.14s}
+.modal-x:hover{color:var(--text)}
+.modal-b{padding:clamp(1.05rem,3vw,1.35rem);display:flex;flex-direction:column;gap:clamp(.85rem,2.5vw,1rem)}
+.modal-f{padding:clamp(.85rem,2.5vw,1.05rem) clamp(1.05rem,3vw,1.45rem);border-top:1px solid var(--bdr);display:flex;gap:.62rem;justify-content:flex-end;flex-wrap:wrap}
+.modal-f .bs{padding:.52rem 1.05rem;font-size:clamp(.74rem,2vw,.82rem)}
+.info-box{background:rgba(255,255,255,.025);border:1px solid var(--bdr);border-radius:var(--r);padding:.9rem 1rem}
+.info-row{display:flex;align-items:flex-start;gap:.6rem;margin-bottom:.52rem}
+.info-row:last-child{margin-bottom:0}
+.info-lbl{font-size:clamp(.6rem,1.8vw,.68rem);color:var(--muted);width:90px;flex-shrink:0;margin-top:.06rem}
+.info-val{font-size:clamp(.74rem,2.2vw,.82rem);font-weight:600;color:var(--text2);flex:1}
+.sig-view-box{background:#f8fafc;border:1px solid #e2e8f0;border-radius:var(--rs);overflow:hidden;text-align:center;padding:.5rem}
+.sig-view-box img{max-width:100%;max-height:120px;object-fit:contain}
+.sig-view-fullscreen{width:100%;background:none;border:1px solid rgba(0,217,126,.18);color:var(--green);border-radius:7px;padding:.38rem;font-size:.7rem;cursor:pointer;transition:.14s;margin-top:.35rem;font-family:'Outfit',sans-serif}
+.hora-real-badge{display:flex;align-items:center;gap:.5rem;font-family:'JetBrains Mono',monospace;font-size:.88rem;color:var(--green);background:rgba(0,217,126,.06);border:1px solid rgba(0,217,126,.14);border-radius:var(--rs);padding:.5rem .85rem;font-weight:500}
+
+/* USER CARDS */
+.user-card{display:flex;align-items:center;gap:.85rem;padding:.85rem 1rem;background:var(--surf);border:1px solid var(--bdr);border-radius:var(--r);margin-bottom:.52rem}
+.user-card:last-child{margin-bottom:0}
+.u-av{width:37px;height:37px;border-radius:50%;flex-shrink:0;background:linear-gradient(135deg,var(--blue),var(--purple));display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700}
+.u-av.master{background:linear-gradient(135deg,var(--amber),#f97316)}
+.u-name{font-weight:700;font-size:clamp(.8rem,2.3vw,.88rem);font-family:'Syne',sans-serif}
+.u-info{font-size:clamp(.61rem,1.8vw,.68rem);color:var(--muted);margin-top:.06rem}
+.u-actions{margin-left:auto;display:flex;gap:.4rem}
+
+/* SB STATUS */
+.sb-status{position:fixed;bottom:1rem;left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--bdr);border-radius:99px;padding:.38rem .88rem;font-size:.66rem;display:flex;align-items:center;gap:.48rem;z-index:400;white-space:nowrap;box-shadow:var(--sh);font-family:'Outfit',sans-serif}
+.sb-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.sb-dot.ok{background:var(--green);animation:glow 2s infinite}
+.sb-dot.err{background:var(--red)}
+.sb-dot.conn{background:var(--amber);animation:glow 1s infinite}
+
+/* BANNER NOTIF */
+.notif-banner{position:fixed;top:max(1rem,env(safe-area-inset-top));left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--green);border-radius:var(--rl);padding:.85rem 1.2rem;box-shadow:var(--shl),var(--ggreen);display:flex;align-items:center;gap:.75rem;z-index:600;max-width:min(400px,92vw);width:100%;animation:notifIn .32s cubic-bezier(.175,.885,.32,1.275);font-size:clamp(.74rem,2.3vw,.83rem)}
+.notif-banner.dev{border-color:var(--amber);box-shadow:var(--shl),var(--gamber)}
+.notif-banner.aprov{border-color:var(--blue);box-shadow:var(--shl),var(--gblue)}
+@keyframes notifIn{from{opacity:0;transform:translateX(-50%) translateY(-20px) scale(.94)}to{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}}
+.notif-ico{font-size:1.3rem;flex-shrink:0}
+.notif-txt strong{display:block;font-size:clamp(.78rem,2.3vw,.88rem);margin-bottom:.08rem}
+.notif-txt small{color:var(--muted)}
+.notif-close{margin-left:auto;background:none;border:none;color:var(--muted);font-size:.95rem;cursor:pointer;flex-shrink:0}
+
+/* TOASTS */
+#toasts{position:fixed;bottom:max(1.2rem,env(safe-area-inset-bottom));right:max(1.2rem,env(safe-area-inset-right));z-index:500;display:flex;flex-direction:column;gap:.45rem;pointer-events:none;max-width:min(295px,88vw)}
+.toast{background:var(--card);border:1px solid var(--bdr);border-left:3px solid var(--green);border-radius:var(--r);padding:.78rem 1rem;box-shadow:var(--sh);animation:tin .24s ease;display:flex;gap:.6rem;align-items:flex-start;pointer-events:all}
+.toast.w{border-left-color:var(--amber)}.toast.r{border-left-color:var(--red)}.toast.p{border-left-color:var(--purple)}.toast.b{border-left-color:var(--blue)}
+.t-ico{font-size:.9rem;flex-shrink:0;margin-top:.05rem}
+.toast strong{display:block;font-size:clamp(.74rem,2vw,.81rem);margin-bottom:.07rem;font-family:'Syne',sans-serif}
+.toast small{font-size:clamp(.62rem,1.8vw,.68rem);color:var(--muted)}
+@keyframes tin{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:translateX(0)}}
+
+/* ══════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════ */
+@media(max-width:720px){
+  #s-tec{flex-direction:column}
+  .sb{width:100%;flex-direction:row;align-items:center;padding:.42rem .52rem;border-right:none;border-bottom:1px solid var(--bdr);gap:.02rem;flex-wrap:nowrap;overflow-x:auto;padding-bottom:max(.42rem,env(safe-area-inset-bottom))}
+  .sb-logo,.sb-section,.sb-foot{display:none}
+  .nav-btn{flex-direction:column;gap:.06rem;padding:.42rem .55rem;font-size:.55rem;border:none;white-space:nowrap;min-width:48px;border-radius:8px}
+  .nb-icon{font-size:.88rem;width:auto}
+  .tec-main{padding:.82rem}
+}
+</style>
+</head>
+<body>
+
+<div class="bg-fx"></div>
+<div class="grid-bg"></div>
+
+<!-- ══════════════════════════════════════════
+  HOME
+══════════════════════════════════════════ -->
+<div id="s-home" class="screen active">
+  <div class="home-logo" style="position:relative;z-index:1">
+    <div class="home-mark">🔒</div>
+    <div class="home-wordmark">Tech<em>Locker</em></div>
+    <div class="home-sub">UNA · Gestão de Equipamentos TI</div>
+  </div>
+
+  <div class="home-btns">
+    <button class="hbtn hbtn-green" onclick="abrirFormulario()">
+      <div class="hbtn-icon hbtn-ig">📋</div>
+      <div class="hbtn-txt"><h3>Solicitar Equipamento</h3><p>Formulário de empréstimo com assinatura</p></div>
+    </button>
+    <button class="hbtn hbtn-amber" onclick="abrirDevolucao()">
+      <div class="hbtn-icon hbtn-ia">↩️</div>
+      <div class="hbtn-txt"><h3>Devolver Equipamento</h3><p>Registre a devolução via protocolo ou QR</p></div>
+    </button>
+    <button class="hbtn hbtn-blue" onclick="show('s-login')">
+      <div class="hbtn-icon hbtn-ib">🛡️</div>
+      <div class="hbtn-txt"><h3>Área do Técnico</h3><p>Painel restrito de TI</p></div>
+    </button>
+  </div>
+
+  <p class="home-note" style="position:relative;z-index:1">🔖 Escaneie o <strong>QR Code</strong> do armário de TI para abrir direto. Ao devolver, use o QR do seu comprovante.</p>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+  SOLICITAR EQUIPAMENTO — PROFESSOR
+══════════════════════════════════════════ -->
+<div id="s-prof" class="screen">
+  <div class="pf-wrap" style="z-index:1">
+
+    <div class="pf-topbar">
+      <button class="btn-back" onclick="show('s-home')">←</button>
+      <div><div class="tb-title">Solicitar Equipamento</div><div class="tb-sub">Preencha, escolha local e assine</div></div>
+    </div>
+
+    <div class="flow-steps">
+      <div class="flow-step"><div class="flow-num cur" id="fs1">1</div><span class="flow-lbl cur">Identificação</span></div>
+      <div class="flow-arr">›</div>
+      <div class="flow-step"><div class="flow-num nxt" id="fs2">2</div><span class="flow-lbl">Equipamentos</span></div>
+      <div class="flow-arr">›</div>
+      <div class="flow-step"><div class="flow-num nxt" id="fs3">3</div><span class="flow-lbl">Local Dev.</span></div>
+      <div class="flow-arr">›</div>
+      <div class="flow-step"><div class="flow-num nxt" id="fs4">4</div><span class="flow-lbl">Assinar</span></div>
+    </div>
+
+    <!-- 1. ID -->
+    <div class="fcard">
+      <div class="fc-title">👤 Identificação</div>
+      <div class="field"><label>Nome Completo <span class="req">*</span></label><input type="text" id="pf-nome" placeholder="Ex: João da Silva" autocomplete="name"></div>
+      <div class="frow">
+        <div class="field"><label>Unidade <span class="req">*</span></label>
+          <select id="pf-uni">
+            <option value="">Selecione</option>
+            <option value="aimores">UNA Aimorés</option>
+            <option value="liberdade">UNA Liberdade</option>
+            <option value="betim">UNA Betim</option>
+            <option value="contagem">UNA Contagem</option>
+          </select>
+        </div>
+        <div class="field"><label>Sala <span class="req">*</span></label><input type="text" id="pf-sala" placeholder="Ex: L101"></div>
+      </div>
+    </div>
+
+    <!-- 2. EQUIPAMENTOS -->
+    <div class="fcard">
+      <div class="fc-title">💻 Equipamentos Disponíveis</div>
+      <div class="eq-grid" id="eq-grid">
+        <div class="eq-item" data-nome="Chromebook" data-qid="cb-qty" onclick="toggleEq(this)"><span class="eq-icon">💻</span><div class="eq-name">Chromebook</div><div class="eq-avail ok">12 disp.</div></div>
+        <div class="eq-item" data-nome="Notebook" data-qid="nb-qty" onclick="toggleEq(this)"><span class="eq-icon">🖥️</span><div class="eq-name">Notebook</div><div class="eq-avail ok">5 disp.</div></div>
+        <div class="eq-item" data-nome="Microfone" onclick="toggleEq(this)"><span class="eq-icon">🎙️</span><div class="eq-name">Microfone</div><div class="eq-avail low">2 disp.</div></div>
+        <div class="eq-item" data-nome="USB-C → HDMI" onclick="toggleEq(this)"><span class="eq-icon">🔌</span><div class="eq-name">USB-C → HDMI</div><div class="eq-avail ok">8 disp.</div></div>
+        <div class="eq-item" data-nome="HDMI → VGA" onclick="toggleEq(this)"><span class="eq-icon">📺</span><div class="eq-name">HDMI → VGA</div><div class="eq-avail ok">6 disp.</div></div>
+        <div class="eq-item" data-nome="Carregador" onclick="toggleEq(this)"><span class="eq-icon">⚡</span><div class="eq-name">Carregador</div><div class="eq-avail ok">10 disp.</div></div>
+        <div class="eq-item" data-nome="Cabo HDMI" onclick="toggleEq(this)"><span class="eq-icon">🔗</span><div class="eq-name">Cabo HDMI</div><div class="eq-avail low">3 disp.</div></div>
+        <div class="eq-item zerado"><span class="eq-icon">📽️</span><div class="eq-name">Projetor</div><div class="eq-avail zero">0 disp.</div></div>
+      </div>
+      <div id="cb-qty" class="qty-row" style="display:none"><span class="qty-lbl">Quantos Chromebooks?</span><div class="qty-ctrl"><button class="qty-btn" onclick="chQty('cb-n',-1)">−</button><span class="qty-v" id="cb-n">1</span><button class="qty-btn" onclick="chQty('cb-n',1)">+</button></div></div>
+      <div id="nb-qty" class="qty-row" style="display:none"><span class="qty-lbl">Quantos Notebooks?</span><div class="qty-ctrl"><button class="qty-btn" onclick="chQty('nb-n',-1)">−</button><span class="qty-v" id="nb-n">1</span><button class="qty-btn" onclick="chQty('nb-n',1)">+</button></div></div>
+    </div>
+
+    <!-- 3. QUANDO + LOCAL -->
+    <div class="fcard">
+      <div class="fc-title">📅 Quando Precisa?</div>
+      <div class="tipo-row">
+        <div class="tipo-btn sel" id="t-agora" onclick="setTipo('agora')"><i>🤝</i><span>Retirar Agora</span><small>Busco hoje</small></div>
+        <div class="tipo-btn" id="t-agendar" onclick="setTipo('agendar')"><i>🗓️</i><span>Agendar</span><small>Outra data</small></div>
+      </div>
+      <div id="agendar-block">
+        <div class="frow" style="margin-top:.12rem">
+          <div class="field"><label>Data de Retirada</label><input type="date" id="pf-ag-data"></div>
+          <div class="field"><label>Horário</label><input type="time" id="pf-ag-hora"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="fcard">
+      <div class="fc-title">📍 Onde Vai Devolver?</div>
+      <p style="font-size:.74rem;color:var(--muted);margin-bottom:.85rem;line-height:1.55">Informe onde deixará os equipamentos — isso nos ajuda a localizá-los.</p>
+      <div class="local-grid" id="local-grid">
+        <div class="local-opt" onclick="selLocal(this,'Balcão TI')"><i>🏢</i><span>Balcão TI</span></div>
+        <div class="local-opt" onclick="selLocal(this,'Sala de Aula')"><i>🚪</i><span>Sala de Aula</span></div>
+        <div class="local-opt" onclick="selLocal(this,'Recepção')"><i>📋</i><span>Recepção</span></div>
+        <div class="local-opt" onclick="selLocal(this,'Coordenação')"><i>🏫</i><span>Coordenação</span></div>
+      </div>
+      <div class="field" style="margin-bottom:0;margin-top:.65rem">
+        <label>Detalhe o local <span class="opt-tag">OPCIONAL</span></label>
+        <input type="text" id="pf-local" placeholder="Ex: Sala L101, mesa do professor…">
+      </div>
+    </div>
+
+    <!-- 4. ASSINATURA -->
+    <div class="fcard">
+      <div class="fc-title green">✍️ Assinatura do Professor</div>
+      <p style="font-size:.74rem;color:var(--muted);margin-bottom:.75rem;line-height:1.55">Ao assinar, você confirma a solicitação e <strong style="color:var(--text2)">assume responsabilidade</strong> pelos equipamentos.</p>
+      <div class="sig-wrap" id="sig-wp"><canvas class="sig-canvas" id="sig-p" width="1000" height="260"></canvas><div class="sig-hint" id="sig-hp"><i>✍️</i><span>Assine com o dedo ou mouse</span></div></div>
+      <div class="sig-acts"><button class="sig-clr" onclick="clearSig('sig-p','sig-hp','sig-wp')">Limpar assinatura</button></div>
+    </div>
+
+    <button class="btn-main" id="btn-submit-prof" onclick="submitProf()">📤 Enviar Solicitação</button>
+    <button class="btn-ghost" onclick="show('s-home')">← Cancelar</button>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+  SUCCESS — SOLICITAÇÃO ENVIADA
+══════════════════════════════════════════ -->
+<div id="s-success" class="screen">
+  <div class="suc-wrap" style="z-index:1">
+    <div class="suc-circle green">✅</div>
+    <h1>Solicitação Enviada!</h1>
+    <p>Seu pedido chegou para a equipe técnica em tempo real. Aguarde a aprovação.</p>
+
+    <div class="proto-card">
+      <div class="proto-lbl">Número do Protocolo</div>
+      <div class="proto-num" id="proto-num">TL202500001</div>
+      <div class="proto-sub" id="proto-sub">Aguardando aprovação da equipe TI</div>
+    </div>
+
+    <div class="qr-section">
+      <div class="qr-badge">📱 QR Code para Devolução</div>
+      <div id="qr-canvas"></div>
+      <p class="qr-lbl"><strong>Guarde este QR Code!</strong> Ao terminar sua aula, escaneie-o para iniciar a devolução automaticamente — sem digitar o protocolo.</p>
+    </div>
+
+    <div class="suc-info">
+      <strong>⏳ Próximos Passos</strong>
+      A equipe de TI irá revisar e aprovar sua solicitação. Dirija-se ao balcão de TI para retirar os equipamentos após a aprovação.
+    </div>
+
+    <div style="width:100%;display:flex;flex-direction:column;gap:.75rem;margin-top:.15rem">
+      <button class="btn-main g" onclick="abrirFormulario()">✚ Nova Solicitação</button>
+      <button class="btn-ghost" onclick="show('s-home')">← Voltar ao Início</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+  SUCCESS — DEVOLUÇÃO REGISTRADA
+══════════════════════════════════════════ -->
+<div id="s-dev-success" class="screen">
+  <div class="suc-wrap" style="z-index:1">
+    <div class="suc-circle amber">↩️</div>
+    <h1>Devolução Registrada!</h1>
+    <p>Registro completo enviado à equipe técnica. Sua devolução está documentada com hora, local e assinatura.</p>
+
+    <div class="proto-card" style="--grad:linear-gradient(90deg,var(--amber),var(--amber2))">
+      <div class="proto-lbl">Protocolo da Devolução</div>
+      <div class="proto-num" id="dev-proto-num" style="color:var(--amber)">—</div>
+      <div class="proto-sub" id="dev-proto-sub"></div>
+    </div>
+
+    <div class="suc-info">
+      <strong>✅ Auditoria Completa</strong>
+      Registramos: data/hora exatos, local de entrega, condição dos equipamentos e sua assinatura. O técnico confirmará quando verificar fisicamente os itens.
+    </div>
+
+    <div style="width:100%;display:flex;flex-direction:column;gap:.75rem;margin-top:.15rem">
+      <button class="btn-main a" onclick="abrirDevolucao()">↩️ Nova Devolução</button>
+      <button class="btn-ghost" onclick="show('s-home')">← Voltar ao Início</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+  DEVOLVER EQUIPAMENTO — PROFESSOR
+══════════════════════════════════════════ -->
+<div id="s-dev-prof" class="screen">
+  <div class="pf-wrap" style="z-index:1">
+
+    <div class="pf-topbar">
+      <button class="btn-back" onclick="show('s-home')">←</button>
+      <div><div class="tb-title">↩️ Devolver Equipamento</div><div class="tb-sub">Protocolo ou QR Code do comprovante</div></div>
+    </div>
+
+    <!-- Banner QR detectado -->
+    <div id="qr-detected-banner" style="display:none" class="qr-detected">
+      <i>📱</i>
+      <div><strong style="color:#fff;display:block;margin-bottom:.1rem">QR Code detectado!</strong>Protocolo identificado automaticamente. Confirme os dados abaixo.</div>
+    </div>
+
+    <!-- BUSCA -->
+    <div class="fcard">
+      <div class="fc-title warn">🔍 Localizar Empréstimo</div>
+      <p style="font-size:.74rem;color:var(--muted);margin-bottom:.88rem;line-height:1.55">Digite o número do protocolo que recebeu ao solicitar, ou escaneie o QR Code do comprovante.</p>
+      <div class="proto-search-bar">
+        <input type="text" id="dev-proto-inp" class="proto-inp" placeholder="Ex: TL202500005" oninput="this.value=this.value.toUpperCase()">
+        <button class="proto-search-btn" onclick="buscarProtocolo()">🔍 Buscar</button>
+      </div>
+      <div id="proto-result" class="proto-result">
+        <div class="result-title">📋 Dados do Empréstimo Encontrado</div>
+        <div class="dr-row"><span class="dr-lbl">Professor</span><span class="dr-val" id="dr-nome">—</span></div>
+        <div class="dr-row"><span class="dr-lbl">Sala</span><span class="dr-val" id="dr-sala">—</span></div>
+        <div class="dr-row"><span class="dr-lbl">Equipamentos</span><div><div class="dev-tags" id="dr-equips"></div></div></div>
+        <div class="dr-row"><span class="dr-lbl">Data Empréstimo</span><span class="dr-val mono-sm" id="dr-hora">—</span></div>
+        <div class="dr-row"><span class="dr-lbl">Status</span><span class="dr-val" id="dr-status">—</span></div>
+      </div>
+    </div>
+
+    <!-- LOCAL DE DEVOLUÇÃO -->
+    <div class="fcard" id="dev-local-card" style="display:none">
+      <div class="fc-title warn">📍 Onde Está Devolvendo Agora?</div>
+      <div class="local-grid" id="dev-local-grid">
+        <div class="local-opt" onclick="selLocalDev(this,'Balcão TI')"><i>🏢</i><span>Balcão TI</span></div>
+        <div class="local-opt" onclick="selLocalDev(this,'Sala de Aula')"><i>🚪</i><span>Sala de Aula</span></div>
+        <div class="local-opt" onclick="selLocalDev(this,'Recepção')"><i>📋</i><span>Recepção</span></div>
+        <div class="local-opt" onclick="selLocalDev(this,'Coordenação')"><i>🏫</i><span>Coordenação</span></div>
+      </div>
+      <div class="field" style="margin-bottom:0;margin-top:.65rem">
+        <label>Detalhe <span class="opt-tag">OPCIONAL</span></label>
+        <input type="text" id="dev-local-det" placeholder="Ex: Corredor bloco B…">
+      </div>
+    </div>
+
+    <!-- CONDIÇÃO -->
+    <div class="fcard" id="dev-cond-card" style="display:none">
+      <div class="fc-title warn">🔍 Condição dos Equipamentos</div>
+      <div class="field">
+        <label>Como estão os equipamentos?</label>
+        <select id="dev-cond">
+          <option value="otimo">✅ Ótimo — sem nenhum dano</option>
+          <option value="bom" selected>👍 Bom — estado normal de uso</option>
+          <option value="regular">⚠️ Regular — pequenos desgastes</option>
+          <option value="danificado">❌ Danificado — precisa comunicar ao TI</option>
+        </select>
+      </div>
+      <div class="field" style="margin-bottom:0">
+        <label>Observações <span class="opt-tag">OPCIONAL</span></label>
+        <textarea id="dev-obs" placeholder="Alguma observação sobre a devolução…"></textarea>
+      </div>
+    </div>
+
+    <!-- ASSINATURA PROFESSOR NA DEVOLUÇÃO -->
+    <div class="fcard" id="dev-sig-card" style="display:none">
+      <div class="fc-title warn">✍️ Confirme com sua Assinatura</div>
+      <p style="font-size:.74rem;color:var(--muted);margin-bottom:.75rem;line-height:1.55">Assine para confirmar a devolução. Isso cria um registro auditável mesmo sem o técnico presente.</p>
+      <div class="sig-wrap" id="sig-wdp"><canvas class="sig-canvas" id="sig-dp" width="1000" height="260"></canvas><div class="sig-hint" id="sig-hdp"><i>✍️</i><span>Assine com o dedo ou mouse</span></div></div>
+      <div class="sig-acts"><button class="sig-clr" onclick="clearSig('sig-dp','sig-hdp','sig-wdp')">Limpar</button></div>
+    </div>
+
+    <button class="btn-main a" id="btn-submit-dev" style="display:none;color:#000" onclick="submitDevolucao()">↩️ Registrar Devolução</button>
+    <button class="btn-ghost" onclick="show('s-home')">← Cancelar</button>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+  LOGIN
+══════════════════════════════════════════ -->
+<div id="s-login" class="screen">
+  <div class="l-card" style="z-index:1">
+    <div class="l-top">
+      <div class="l-icon">🛡️</div>
+      <h2>Área do Técnico</h2>
+      <p>Acesso restrito · Tech Locker UNA</p>
+    </div>
+    <div class="l-err" id="l-err">⚠️ E-mail ou senha inválidos.</div>
+    <div class="field"><label>E-mail</label><input type="email" id="l-email" placeholder="tecnico@una.edu.br" autocomplete="email"></div>
+    <div class="field" style="margin-bottom:1.5rem"><label>Senha</label><input type="password" id="l-senha" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <button class="btn-main" onclick="doLogin()">🔐 Entrar no Painel</button>
+    <button class="btn-ghost" style="margin-top:.75rem" onclick="show('s-home')">← Voltar</button>
+    <div class="l-foot">Demo Técnico: <code>tecnico@una.edu.br</code> / <code>1234</code><br>Demo Master: <code>master@una.edu.br</code> / <code>master123</code></div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+  PAINEL TÉCNICO
+══════════════════════════════════════════ -->
+<div id="s-tec" class="screen">
+  <nav class="sb">
+    <div class="sb-logo"><div class="sb-logo-icon">🔒</div>Tech<em>Locker</em></div>
+    <div class="sb-section">Monitor</div>
+    <div class="nav-btn on" data-pg="pg-dash" onclick="navTo('pg-dash',this)"><span class="nb-icon">📊</span>Dashboard</div>
+    <div class="nav-btn" data-pg="pg-solics" onclick="navTo('pg-solics',this)"><span class="nb-icon">🔔</span>Solicitações<span class="nb-badge" id="bdg" style="display:none">0</span></div>
+    <div class="nav-btn" data-pg="pg-devs" onclick="navTo('pg-devs',this)"><span class="nb-icon">↩️</span>Devoluções<span class="nb-badge" id="bdg-dev" style="display:none">0</span></div>
+    <div class="sb-section">Aprovações</div>
+    <div class="nav-btn" data-pg="pg-aprov" onclick="navTo('pg-aprov',this)"><span class="nb-icon">📦</span>Aprovados Hoje<span class="nb-badge amber" id="bdg-aprov" style="display:none">0</span></div>
+    <div class="sb-section">Gestão</div>
+    <div class="nav-btn" data-pg="pg-emp" onclick="navTo('pg-emp',this)"><span class="nb-icon">🔄</span>Empréstimos</div>
+    <div class="nav-btn" data-pg="pg-equip" onclick="navTo('pg-equip',this)"><span class="nb-icon">💻</span>Equipamentos</div>
+    <div class="nav-btn" data-pg="pg-log" onclick="navTo('pg-log',this)"><span class="nb-icon">📋</span>Logs</div>
+    <div class="nav-btn" id="nav-usuarios" data-pg="pg-usuarios" onclick="navTo('pg-usuarios',this)" style="display:none"><span class="nb-icon">👥</span>Usuários</div>
+    <div class="sb-foot">
+      <div class="sb-user"><div class="sb-av" id="tc-av">TI</div><div><div class="sb-uname" id="tc-nome">Técnico</div><div class="sb-role" id="tc-role">Técnico TI</div></div></div>
+      <button class="sb-logout" onclick="doLogout()">← Sair</button>
+    </div>
+  </nav>
+
+  <main class="tec-main">
+
+    <!-- ── DASHBOARD ── -->
+    <div class="tec-page on" id="pg-dash">
+      <div class="pg-head"><div><h1>Dashboard</h1><p>Monitoramento em tempo real</p></div><div class="live-pill">Ao Vivo</div></div>
+      <div class="stats-grid">
+        <div class="stat-c" data-ico="🔔" style="--accent-grad:linear-gradient(90deg,var(--amber),var(--amber2));--stat-clr:var(--amber)"><div class="s-lbl">Pendentes</div><div class="s-val" id="st-pend">0</div><div class="s-trend">Aguardando aprovação</div></div>
+        <div class="stat-c" data-ico="📦" style="--accent-grad:linear-gradient(90deg,var(--blue),var(--purple));--stat-clr:var(--blue)"><div class="s-lbl">Aprovados Hoje</div><div class="s-val" id="st-aprov">0</div><div class="s-trend">Aguardando retirada</div></div>
+        <div class="stat-c" data-ico="↩️" style="--accent-grad:linear-gradient(90deg,var(--amber),#f97316);--stat-clr:#fb923c"><div class="s-lbl">Dev. Pendentes</div><div class="s-val" id="st-devs">0</div><div class="s-trend">Aguardando confirmação</div></div>
+        <div class="stat-c" data-ico="🔄" style="--accent-grad:linear-gradient(90deg,var(--green),var(--green2));--stat-clr:var(--green)"><div class="s-lbl">Ativos</div><div class="s-val" id="st-ativos">0</div><div class="s-trend">Empréstimos em aberto</div></div>
+      </div>
+
+      <div class="tc">
+        <div class="tc-head"><div class="tc-title">🔔 Solicitações Pendentes</div><button class="bs blue" onclick="navTo('pg-solics',document.querySelector('[data-pg=pg-solics]'))">Ver todas →</button></div>
+        <div class="solic-list" id="dash-solic-list"></div>
+      </div>
+      <div class="tc">
+        <div class="tc-head"><div class="tc-title">📦 Aprovados Aguardando Retirada</div><button class="bs amber" onclick="navTo('pg-aprov',document.querySelector('[data-pg=pg-aprov]'))">Ver todos →</button></div>
+        <div class="solic-list" id="dash-aprov-list"></div>
+      </div>
+      <div class="tc">
+        <div class="tc-head"><div class="tc-title">↩️ Devoluções Pendentes</div><button class="bs amber" onclick="navTo('pg-devs',document.querySelector('[data-pg=pg-devs]'))">Ver todas →</button></div>
+        <div class="solic-list" id="dash-dev-list"></div>
+      </div>
+    </div>
+
+    <!-- ── SOLICITAÇÕES PENDENTES ── -->
+    <div class="tec-page" id="pg-solics">
+      <div class="pg-head"><div><h1>Solicitações</h1><p>Verifique dados e assinatura antes de aprovar</p></div><div class="live-pill">Tempo Real</div></div>
+      <div class="tc">
+        <div class="tc-head"><div class="tc-title">🔔 Fila de Aprovação</div><span id="solic-count" style="font-size:.7rem;color:var(--muted)"></span></div>
+        <div class="solic-list" id="solics-list"></div>
+      </div>
+    </div>
+
+    <!-- ── DEVOLUÇÕES PENDENTES ── -->
+    <div class="tec-page" id="pg-devs">
+      <div class="pg-head"><div><h1>Devoluções</h1><p>Confirme o recebimento físico e assine</p></div><div class="live-pill">Tempo Real</div></div>
+      <div class="tc">
+        <div class="tc-head"><div class="tc-title">↩️ Aguardando Confirmação Física</div><span id="devs-count" style="font-size:.7rem;color:var(--muted)"></span></div>
+        <div class="solic-list" id="devs-list"></div>
+      </div>
+    </div>
+
+    <!-- ── APROVADOS HOJE ── -->
+    <div class="tec-page" id="pg-aprov">
+      <div class="pg-head"><div><h1>Aprovados Hoje</h1><p>Pedidos aprovados aguardando retirada pelo professor</p></div><div class="live-pill">Ao Vivo</div></div>
+
+      <!-- Retiradas pendentes -->
+      <div class="tc">
+        <div class="tc-head">
+          <div class="tc-title">⏳ Aguardando Retirada</div>
+          <span id="aprov-pend-count" style="font-size:.7rem;color:var(--muted)"></span>
+        </div>
+        <div class="solic-list" id="aprov-pend-list"></div>
+      </div>
+
+      <!-- Retirados hoje -->
+      <div class="tc">
+        <div class="tc-head">
+          <div class="tc-title">✅ Entregues Hoje</div>
+          <span id="aprov-retir-count" style="font-size:.7rem;color:var(--muted)"></span>
+        </div>
+        <div class="solic-list" id="aprov-retir-list"></div>
+      </div>
+    </div>
+
+    <!-- ── EMPRÉSTIMOS HISTÓRICO ── -->
+    <div class="tec-page" id="pg-emp">
+      <div class="pg-head"><div><h1>Empréstimos</h1><p>Histórico completo</p></div></div>
+      <div class="tc">
+        <div class="tc-head"><div class="tc-title">Todos os Registros</div><input class="sinp" placeholder="Buscar por nome, protocolo…" oninput="filterEmp(this)"></div>
+        <div class="tbl-scroll"><table>
+          <thead><tr><th>Protocolo</th><th>Professor</th><th>Sala</th><th>Equipamentos</th><th>Local Dev.</th><th>Status</th><th>Assin. Prof</th><th>Hora</th><th>Ação</th></tr></thead>
+          <tbody id="emp-tbody"></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- ── EQUIPAMENTOS ── -->
+    <div class="tec-page" id="pg-equip">
+      <div class="pg-head"><div><h1>Equipamentos</h1></div><button class="bs blue" onclick="openNovoEquipModal()">+ Cadastrar</button></div>
+      <div class="stats-grid" style="margin-bottom:.2rem">
+        <div class="stat-c" data-ico="✅" style="--accent-grad:linear-gradient(90deg,var(--green),var(--green2));--stat-clr:var(--green)"><div class="s-lbl">Disponíveis</div><div class="s-val">38</div><div class="s-trend">Prontos</div></div>
+        <div class="stat-c" data-ico="🔄" style="--accent-grad:linear-gradient(90deg,var(--amber),var(--amber2));--stat-clr:var(--amber)"><div class="s-lbl">Em Uso</div><div class="s-val">8</div><div class="s-trend">Emprestados</div></div>
+        <div class="stat-c" data-ico="🔧" style="--accent-grad:linear-gradient(90deg,var(--red),var(--red2));--stat-clr:var(--red)"><div class="s-lbl">Manutenção</div><div class="s-val">2</div><div class="s-trend">Em reparo</div></div>
+        <div class="stat-c" data-ico="📦" style="--accent-grad:linear-gradient(90deg,var(--blue),var(--purple));--stat-clr:#93c5fd"><div class="s-lbl">Total</div><div class="s-val">48</div><div class="s-trend">Inventário</div></div>
+      </div>
+      <div class="tc">
+        <div class="tc-head"><div class="tc-title">Inventário</div><input class="sinp" placeholder="Buscar…"></div>
+        <div class="tbl-scroll"><table>
+          <thead><tr><th>Patrimônio</th><th>Nome</th><th>Categoria</th><th>Unidade</th><th>Condição</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td class="mono-sm" style="color:var(--muted)">UNA-0001</td><td>Chromebook Lenovo 300e</td><td>Chromebook</td><td>Aimorés</td><td style="color:var(--green)">Ótimo</td><td><span class="bdg retir">disponível</span></td></tr>
+            <tr><td class="mono-sm" style="color:var(--muted)">UNA-0002</td><td>Notebook Dell Inspiron</td><td>Notebook</td><td>Aimorés</td><td style="color:var(--green)">Bom</td><td><span class="bdg atr">em uso</span></td></tr>
+            <tr><td class="mono-sm" style="color:var(--muted)">UNA-0010</td><td>Microfone Fifine K670</td><td>Microfone</td><td>Liberdade</td><td style="color:var(--amber)">Regular</td><td><span class="bdg retir">disponível</span></td></tr>
+          </tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- ── LOGS ── -->
+    <div class="tec-page" id="pg-log">
+      <div class="pg-head"><div><h1>Logs de Atividade</h1><p>Registro completo e auditável</p></div><div class="live-pill">Tempo Real</div></div>
+      <div class="tc">
+        <div class="tc-head"><div class="tc-title">📋 Histórico</div><input class="sinp" placeholder="Filtrar…" oninput="filterLogs(this)"></div>
+        <div id="log-list" style="max-height:540px;overflow-y:auto"></div>
+      </div>
+    </div>
+
+    <!-- ── USUÁRIOS (MASTER) ── -->
+    <div class="tec-page" id="pg-usuarios">
+      <div class="pg-head"><div><h1>Gestão de Usuários</h1><p>Somente o Master pode gerenciar</p></div><button class="bs blue" onclick="openNovoUserModal()">+ Novo Técnico</button></div>
+      <div class="tc"><div class="tc-head"><div class="tc-title">👥 Técnicos Cadastrados</div></div><div style="padding:1rem" id="users-list"></div></div>
+      <div class="tc">
+        <div class="tc-head"><div class="tc-title">📋 Log de Acesso</div></div>
+        <div class="tbl-scroll"><table>
+          <thead><tr><th>Usuário</th><th>Ação</th><th>Data/Hora</th></tr></thead>
+          <tbody id="access-log-tbody"><tr><td>—</td><td>—</td><td>—</td></tr></tbody>
+        </table></div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+  MODALS
+══════════════════════════════════════════ -->
+
+<!-- Modal: Ver assinatura -->
+<div class="overlay" id="ov-sig">
+  <div class="modal" style="max-width:440px">
+    <div class="modal-h"><h3>✍️ Assinatura do Professor</h3><button class="modal-x" onclick="closeOv('ov-sig')">✕</button></div>
+    <div class="modal-b">
+      <div class="info-box">
+        <div class="info-row"><span class="info-lbl">Protocolo</span><span class="info-val mono-sm" id="sig-modal-proto" style="color:var(--blue)">—</span></div>
+        <div class="info-row"><span class="info-lbl">Professor</span><span class="info-val" id="sig-modal-nome">—</span></div>
+        <div class="info-row"><span class="info-lbl">Registrada</span><span class="info-val mono-sm" id="sig-modal-time">—</span></div>
+      </div>
+      <div>
+        <p style="font-size:.7rem;color:var(--muted);margin-bottom:.5rem">Assinatura registrada no momento da solicitação:</p>
+        <div class="sig-view-box" id="sig-modal-img-box"><img id="sig-modal-img" src="" alt="Assinatura"></div>
+        <button class="sig-view-fullscreen" onclick="expandSig()">⛶ Ver em tela cheia</button>
+      </div>
+      <div style="background:rgba(0,217,126,.05);border:1px solid rgba(0,217,126,.15);border-radius:var(--rs);padding:.75rem;font-size:.74rem;color:#6ee7b7;line-height:1.5">
+        ✅ Assinatura válida · registrada em <span id="sig-modal-time2" style="font-family:'JetBrains Mono',monospace">—</span>
+      </div>
+    </div>
+    <div class="modal-f"><button class="bs ghost" onclick="closeOv('ov-sig')">Fechar</button></div>
+  </div>
+</div>
+
+<!-- Modal: Confirmar devolução (técnico) -->
+<div class="overlay" id="ov-confirmar-dev">
+  <div class="modal">
+    <div class="modal-h"><h3>↩️ Confirmar Devolução</h3><button class="modal-x" onclick="closeOv('ov-confirmar-dev')">✕</button></div>
+    <div class="modal-b">
+      <div style="background:rgba(255,181,71,.04);border:1px solid rgba(255,181,71,.15);border-radius:var(--rs);padding:.72rem .95rem;font-size:.74rem;color:#fcd34d;line-height:1.5">
+        ⚠️ Verifique <strong>fisicamente</strong> todos os equipamentos antes de assinar a confirmação.
+      </div>
+      <div class="info-box">
+        <div style="font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:.7rem">📋 Dados do Empréstimo</div>
+        <div class="info-row"><span class="info-lbl">Protocolo</span><span class="info-val mono-sm" id="cd-proto" style="color:var(--blue)">—</span></div>
+        <div class="info-row"><span class="info-lbl">Professor</span><span class="info-val" id="cd-nome">—</span></div>
+        <div class="info-row"><span class="info-lbl">Sala</span><span class="info-val" id="cd-sala">—</span></div>
+        <div class="info-row"><span class="info-lbl">Equipamentos</span><div class="dev-tags" id="cd-equips" style="margin-top:.1rem"></div></div>
+        <div class="info-row"><span class="info-lbl">Local Dev.</span><span class="info-val" id="cd-local" style="color:#c4b5fd">—</span></div>
+      </div>
+      <div class="hora-real-badge">⏱ Hora de Confirmação: <span id="cd-hora-real" style="margin-left:.4rem">—</span></div>
+
+      <!-- Assinatura professor na devolução -->
+      <div id="cd-sig-prof-box">
+        <p style="font-size:.72rem;color:var(--muted);margin-bottom:.45rem">✍️ Assinatura do Professor na Devolução:</p>
+        <div class="sig-view-box" id="cd-sig-prof-img-box"><img id="cd-sig-prof-img" src="" alt="Assinatura Professor" style="max-height:140px;width:100%;object-fit:contain"></div>
+        <button class="sig-view-fullscreen" onclick="verAssinaturaModal()">⛶ Ampliar</button>
+      </div>
+      <div id="cd-no-sig-box" style="display:none">
+        <div style="background:var(--redbg);border:1px solid rgba(255,77,109,.18);border-radius:var(--rs);padding:.7rem;font-size:.74rem;color:#fca5a5">⚠️ Nenhuma assinatura do professor registrada.</div>
+      </div>
+
+      <div class="field">
+        <label>Condição de Retorno <span class="req">*</span></label>
+        <select id="cd-cond"><option value="otimo">✅ Ótimo</option><option value="bom" selected>👍 Bom</option><option value="regular">⚠️ Regular</option><option value="danificado">❌ Danificado</option></select>
+      </div>
+      <div class="field">
+        <label>Observações do Técnico</label>
+        <textarea id="cd-obs" placeholder="Estado dos equipamentos, observações…"></textarea>
+      </div>
+      <div>
+        <p style="font-size:.74rem;color:var(--muted);margin-bottom:.55rem">✍️ <strong style="color:var(--text2)">Assinatura do Técnico</strong> — obrigatória</p>
+        <div class="sig-wrap" id="sig-wt"><canvas class="sig-canvas" id="sig-t" width="1000" height="220"></canvas><div class="sig-hint" id="sig-ht"><i>✍️</i><span>Técnico assina aqui</span></div></div>
+        <div class="sig-acts"><button class="sig-clr" onclick="clearSig('sig-t','sig-ht','sig-wt')">Limpar</button></div>
+      </div>
+    </div>
+    <div class="modal-f">
+      <button class="bs ghost" onclick="closeOv('ov-confirmar-dev')">Cancelar</button>
+      <button class="bs green" onclick="confirmarDevTec()">✓ Confirmar Devolução</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Marcar como entregue (Aprovados Hoje) -->
+<div class="overlay" id="ov-marcar-entregue">
+  <div class="modal" style="max-width:440px">
+    <div class="modal-h"><h3>📦 Marcar como Entregue</h3><button class="modal-x" onclick="closeOv('ov-marcar-entregue')">✕</button></div>
+    <div class="modal-b">
+      <div style="background:rgba(79,142,247,.05);border:1px solid rgba(79,142,247,.15);border-radius:var(--rs);padding:.75rem;font-size:.74rem;color:#93c5fd;line-height:1.5">
+        📋 Confirme que entregou os equipamentos fisicamente ao professor.
+      </div>
+      <div class="info-box">
+        <div class="info-row"><span class="info-lbl">Protocolo</span><span class="info-val mono-sm" id="me-proto" style="color:var(--blue)">—</span></div>
+        <div class="info-row"><span class="info-lbl">Professor</span><span class="info-val" id="me-nome">—</span></div>
+        <div class="info-row"><span class="info-lbl">Equipamentos</span><div class="dev-tags" id="me-equips"></div></div>
+        <div class="info-row"><span class="info-lbl">Sala</span><span class="info-val" id="me-sala">—</span></div>
+      </div>
+      <div class="hora-real-badge">⏱ Hora de Entrega: <span id="me-hora-real" style="margin-left:.4rem">—</span></div>
+    </div>
+    <div class="modal-f">
+      <button class="bs ghost" onclick="closeOv('ov-marcar-entregue')">Cancelar</button>
+      <button class="bs green" onclick="confirmarEntrega()">✓ Entregue ao Professor</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Novo Usuário -->
+<div class="overlay" id="ov-new-user">
+  <div class="modal">
+    <div class="modal-h"><h3>👤 Novo Técnico</h3><button class="modal-x" onclick="closeOv('ov-new-user')">✕</button></div>
+    <div class="modal-b">
+      <div class="field"><label>Nome Completo <span class="req">*</span></label><input type="text" id="nu-nome" placeholder="Ex: Carlos Silva"></div>
+      <div class="field"><label>E-mail <span class="req">*</span></label><input type="email" id="nu-email" placeholder="carlos@una.edu.br"></div>
+      <div class="frow">
+        <div class="field"><label>Senha <span class="req">*</span></label><input type="password" id="nu-senha" placeholder="Mín. 6 caracteres"></div>
+        <div class="field"><label>Nível</label><select id="nu-role"><option value="tecnico">Técnico TI</option><option value="senior">Técnico Sênior</option></select></div>
+      </div>
+    </div>
+    <div class="modal-f"><button class="bs ghost" onclick="closeOv('ov-new-user')">Cancelar</button><button class="bs blue" onclick="criarUsuario()">✓ Criar</button></div>
+  </div>
+</div>
+
+<!-- Modal: Novo Equipamento -->
+<div class="overlay" id="ov-new-equip">
+  <div class="modal">
+    <div class="modal-h"><h3>💻 Cadastrar Equipamento</h3><button class="modal-x" onclick="closeOv('ov-new-equip')">✕</button></div>
+    <div class="modal-b">
+      <div class="frow">
+        <div class="field"><label>N° Patrimônio <span class="req">*</span></label><input type="text" id="ne-pat" placeholder="UNA-0025"></div>
+        <div class="field"><label>Categoria</label><select id="ne-cat"><option>Chromebook</option><option>Notebook</option><option>Microfone</option><option>Cabo HDMI</option><option>Adaptador</option><option>Projetor</option><option>Carregador</option></select></div>
+      </div>
+      <div class="field"><label>Nome <span class="req">*</span></label><input type="text" id="ne-nome" placeholder="Ex: Chromebook Lenovo 300e"></div>
+      <div class="frow">
+        <div class="field"><label>Unidade</label><select id="ne-uni"><option value="aimores">UNA Aimorés</option><option value="liberdade">UNA Liberdade</option></select></div>
+        <div class="field"><label>Condição</label><select id="ne-cond"><option value="otimo">Ótimo</option><option value="bom">Bom</option><option value="regular">Regular</option></select></div>
+      </div>
+    </div>
+    <div class="modal-f"><button class="bs ghost" onclick="closeOv('ov-new-equip')">Cancelar</button><button class="bs blue" onclick="salvarEquipamento()">✓ Cadastrar</button></div>
+  </div>
+</div>
+
+<!-- Supabase Status -->
+<div class="sb-status" id="sb-status"><div class="sb-dot conn" id="sb-dot"></div><span id="sb-txt">Conectando…</span></div>
+<div id="toasts"></div>
+
+
+<script>
+/* ══════════════════════════════════════════
+   SUPABASE CONFIG — substitua suas credenciais
+══════════════════════════════════════════ */
+const SUPABASE_URL = 'https://stybfwmbpuibsroxxmbx.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_cOnmQ_l3dElESc-0QXZXwg_ryrZS7Dj';
+
+/* ══════════════════════════════════════════
+   SUPABASE LAYER
+══════════════════════════════════════════ */
+let sbClient = null, sbOnline = false;
+
+async function sbInit(){
+  try{
+    await loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js');
+    if(SUPABASE_URL.includes('SEU_PROJETO')){ setSbStatus('err','Modo local (Supabase não configurado)'); return; }
+    sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const {error} = await sbClient.from('solicitacoes').select('id').limit(1);
+    if(error) throw error;
+    sbOnline = true;
+    setSbStatus('ok','Supabase conectado · Tempo real');
+    setupRealtime();
+  }catch(e){ sbOnline=false; setSbStatus('err','Modo local (Supabase offline)'); console.warn('SB offline:',e.message); }
+}
+
+function loadScript(src){ return new Promise((res,rej)=>{ const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=rej;document.head.appendChild(s); }); }
+function setSbStatus(t,txt){ const d=document.getElementById('sb-dot'),e=document.getElementById('sb-txt'); d.className='sb-dot '+t; e.textContent=txt; }
+
+function setupRealtime(){
+  if(!sbClient||!sbOnline) return;
+  sbClient.channel('tl-changes')
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'solicitacoes'},p=>{
+      const s=p.new;
+      const nova={ id:s.id, proto:s.protocolo, prof:s.professor, sala:s.sala, uni:s.unidade,
+        equips:s.equipamentos||[], obs:s.observacao||'', tipo:s.tipo||'agora',
+        hora:_agora(), nova:true, sig:s.assinatura_prof, local:s.local_devolucao,
+        localDet:s.local_detalhe||'', status:'pendente', agData:s.ag_data||'', agHora:s.ag_hora||'' };
+      solicitacoes.unshift(nova);
+      updateBadges(); renderAll();
+      showBanner('🔔',`Nova Solicitação: ${s.professor}`,`${(s.equipamentos||[]).join(', ')} · Sala ${s.sala}`,'new');
+    })
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'devolucoes'},p=>{
+      const d=p.new;
+      const nova={ id:d.id, proto:d.protocolo, protoOrig:d.protocolo_original, prof:d.professor,
+        sala:d.sala, equips:d.equipamentos||[], hora:_agora(), nova:true,
+        sigProf:d.assinatura_prof, localDev:d.local_devolucao, localDet:d.local_detalhe||'' };
+      devsPendentes.unshift(nova);
+      updateBadges(); renderAll();
+      showBanner('↩️',`Devolução Pendente: ${d.professor}`,`${(d.equipamentos||[]).join(', ')} · ${d.local_devolucao}`,'dev');
+    })
+    .subscribe();
+}
+
+async function sbInsertSolicitacao(d){
+  if(!sbOnline||!sbClient) return {ok:false};
+  const {error}=await sbClient.from('solicitacoes').insert({
+    protocolo:d.proto, professor:d.prof, sala:d.sala, unidade:d.uni,
+    equipamentos:d.equips, observacao:d.obs, tipo:d.tipo,
+    assinatura_prof:d.sig, local_devolucao:d.local, local_detalhe:d.localDet,
+    ag_data:d.agData||null, ag_hora:d.agHora||null,
+    data_solicitacao:new Date().toISOString(), status:'pendente'
+  });
+  return {ok:!error, error};
+}
+
+async function sbInsertDevolucao(d){
+  if(!sbOnline||!sbClient) return {ok:false};
+  const {error}=await sbClient.from('devolucoes').insert({
+    protocolo:d.proto, protocolo_original:d.protoOrig, professor:d.prof, sala:d.sala,
+    equipamentos:d.equips, assinatura_prof:d.sigProf, local_devolucao:d.localDev,
+    local_detalhe:d.localDet, condicao:d.cond, observacao:d.obs,
+    data_devolucao:new Date().toISOString(), status:'aguardando_tecnico'
+  });
+  return {ok:!error, error};
+}
+
+async function sbAprovar(id, tecNome){
+  if(!sbOnline||!sbClient) return {ok:false};
+  const {error}=await sbClient.from('solicitacoes').update({
+    status:'aprovado', tecnico_aprovador:tecNome,
+    data_aprovacao:new Date().toISOString(), hora_aprovacao:_agora()
+  }).eq('id',id);
+  return {ok:!error,error};
+}
+
+async function sbMarcarRetirado(id, tecNome){
+  if(!sbOnline||!sbClient) return {ok:false};
+  const {error}=await sbClient.from('solicitacoes').update({
+    status:'retirado', data_retirada:new Date().toISOString(), hora_retirada:_agora()
+  }).eq('id',id);
+  return {ok:!error,error};
+}
+
+async function sbConfirmarDevolucao(id, d){
+  if(!sbOnline||!sbClient) return {ok:false};
+  const {error}=await sbClient.from('devolucoes').update({
+    assinatura_tec:d.sigTec, tecnico_nome:d.tecNome, condicao_retorno:d.cond,
+    observacao_tec:d.obs, data_confirmacao:new Date().toISOString(), hora_confirmacao:_agora(), status:'confirmado'
+  }).eq('id',id);
+  return {ok:!error,error};
+}
+
+async function sbBuscarProtocolo(proto){
+  if(!sbOnline||!sbClient){
+    // busca local
+    const s=solicitacoes.find(x=>x.proto===proto.toUpperCase());
+    if(s) return {ok:true,data:{professor:s.prof,sala:s.sala,equipamentos:s.equips,hora:s.hora,id:s.id,proto:s.proto,status:s.status,tipo:s.tipo,agData:s.agData||'',agHora:s.agHora||''}};
+    if(proto.toUpperCase().startsWith('TL'))
+      return {ok:true,data:{professor:'Demo Professor',sala:'L100',equipamentos:['Chromebook (1×)'],hora:_agora(),id:null,proto:proto.toUpperCase(),status:'retirado',tipo:'agora',agData:'',agHora:''}};
+    return {ok:false,error:'Protocolo não encontrado'};
+  }
+  const {data,error}=await sbClient.from('solicitacoes').select('*').eq('protocolo',proto.toUpperCase()).single();
+  if(error||!data) return {ok:false,error:'Protocolo não encontrado'};
+  return {ok:true,data:{professor:data.professor,sala:data.sala,equipamentos:data.equipamentos,hora:data.data_solicitacao,id:data.id,proto:data.protocolo,status:data.status,tipo:data.tipo,agData:data.ag_data||'',agHora:data.ag_hora||''}};
+}
+
+/* ══════════════════════════════════════════
+   STATE
+══════════════════════════════════════════ */
+/*
+  ESTADO MÁQUINA SOLICITAÇÕES:
+  pendente → aprovado → retirado
+  
+  ESTADO MÁQUINA DEVOLUÇÕES:
+  aguardando_tecnico → confirmado
+*/
+let solicitacoes = [
+  { id:1, proto:'TL202500001', prof:'Fernanda Costa', sala:'C110', uni:'aimores', equips:['Microfone','USB-C → HDMI'], obs:'Apresentação TCC', tipo:'agora', hora:'Há 2 min', nova:true, sig:null, local:'Balcão TI', localDet:'', status:'pendente', agData:'', agHora:'' },
+  { id:2, proto:'TL202500002', prof:'Ricardo Alves',  sala:'L204', uni:'aimores', equips:['Chromebook (2×)','Notebook'], obs:'Aula prática', tipo:'agendar', hora:'Há 8 min', nova:false, sig:null, local:'Sala de Aula', localDet:'Mesa do fundo', status:'pendente', agData:'2025-06-15', agHora:'14:00' },
+  { id:3, proto:'TL202500003', prof:'Ana Claudia Melo', sala:'B102', uni:'liberdade', equips:['Chromebook (3×)'], obs:'', tipo:'agora', hora:'Há 15 min', nova:false, sig:null, local:'Balcão TI', localDet:'', status:'aprovado', horaAprovacao:'Hoje 08:30', tecAprovador:'Bruno T.', agData:'', agHora:'' },
+  { id:4, proto:'TL202500004', prof:'Carlos Duarte', sala:'A301', uni:'aimores', equips:['Notebook','HDMI → VGA'], obs:'', tipo:'agora', hora:'Ontem', nova:false, sig:null, local:'Sala de Aula', localDet:'', status:'retirado', horaAprovacao:'Ontem 10:00', horaRetirada:'Ontem 10:30', tecAprovador:'Bruno T.', agData:'', agHora:'' }
+];
+let devsPendentes = [];
+let logs = [
+  {tipo:'e',acao:'Solicitação Recebida',detalhe:'Fernanda Costa → Microfone, USB-C → HDMI · Sala C110',hora:_agora()},
+  {tipo:'e',acao:'Solicitação Recebida',detalhe:'Ricardo Alves → Chromebook (2×), Notebook · Sala L204',hora:_agora()},
+  {tipo:'a',acao:'Solicitação Aprovada',detalhe:'Bruno T. aprovou TL202500003 de Ana Claudia Melo',hora:_agora()},
+  {tipo:'d',acao:'Equipamento Entregue',detalhe:'Carlos Duarte retirou Notebook, HDMI → VGA · Sala A301',hora:_agora()},
+];
+
+let selEquips=[], tipoSolic='agora', profSig=null, tecSig=null, devProfSig=null;
+let protoSeq=4, localSelecionado='', localDevSelecionado='';
+let currentUser=null, _devBuscaResult=null, _cdSigProf=null, _cdDevId=null;
+let _meId=null; // for marcar entregue modal
+let _sigFullData=null;
+
+const USERS={};
+USERS['tecnico@una.edu.br']={senha:'1234',nome:'Bruno Técnico',role:'Técnico TI',av:'BT',nivel:'tecnico'};
+USERS['admin@una.edu.br']={senha:'admin',nome:'Admin TI',role:'Técnico TI',av:'AD',nivel:'tecnico'};
+USERS['master@una.edu.br']={senha:'master123',nome:'Admin Master',role:'Master',av:'MA',nivel:'master'};
+let tecUsers=[{email:'tecnico@una.edu.br',nome:'Bruno Técnico',role:'Técnico TI',av:'BT'},{email:'admin@una.edu.br',nome:'Admin TI',role:'Técnico TI',av:'AD'}];
+
+/* ══════════════════════════════════════════
+   HELPERS
+══════════════════════════════════════════ */
+function _agora(){ const n=new Date(); return `${_p(n.getDate())}/${_p(n.getMonth()+1)} ${_p(n.getHours())}:${_p(n.getMinutes())}`; }
+function _agoraHora(){ const n=new Date(); return `${_p(n.getHours())}:${_p(n.getMinutes())}`; }
+function _hoje(){ const n=new Date(); return `${_p(n.getDate())}/${_p(n.getMonth()+1)}/${n.getFullYear()}`; }
+function _p(v){ return String(v).padStart(2,'0'); }
+
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+/* ══════════════════════════════════════════
+   QR CODE / URL PARAMS
+══════════════════════════════════════════ */
+function checkURLParams(){
+  try{
+    const p=new URLSearchParams(window.location.search);
+    const proto=p.get('proto');
+    const mode=p.get('mode');
+    if(proto){
+      if(mode==='devolver'){
+        abrirDevolucao(true);
+        setTimeout(()=>{
+          document.getElementById('dev-proto-inp').value=proto.toUpperCase();
+          document.getElementById('qr-detected-banner').style.display='flex';
+          buscarProtocolo();
+        },350);
+      }
+    }
+  }catch(e){}
+}
+
+function gerarQRUrl(proto){
+  const base=window.location.origin+window.location.pathname;
+  return `${base}?proto=${proto}&mode=devolver`;
+}
+
+function renderQR(canvasId, proto){
+  try{
+    const el=document.getElementById(canvasId);
+    if(!el) return;
+    el.innerHTML='';
+    if(typeof QRCode!=='undefined'){
+      new QRCode(el,{text:gerarQRUrl(proto),width:128,height:128,colorDark:'#1e293b',colorLight:'#ffffff'});
+    } else {
+      el.innerHTML=`<div style="width:128px;height:128px;background:#f8fafc;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:.3rem;border:1px solid #e2e8f0;font-size:.62rem;color:#64748b;text-align:center;padding:.5rem"><span style="font-size:1.8rem">📱</span><span>${proto}</span><span>QR disponível online</span></div>`;
+    }
+  }catch(e){ console.warn('QR error:',e); }
+}
+
+/* ══════════════════════════════════════════
+   PROFESSOR — SOLICITAR
+══════════════════════════════════════════ */
+function abrirFormulario(){
+  ['pf-nome','pf-sala','pf-local'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  document.getElementById('pf-uni').value='';
+  document.querySelectorAll('.eq-item').forEach(e=>e.classList.remove('sel'));
+  document.querySelectorAll('.qty-row').forEach(e=>e.style.display='none');
+  selEquips=[]; profSig=null; localSelecionado='';
+  document.querySelectorAll('#local-grid .local-opt').forEach(e=>e.classList.remove('sel'));
+  clearSig('sig-p','sig-hp','sig-wp');
+  setTipo('agora');
+  show('s-prof');
+  setTimeout(()=>initSig('sig-p','sig-hp','sig-wp',v=>profSig=v),200);
+}
+
+function toggleEq(el){
+  const nome=el.dataset.nome;
+  const qid=el.dataset.qid;
+  el.classList.toggle('sel');
+  const s=el.classList.contains('sel');
+  if(s){ if(!selEquips.includes(nome)) selEquips.push(nome); }
+  else { selEquips=selEquips.filter(e=>e!==nome); }
+  if(qid){ document.getElementById(qid).style.display=s?'flex':'none'; }
+}
+
+function chQty(id,d){ const el=document.getElementById(id); let v=parseInt(el.textContent)+d; if(v<1)v=1; if(v>20)v=20; el.textContent=v; }
+function setTipo(t){ tipoSolic=t; document.getElementById('t-agora').classList.toggle('sel',t==='agora'); document.getElementById('t-agendar').classList.toggle('sel',t==='agendar'); document.getElementById('agendar-block').style.display=t==='agendar'?'block':'none'; }
+function selLocal(el,nome){ document.querySelectorAll('#local-grid .local-opt').forEach(e=>e.classList.remove('sel')); el.classList.add('sel'); localSelecionado=nome; }
+
+async function submitProf(){
+  const nome=document.getElementById('pf-nome').value.trim();
+  const sala=document.getElementById('pf-sala').value.trim();
+  const uni=document.getElementById('pf-uni').value;
+  if(!nome||!sala||!uni){ toast('⚠️','Campos obrigatórios','Preencha nome, sala e unidade.','w'); return; }
+  if(selEquips.length===0){ toast('⚠️','Selecione equipamentos','Escolha ao menos um item.','w'); return; }
+  if(!localSelecionado){ toast('📍','Local obrigatório','Informe onde vai devolver.','w'); document.getElementById('local-grid').scrollIntoView({behavior:'smooth',block:'center'}); return; }
+  if(!document.getElementById('sig-wp').classList.contains('has')){ toast('✍️','Assinatura obrigatória','Assine para confirmar.','w'); document.getElementById('sig-wp').scrollIntoView({behavior:'smooth',block:'center'}); return; }
+
+  const cbQ=parseInt(document.getElementById('cb-n').textContent);
+  const nbQ=parseInt(document.getElementById('nb-n').textContent);
+  const ef=selEquips.map(e=>{ if(e==='Chromebook')return`Chromebook (${cbQ}×)`; if(e==='Notebook')return`Notebook (${nbQ}×)`; return e; });
+
+  protoSeq++;
+  const proto=`TL${new Date().getFullYear()}${String(protoSeq).padStart(5,'0')}`;
+  const agData=tipoSolic==='agendar'?(document.getElementById('pf-ag-data').value||''):'';
+  const agHora=tipoSolic==='agendar'?(document.getElementById('pf-ag-hora').value||''):'';
+
+  const nova={ id:Date.now(), proto, prof:nome, sala, uni, equips:ef, obs:'', tipo:tipoSolic,
+    hora:_agora(), nova:true, sig:profSig, local:localSelecionado,
+    localDet:document.getElementById('pf-local').value, status:'pendente', agData, agHora };
+
+  const btn=document.getElementById('btn-submit-prof');
+  btn.disabled=true; btn.textContent='Enviando…';
+
+  const sbRes=await sbInsertSolicitacao(nova);
+  if(sbOnline&&!sbRes.ok) toast('⚠️','Erro no servidor','Salvando localmente.','w');
+
+  solicitacoes.unshift(nova);
+  updateBadges(); addLog('e','Solicitação Enviada',`${nome} → ${ef.join(', ')} · Sala ${sala}`);
+
+  document.getElementById('proto-num').textContent=proto;
+  document.getElementById('proto-sub').textContent=tipoSolic==='agora'?`${nome} · Sala ${sala} · Retirada imediata`:`${nome} · Sala ${sala} · Agendado para ${agData||'—'} às ${agHora||'—'}`;
+
+  btn.disabled=false; btn.textContent='📤 Enviar Solicitação';
+
+  show('s-success');
+  setTimeout(()=>renderQR('qr-canvas',proto),300);
+
+  setTimeout(()=>{
+    if(document.getElementById('s-tec').classList.contains('active')){
+      showBanner('🔔',`Nova Solicitação: ${nome}`,`${ef.join(', ')} · Sala ${sala}`,'new');
+      renderAll();
+    }
+  },500);
+}
+
+/* ══════════════════════════════════════════
+   PROFESSOR — DEVOLVER
+══════════════════════════════════════════ */
+function abrirDevolucao(fromQR=false){
+  document.getElementById('dev-proto-inp').value='';
+  document.getElementById('proto-result').style.display='none';
+  document.getElementById('dev-local-card').style.display='none';
+  document.getElementById('dev-cond-card').style.display='none';
+  document.getElementById('dev-sig-card').style.display='none';
+  document.getElementById('btn-submit-dev').style.display='none';
+  document.getElementById('qr-detected-banner').style.display='none';
+  document.querySelectorAll('#dev-local-grid .local-opt').forEach(e=>e.classList.remove('sel'));
+  localDevSelecionado=''; devProfSig=null; _devBuscaResult=null;
+  clearSig('sig-dp','sig-hdp','sig-wdp');
+  show('s-dev-prof');
+}
+
+function selLocalDev(el,nome){
+  document.querySelectorAll('#dev-local-grid .local-opt').forEach(e=>e.classList.remove('sel'));
+  el.classList.add('sel'); localDevSelecionado=nome;
+  document.getElementById('dev-cond-card').style.display='block';
+  document.getElementById('dev-sig-card').style.display='block';
+  document.getElementById('btn-submit-dev').style.display='flex';
+  setTimeout(()=>initSig('sig-dp','sig-hdp','sig-wdp',v=>devProfSig=v),150);
+}
+
+async function buscarProtocolo(){
+  const proto=document.getElementById('dev-proto-inp').value.trim();
+  if(!proto||proto.length<5){ toast('⚠️','Protocolo inválido','Digite um protocolo válido.','w'); return; }
+  toast('🔍','Buscando…','Localizando empréstimo.','b');
+
+  const res=await sbBuscarProtocolo(proto);
+  if(!res.ok){ toast('❌','Não encontrado','Verifique o protocolo digitado.','r'); return; }
+
+  _devBuscaResult=res.data;
+  document.getElementById('dr-nome').textContent=res.data.professor||'—';
+  document.getElementById('dr-sala').textContent=res.data.sala||'—';
+  document.getElementById('dr-hora').textContent=res.data.hora||'—';
+
+  // Status badge
+  const statusMap={pendente:'⏳ Aguardando aprovação',aprovado:'✅ Aprovado — aguardando retirada',retirado:'🔄 Em uso — pode devolver',cancelado:'❌ Cancelado'};
+  const statusEl=document.getElementById('dr-status');
+  statusEl.textContent=statusMap[res.data.status]||res.data.status||'—';
+  const clrMap={pendente:'var(--amber)',aprovado:'var(--blue)',retirado:'var(--green)',cancelado:'var(--red)'};
+  statusEl.style.color=clrMap[res.data.status]||'var(--text)';
+
+  const eqEl=document.getElementById('dr-equips');
+  eqEl.innerHTML=(res.data.equipamentos||[]).map(e=>`<span class="dev-tag">${e}</span>`).join('');
+
+  // Se for agendamento, mostrar aviso
+  if(res.data.tipo==='agendar' && res.data.status==='pendente'){
+    toast('🗓️','Pedido Agendado',`Pedido para ${res.data.agData||'—'} às ${res.data.agHora||'—'}. Aguardando aprovação.`,'b');
+  }
+
+  document.getElementById('proto-result').style.display='block';
+  document.getElementById('dev-local-card').style.display='block';
+  toast('✅','Empréstimo localizado!',`${res.data.professor} · ${(res.data.equipamentos||[]).join(', ')}`);
+}
+
+async function submitDevolucao(){
+  if(!_devBuscaResult){ toast('⚠️','Busque o protocolo primeiro.','','w'); return; }
+  if(!localDevSelecionado){ toast('📍','Local obrigatório','Selecione onde está devolvendo.','w'); return; }
+  if(!document.getElementById('sig-wdp').classList.contains('has')){ toast('✍️','Assinatura obrigatória','Assine para confirmar.','w'); document.getElementById('sig-wdp').scrollIntoView({behavior:'smooth',block:'center'}); return; }
+
+  const btn=document.getElementById('btn-submit-dev');
+  btn.disabled=true; btn.textContent='Enviando…';
+
+  protoSeq++;
+  const protoD=`DEV${new Date().getFullYear()}${String(protoSeq).padStart(5,'0')}`;
+  const dados={
+    proto:protoD, protoOrig:_devBuscaResult.proto||document.getElementById('dev-proto-inp').value.trim().toUpperCase(),
+    prof:_devBuscaResult.professor, sala:_devBuscaResult.sala,
+    equips:_devBuscaResult.equipamentos||[], sigProf:devProfSig,
+    localDev:localDevSelecionado, localDet:document.getElementById('dev-local-det').value,
+    cond:document.getElementById('dev-cond').value, obs:document.getElementById('dev-obs').value,
+    hora:_agora()
+  };
+
+  await sbInsertDevolucao(dados);
+
+  const nova={ id:Date.now(), ...dados, nova:true };
+  devsPendentes.unshift(nova);
+
+  // Atualiza status da solicitação original para "devolucao_pendente" nos logs
+  const solOrig=solicitacoes.find(s=>s.proto===dados.protoOrig);
+  if(solOrig){ solOrig.status='devolucao_pendente'; }
+
+  updateBadges(); addLog('v','Devolução Iniciada',`${dados.prof} → ${dados.equips.join(', ')} · ${localDevSelecionado} · ${_agora()}`);
+
+  document.getElementById('dev-proto-num').textContent=protoD;
+  document.getElementById('dev-proto-sub').textContent=`${dados.prof} · ${dados.equips.join(', ')} · ${localDevSelecionado} · ${_agora()}`;
+
+  btn.disabled=false; btn.textContent='↩️ Registrar Devolução';
+  show('s-dev-success');
+
+  setTimeout(()=>{
+    if(document.getElementById('s-tec').classList.contains('active')){
+      showBanner('↩️',`Devolução Pendente: ${dados.prof}`,`${dados.equips.join(', ')} · ${localDevSelecionado}`,'dev');
+      renderAll();
+    }
+  },500);
+}
+
+/* ══════════════════════════════════════════
+   LOGIN / LOGOUT
+══════════════════════════════════════════ */
+function doLogin(){
+  const email=document.getElementById('l-email').value.trim();
+  const senha=document.getElementById('l-senha').value;
+  const u=USERS[email];
+  const err=document.getElementById('l-err');
+  if(u&&u.senha===senha){
+    err.style.display='none';
+    currentUser={...u,email};
+    document.getElementById('tc-nome').textContent=u.nome;
+    document.getElementById('tc-role').textContent=u.role;
+    const av=document.getElementById('tc-av');
+    av.textContent=u.av; av.className='sb-av'+(u.nivel==='master'?' master':'');
+    document.getElementById('nav-usuarios').style.display=u.nivel==='master'?'flex':'none';
+    show('s-tec');
+    renderAll(); renderLogs(); renderUsers(); updateBadges();
+    setTimeout(()=>toast('✅','Bem-vindo!',`Logado como ${u.nome}`),300);
+    addLog('d','Login',`${u.nome} acessou o painel`);
+    const tb=document.getElementById('access-log-tbody');
+    if(tb){ const tr=document.createElement('tr'); tr.innerHTML=`<td>${u.nome}</td><td style="color:var(--green)">Login</td><td style="color:var(--muted);font-family:'JetBrains Mono',monospace">${_agora()}</td>`; tb.prepend(tr); }
+  } else { err.style.display='block'; }
+}
+function doLogout(){ if(currentUser) addLog('d','Logout',`${currentUser.nome} saiu do sistema`); currentUser=null; show('s-home'); }
+
+/* ══════════════════════════════════════════
+   NAV
+══════════════════════════════════════════ */
+function navTo(pid,btn){
+  document.querySelectorAll('.tec-page').forEach(p=>p.classList.remove('on'));
+  document.getElementById(pid).classList.add('on');
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('on'));
+  if(btn) btn.classList.add('on');
+  if(pid==='pg-solics') markReadSolics();
+  if(pid==='pg-devs') markReadDevs();
+  if(pid==='pg-log') renderLogs();
+  if(pid==='pg-usuarios') renderUsers();
+  if(pid==='pg-aprov') renderAprovadosHoje();
+  if(pid==='pg-emp') renderEmprestimos();
+}
+
+/* ══════════════════════════════════════════
+   RENDER FUNCTIONS
+══════════════════════════════════════════ */
+function renderAll(){
+  renderDash(); renderSolics(); renderDevs(); renderAprovadosHoje(); renderEmprestimos();
+}
+
+function solicCardHTML(s, compact=false){
+  const isAgendado=s.tipo==='agendar';
+  const localTxt=s.local?`<span class="sc-local">📍 ${s.local}${s.localDet?' · '+s.localDet:''}</span>`:'';
+  const sigBtn=s.sig
+    ?`<button class="sc-sig-btn" onclick='verAssinatura(${JSON.stringify(s.sig)},${JSON.stringify(s.proto)},${JSON.stringify(s.prof)},${JSON.stringify(s.hora)})'>✍️ Ver Assinatura</button>`
+    :`<span class="sc-no-sig">⚠️ Sem assinatura</span>`;
+  const agInfo=isAgendado&&s.agData?`<span style="font-size:.65rem;color:var(--blue);margin-top:.08rem;display:block">🗓️ Para ${s.agData} ${s.agHora?' às '+s.agHora:''}</span>`:'';
+  return `
+  <div class="sc nova">
+    <div class="sc-top">
+      <div>
+        <div class="sc-name">${s.prof}</div>
+        <div class="sc-meta">Sala ${s.sala} · ${s.uni||''}</div>
+        ${agInfo}${localTxt}
+      </div>
+      <div style="text-align:right;flex-shrink:0">
+        <span class="bdg ${isAgendado?'aprov':'pend'}">${isAgendado?'Agendado':'Agora'}</span>
+        <div class="sc-time">${s.hora}</div>
+      </div>
+    </div>
+    ${s.obs?`<div style="font-size:.68rem;color:var(--muted)">📝 ${s.obs}</div>`:''}
+    <div class="sc-tags">${s.equips.map(e=>`<span class="sc-tag">${e}</span>`).join('')}</div>
+    <div class="sc-acts">
+      ${sigBtn}
+      <button class="bs green" onclick="aprovar(${s.id})">✓ Aprovar</button>
+      <button class="bs red" onclick="recusar(${s.id})">✕ Recusar</button>
+    </div>
+  </div>`;
+}
+
+function aprovCardHTML(s){
+  const isRetirado=s.status==='retirado';
+  return `
+  <div class="sc${isRetirado?' retir':' aprov'}">
+    <div class="sc-top">
+      <div>
+        <div class="sc-name">${s.prof}</div>
+        <div class="sc-meta">Sala ${s.sala} · <span class="mono-sm" style="color:var(--blue)">${s.proto}</span></div>
+        ${isRetirado?`<span style="font-size:.65rem;color:var(--green);margin-top:.08rem;display:block">✅ Retirado às ${s.horaRetirada||'—'}</span>`:
+          `<span class="pickup-timer">Aguardando retirada desde ${s.horaAprovacao||s.hora}</span>`}
+      </div>
+      <div style="text-align:right;flex-shrink:0">
+        <span class="bdg ${isRetirado?'retir':'aprov'}">${isRetirado?'Retirado':'Aprovado'}</span>
+        <div class="sc-time">${s.horaAprovacao||s.hora}</div>
+      </div>
+    </div>
+    <div class="sc-tags">${s.equips.map(e=>`<span class="sc-tag">${e}</span>`).join('')}</div>
+    ${!isRetirado?`<div class="sc-acts">
+      <button class="bs blue" onclick="openMarcarEntregue(${s.id})">📦 Marcar como Entregue</button>
+      <button class="bs ghost" onclick="verDetalhes(${s.id})">Ver detalhes</button>
+    </div>`:`<div class="sc-acts"><span style="font-size:.68rem;color:var(--muted)">Técnico: ${s.tecAprovador||'—'}</span></div>`}
+  </div>`;
+}
+
+function devCardHTML(d){
+  return `
+  <div class="sc devpend${d.nova?' nova':''}">
+    <div class="sc-top">
+      <div>
+        <div class="sc-name">${d.prof}</div>
+        <div class="sc-meta">Sala ${d.sala||'—'} · Empréstimo: <span class="mono-sm" style="color:var(--blue)">${d.protoOrig||d.proto}</span></div>
+        <span class="sc-local">📍 ${d.localDev}${d.localDet?' · '+d.localDet:''}</span>
+      </div>
+      <div style="text-align:right;flex-shrink:0">
+        <span class="bdg devpend">Dev. Pendente</span>
+        <div class="sc-time">${d.hora}</div>
+      </div>
+    </div>
+    <div class="sc-tags">${(d.equips||[]).map(e=>`<span class="sc-tag">${e}</span>`).join('')}</div>
+    <div class="sc-acts">
+      ${d.sigProf?`<button class="sc-sig-btn" onclick='verAssinatura(${JSON.stringify(d.sigProf)},${JSON.stringify(d.proto)},${JSON.stringify(d.prof)},${JSON.stringify(d.hora)})'>✍️ Assinatura</button>`:`<span class="sc-no-sig">✍️ Sem assinatura</span>`}
+      <button class="bs green" onclick="openConfirmarDev('${d.protoOrig||d.proto}','${d.prof.replace(/'/g,"\\'")}','${d.sala||''}',${JSON.stringify(d.sigProf)},${d.id},${JSON.stringify(d.equips)},${JSON.stringify(d.localDev)})">✓ Confirmar Dev.</button>
+      <button class="bs red" onclick="recusarDev(${d.id})">✕ Recusar</button>
+    </div>
+  </div>`;
+}
+
+function renderDash(){
+  const pendentes=solicitacoes.filter(s=>s.status==='pendente');
+  const aprovados=solicitacoes.filter(s=>s.status==='aprovado');
+
+  const sl=document.getElementById('dash-solic-list');
+  if(sl) sl.innerHTML=pendentes.length?pendentes.slice(0,2).map(s=>solicCardHTML(s)).join(''):`<div class="empty"><i>🔕</i><p>Nenhuma pendente</p></div>`;
+
+  const al=document.getElementById('dash-aprov-list');
+  if(al) al.innerHTML=aprovados.length?aprovados.slice(0,2).map(s=>aprovCardHTML(s)).join(''):`<div class="empty"><i>📦</i><p>Sem aprovados aguardando</p></div>`;
+
+  const dl=document.getElementById('dash-dev-list');
+  if(dl) dl.innerHTML=devsPendentes.length?devsPendentes.slice(0,2).map(d=>devCardHTML(d)).join(''):`<div class="empty"><i>✅</i><p>Sem devoluções pendentes</p></div>`;
+
+  const st_p=document.getElementById('st-pend'); if(st_p) st_p.textContent=pendentes.length;
+  const st_a=document.getElementById('st-aprov'); if(st_a) st_a.textContent=aprovados.length;
+  const st_d=document.getElementById('st-devs'); if(st_d) st_d.textContent=devsPendentes.length;
+  const st_at=document.getElementById('st-ativos'); if(st_at) st_at.textContent=solicitacoes.filter(s=>s.status==='retirado').length;
+}
+
+function renderSolics(){
+  const pendentes=solicitacoes.filter(s=>s.status==='pendente');
+  const el=document.getElementById('solics-list');
+  if(el) el.innerHTML=pendentes.length?pendentes.map(s=>solicCardHTML(s)).join(''):`<div class="empty"><i>🔕</i><p>Nenhuma solicitação pendente</p></div>`;
+  const ct=document.getElementById('solic-count'); if(ct) ct.textContent=pendentes.length?`${pendentes.length} solicitação(ões)`:'';
+}
+
+function renderDevs(){
+  const el=document.getElementById('devs-list');
+  if(el) el.innerHTML=devsPendentes.length?devsPendentes.map(d=>devCardHTML(d)).join(''):`<div class="empty"><i>✅</i><p>Nenhuma devolução pendente</p></div>`;
+  const ct=document.getElementById('devs-count'); if(ct) ct.textContent=devsPendentes.length?`${devsPendentes.length} pendente(s)`:'';
+}
+
+function renderAprovadosHoje(){
+  const aprovados=solicitacoes.filter(s=>s.status==='aprovado');
+  const retirados=solicitacoes.filter(s=>s.status==='retirado');
+
+  const pendEl=document.getElementById('aprov-pend-list');
+  if(pendEl) pendEl.innerHTML=aprovados.length?aprovados.map(s=>aprovCardHTML(s)).join(''):`<div class="empty"><i>⏳</i><p>Nenhum aguardando retirada</p></div>`;
+  const pendCt=document.getElementById('aprov-pend-count'); if(pendCt) pendCt.textContent=aprovados.length?`${aprovados.length} aguardando`:'';
+
+  const retirEl=document.getElementById('aprov-retir-list');
+  if(retirEl) retirEl.innerHTML=retirados.length?retirados.slice(0,5).map(s=>aprovCardHTML(s)).join(''):`<div class="empty"><i>📭</i><p>Nenhum entregue ainda hoje</p></div>`;
+  const retirCt=document.getElementById('aprov-retir-count'); if(retirCt) retirCt.textContent=retirados.length?`${retirados.length} entregue(s)`:'';
+}
+
+function renderEmprestimos(){
+  const tbody=document.getElementById('emp-tbody'); if(!tbody) return;
+  const todos=solicitacoes;
+  const statusMap={ pendente:'<span class="bdg pend">Pendente</span>', aprovado:'<span class="bdg aprov">Aprovado</span>', retirado:'<span class="bdg retir">Retirado</span>', cancelado:'<span class="bdg atr">Cancelado</span>', devolucao_pendente:'<span class="bdg devpend">Dev. Pend.</span>' };
+  tbody.innerHTML=todos.map(s=>`
+    <tr>
+      <td><span class="mono-sm" style="color:var(--blue)">${s.proto}</span></td>
+      <td><strong>${s.prof}</strong></td>
+      <td>${s.sala}</td>
+      <td style="font-size:.75rem">${s.equips.join(', ')}</td>
+      <td style="color:#c4b5fd;font-size:.7rem">📍 ${s.local||'—'}</td>
+      <td>${statusMap[s.status]||s.status}</td>
+      <td>${s.sig?`<button class="sc-sig-btn" onclick='verAssinatura(${JSON.stringify(s.sig)},${JSON.stringify(s.proto)},${JSON.stringify(s.prof)},${JSON.stringify(s.hora)})'>✍️ Ver</button>`:'<span style="color:var(--muted);font-size:.7rem">—</span>'}</td>
+      <td><span class="mono-sm" style="color:var(--muted)">${s.hora}</span></td>
+      <td>${s.status==='aprovado'?`<button class="bs amber" onclick="openMarcarEntregue(${s.id})">📦 Entregar</button>`:s.status==='retirado'?`<button class="bs amber" onclick="openConfirmarDev('${s.proto}','${s.prof.replace(/'/g,"\\'")}','${s.sala}',null,null,${JSON.stringify(s.equips)},${JSON.stringify(s.local||'')})">↩ Devolver</button>`:`<button class="bs ghost">Ver</button>`}</td>
+    </tr>`).join('');
+}
+
+/* ACTIONS */
+async function aprovar(id){
+  const s=solicitacoes.find(x=>x.id===id);
+  if(!s) return;
+  s.status='aprovado'; s.horaAprovacao=_agora(); s.tecAprovador=currentUser?.nome||'Técnico'; s.nova=false;
+  await sbAprovar(id, currentUser?.nome||'Técnico');
+  renderAll(); updateBadges();
+  toast('✅','Aprovado!',`${s.prof} notificado · Aguardando retirada.`);
+  addLog('a','Aprovação',`${currentUser?.nome||'Técnico'} aprovou ${s.proto} de ${s.prof} · Status: Aguardando Retirada`);
+  showBanner('📦',`Aprovado: ${s.prof}`,`${s.equips.join(', ')} · Aguardando retirada`,'aprov');
+}
+
+function recusar(id){
+  const s=solicitacoes.find(x=>x.id===id);
+  solicitacoes=solicitacoes.filter(x=>x.id!==id);
+  renderAll(); updateBadges();
+  if(s){ toast('❌','Recusado','Solicitação removida.','r'); addLog('r','Recusa',`${currentUser?.nome||'Técnico'} recusou ${s.proto} de ${s.prof}`); }
+}
+
+function recusarDev(id){
+  const d=devsPendentes.find(x=>x.id===id);
+  devsPendentes=devsPendentes.filter(x=>x.id!==id);
+  renderAll(); updateBadges();
+  if(d){ toast('❌','Devolução recusada','Verifique com o professor.','r'); addLog('r','Dev. Recusada',`${currentUser?.nome||'Técnico'} recusou devolução de ${d.prof}`); }
+}
+
+function markReadSolics(){ solicitacoes=solicitacoes.map(s=>({...s,nova:false})); updateBadges(); renderSolics(); }
+function markReadDevs(){ devsPendentes=devsPendentes.map(d=>({...d,nova:false})); updateBadges(); renderDevs(); }
+
+function updateBadges(){
+  const pendentes=solicitacoes.filter(s=>s.status==='pendente');
+  const aprovados=solicitacoes.filter(s=>s.status==='aprovado');
+  const np=pendentes.filter(s=>s.nova).length;
+  const nd=devsPendentes.filter(d=>d.nova).length;
+  const na=aprovados.length;
+
+  const b=document.getElementById('bdg'); if(b){b.textContent=np;b.style.display=np?'flex':'none';}
+  const bd=document.getElementById('bdg-dev'); if(bd){bd.textContent=nd;bd.style.display=nd?'flex':'none';}
+  const ba=document.getElementById('bdg-aprov'); if(ba){ba.textContent=na;ba.style.display=na?'flex':'none';}
+
+  const sp=document.getElementById('st-pend'); if(sp) sp.textContent=pendentes.length;
+  const sa=document.getElementById('st-aprov'); if(sa) sa.textContent=aprovados.length;
+  const sd=document.getElementById('st-devs'); if(sd) sd.textContent=devsPendentes.length;
+  const sat=document.getElementById('st-ativos'); if(sat) sat.textContent=solicitacoes.filter(s=>s.status==='retirado').length;
+}
+
+/* MARCAR ENTREGUE */
+function openMarcarEntregue(id){
+  const s=solicitacoes.find(x=>x.id===id);
+  if(!s) return;
+  _meId=id;
+  document.getElementById('me-proto').textContent=s.proto;
+  document.getElementById('me-nome').textContent=s.prof;
+  document.getElementById('me-sala').textContent=s.sala;
+  document.getElementById('me-equips').innerHTML=s.equips.map(e=>`<span class="dev-tag">${e}</span>`).join('');
+  document.getElementById('me-hora-real').textContent=_agora();
+  document.getElementById('ov-marcar-entregue').classList.add('open');
+}
+
+async function confirmarEntrega(){
+  if(!_meId) return;
+  const s=solicitacoes.find(x=>x.id===_meId);
+  if(!s) return;
+  s.status='retirado'; s.horaRetirada=_agora();
+  await sbMarcarRetirado(_meId, currentUser?.nome||'Técnico');
+  closeOv('ov-marcar-entregue');
+  renderAll(); updateBadges();
+  toast('📦','Entregue!',`${s.prof} retirou ${s.equips.join(', ')}`);
+  addLog('d','Equipamento Entregue',`${s.prof} retirou ${s.equips.join(', ')} · ${s.proto} · ${_agora()}`);
+}
+
+function filterEmp(inp){ const q=inp.value.toLowerCase(); document.querySelectorAll('#emp-tbody tr').forEach(tr=>tr.style.display=tr.textContent.toLowerCase().includes(q)?'':'none'); }
+function verDetalhes(id){ toast('ℹ️','Detalhes','Em breve: modal com linha do tempo do empréstimo.','b'); }
+
+/* ══════════════════════════════════════════
+   ASSINATURA MODAL
+══════════════════════════════════════════ */
+function verAssinatura(sigData,proto,nome,hora){
+  document.getElementById('sig-modal-proto').textContent=proto||'—';
+  document.getElementById('sig-modal-nome').textContent=nome||'—';
+  document.getElementById('sig-modal-time').textContent=hora||'—';
+  document.getElementById('sig-modal-time2').textContent=hora||'—';
+  const img=document.getElementById('sig-modal-img');
+  const box=document.getElementById('sig-modal-img-box');
+  if(sigData&&sigData!=='demo'&&sigData.length>100){
+    img.src=sigData; img.style.display='block'; _sigFullData=sigData;
+    box.style.background='#f8fafc';
+  } else {
+    img.style.display='none';
+    box.innerHTML='<div style="padding:1.5rem;color:#94a3b8;font-size:.78rem;text-align:center;line-height:1.6">📝 Assinatura de demonstração<br><small>Na versão com Supabase, a imagem real aparece aqui</small></div>';
+  }
+  document.getElementById('ov-sig').classList.add('open');
+}
+
+function verAssinaturaModal(){ const sig=document.getElementById('cd-sig-prof-img').src; if(sig&&sig.length>100) verAssinatura(sig,'','',''); }
+
+function expandSig(){
+  if(!_sigFullData) return;
+  const w=window.open('','_blank','width=620,height=420');
+  w.document.write(`<html><body style="margin:0;background:#f8fafc;display:flex;align-items:center;justify-content:center;min-height:100vh"><img src="${_sigFullData}" style="max-width:100%;max-height:100vh;border:1px solid #e2e8f0;border-radius:8px;padding:.5rem;background:#fff"></body></html>`);
+}
+
+/* ══════════════════════════════════════════
+   CONFIRMAR DEVOLUÇÃO (TÉCNICO)
+══════════════════════════════════════════ */
+function openConfirmarDev(proto,nome,sala,sigProf,devId,equips,localDev){
+  document.getElementById('cd-proto').textContent=proto||'—';
+  document.getElementById('cd-nome').textContent=nome||'—';
+  document.getElementById('cd-sala').textContent=sala||'—';
+  document.getElementById('cd-local').textContent=localDev||'—';
+  document.getElementById('cd-hora-real').textContent=_agora();
+  _cdDevId=devId||null; _cdSigProf=sigProf;
+
+  const eqEl=document.getElementById('cd-equips');
+  eqEl.innerHTML=(equips||[]).map(e=>`<span class="dev-tag">${e}</span>`).join('')||'<span style="font-size:.72rem;color:var(--muted)">—</span>';
+
+  const imgEl=document.getElementById('cd-sig-prof-img');
+  if(sigProf&&sigProf.length>100){
+    imgEl.src=sigProf; imgEl.style.display='block';
+    document.getElementById('cd-sig-prof-box').style.display='block';
+    document.getElementById('cd-no-sig-box').style.display='none';
+  } else {
+    document.getElementById('cd-sig-prof-img-box').innerHTML='<div style="padding:1.2rem;color:#94a3b8;font-size:.76rem;text-align:center;line-height:1.5">📝 Assinatura registrada<br>na solicitação original</div>';
+    imgEl.style.display='none';
+    document.getElementById('cd-sig-prof-box').style.display='block';
+    document.getElementById('cd-no-sig-box').style.display='none';
+  }
+
+  document.getElementById('cd-cond').value='bom';
+  document.getElementById('cd-obs').value='';
+  tecSig=null; clearSig('sig-t','sig-ht','sig-wt');
+  document.getElementById('ov-confirmar-dev').classList.add('open');
+  setTimeout(()=>initSig('sig-t','sig-ht','sig-wt',v=>tecSig=v),160);
+}
+
+async function confirmarDevTec(){
+  if(!document.getElementById('sig-wt').classList.contains('has')){ toast('✍️','Assinatura obrigatória','Técnico deve assinar.','w'); return; }
+  const proto=document.getElementById('cd-proto').textContent;
+  const nome=document.getElementById('cd-nome').textContent;
+  const horaReal=_agora();
+  const cond=document.getElementById('cd-cond').value;
+  const obs=document.getElementById('cd-obs').value;
+
+  if(_cdDevId) await sbConfirmarDevolucao(_cdDevId,{sigTec:tecSig,tecNome:currentUser?.nome||'Técnico',cond,obs});
+
+  if(_cdDevId){ devsPendentes=devsPendentes.filter(x=>x.id!==_cdDevId); }
+  // Atualiza a solicitação original
+  const s=solicitacoes.find(x=>x.proto===proto||x.proto===document.getElementById('cd-proto').textContent);
+  if(s) s.status='devolvido_confirmado';
+
+  closeOv('ov-confirmar-dev');
+  renderAll(); updateBadges();
+  toast('✅','Devolução Confirmada!',`${nome} · ${proto} · ${horaReal}`);
+  addLog('d','Devolução Confirmada',`${currentUser?.nome||'Técnico'} confirmou ${proto} de ${nome} · ${horaReal} · ${cond}`);
+}
+
+/* ══════════════════════════════════════════
+   LOGS
+══════════════════════════════════════════ */
+function addLog(tipo,acao,detalhe){ logs.unshift({tipo,acao,detalhe,hora:_agora()}); }
+function renderLogs(){
+  const el=document.getElementById('log-list'); if(!el) return;
+  el.innerHTML=logs.length?logs.map(l=>`
+    <div class="log-entry">
+      <span class="log-dot ${l.tipo}"></span>
+      <div class="log-txt"><div class="log-action">${l.acao}</div><div class="log-detail">${l.detalhe}</div></div>
+      <div class="log-time">${l.hora}</div>
+    </div>`).join(''):`<div class="empty"><i>📋</i><p>Nenhum evento</p></div>`;
+}
+function filterLogs(inp){ const q=inp.value.toLowerCase(); document.querySelectorAll('#log-list .log-entry').forEach(e=>e.style.display=e.textContent.toLowerCase().includes(q)?'':'none'); }
+
+/* ══════════════════════════════════════════
+   USERS
+══════════════════════════════════════════ */
+function renderUsers(){
+  const el=document.getElementById('users-list'); if(!el) return;
+  el.innerHTML=tecUsers.map(u=>`
+    <div class="user-card">
+      <div class="u-av">${u.av}</div>
+      <div><div class="u-name">${u.nome}</div><div class="u-info">${u.email} · ${u.role}</div></div>
+      <div class="u-actions"><button class="bs ghost" style="font-size:.64rem">Editar</button><button class="bs red" style="font-size:.64rem" onclick="deleteUser('${u.email}')">Remover</button></div>
+    </div>`).join('');
+}
+function openNovoUserModal(){ document.getElementById('ov-new-user').classList.add('open'); }
+function criarUsuario(){
+  const nome=document.getElementById('nu-nome').value.trim();
+  const email=document.getElementById('nu-email').value.trim();
+  const senha=document.getElementById('nu-senha').value;
+  const role=document.getElementById('nu-role').value;
+  if(!nome||!email||!senha){ toast('⚠️','Campos obrigatórios','Preencha tudo.','w'); return; }
+  if(senha.length<6){ toast('⚠️','Senha fraca','Mín. 6 caracteres.','w'); return; }
+  const av=nome.split(' ').map(n=>n[0]).slice(0,2).join('').toUpperCase();
+  const roleLabel=role==='senior'?'Técnico Sênior':'Técnico TI';
+  USERS[email]={senha,nome,role:roleLabel,av,nivel:'tecnico'};
+  tecUsers.push({email,nome,role:roleLabel,av});
+  closeOv('ov-new-user');
+  renderUsers();
+  toast('✅','Técnico Criado!',`${nome} pode fazer login.`);
+  addLog('m','Usuário Criado',`Master criou: ${nome} (${email})`);
+  ['nu-nome','nu-email','nu-senha'].forEach(id=>document.getElementById(id).value='');
+}
+function deleteUser(email){
+  if(!confirm(`Remover ${email}?`)) return;
+  const u=tecUsers.find(x=>x.email===email);
+  tecUsers=tecUsers.filter(x=>x.email!==email);
+  delete USERS[email];
+  renderUsers();
+  toast('🗑️','Removido',`${u?.nome} removido.`,'r');
+  addLog('r','Usuário Removido',`Master removeu: ${u?.nome} (${email})`);
+}
+function openNovoEquipModal(){ document.getElementById('ov-new-equip').classList.add('open'); }
+function salvarEquipamento(){
+  const pat=document.getElementById('ne-pat').value.trim();
+  const nome=document.getElementById('ne-nome').value.trim();
+  if(!pat||!nome){ toast('⚠️','Campos obrigatórios','Preencha tudo.','w'); return; }
+  closeOv('ov-new-equip');
+  toast('✅','Cadastrado!','Equipamento adicionado ao inventário.');
+  addLog('m','Equipamento Cadastrado',`${pat} — ${nome}`);
+}
+
+/* ══════════════════════════════════════════
+   MODALS
+══════════════════════════════════════════ */
+function closeOv(id){ document.getElementById(id).classList.remove('open'); }
+
+/* ══════════════════════════════════════════
+   BANNERS & TOASTS
+══════════════════════════════════════════ */
+function showBanner(ico,titulo,detalhe,tipo){
+  const b=document.createElement('div');
+  const cls={new:'',dev:' dev',aprov:' aprov'}[tipo]||'';
+  b.className=`notif-banner${cls}`;
+  b.innerHTML=`<span class="notif-ico">${ico}</span><div class="notif-txt"><strong>${titulo}</strong><small>${detalhe}</small></div><button class="notif-close" onclick="this.parentNode.remove()">✕</button>`;
+  document.body.appendChild(b);
+  setTimeout(()=>{b.style.opacity='0';b.style.transition='.38s';setTimeout(()=>b.remove(),380);},7000);
+}
+
+function toast(icon,title,msg='',type=''){
+  const tc=document.getElementById('toasts'),t=document.createElement('div');
+  t.className=`toast${type?' '+type:''}`;
+  t.innerHTML=`<span class="t-ico">${icon}</span><div><strong>${title}</strong>${msg?`<small>${msg}</small>`:''}</div>`;
+  tc.appendChild(t);
+  setTimeout(()=>{t.style.opacity='0';t.style.transform='translateX(12px)';t.style.transition='.24s';setTimeout(()=>t.remove(),240);},5000);
+}
+
+/* ══════════════════════════════════════════
+   SIGNATURE ENGINE
+══════════════════════════════════════════ */
+const _sigState={};
+
+function initSig(cid,hid,wid,cb){
+  const old=document.getElementById(cid); if(!old) return;
+  const fresh=old.cloneNode(false);
+  old.parentNode.replaceChild(fresh,old);
+  const c=document.getElementById(cid);
+  const ctx=c.getContext('2d');
+  ctx.fillStyle='#fff'; ctx.fillRect(0,0,c.width,c.height);
+  ctx.strokeStyle='#0f172a'; ctx.lineWidth=3.5; ctx.lineCap='round'; ctx.lineJoin='round';
+  _sigState[cid]={drawing:false,hasSig:false,lastX:0,lastY:0};
+
+  function getPos(e){
+    const rect=c.getBoundingClientRect();
+    const sx=c.width/rect.width, sy=c.height/rect.height;
+    const src=(e.touches&&e.touches.length>0)?e.touches[0]:(e.changedTouches&&e.changedTouches.length>0)?e.changedTouches[0]:e;
+    return{x:(src.clientX-rect.left)*sx,y:(src.clientY-rect.top)*sy};
+  }
+  function onStart(e){e.preventDefault();e.stopPropagation();const st=_sigState[cid];st.drawing=true;const p=getPos(e);st.lastX=p.x;st.lastY=p.y;ctx.beginPath();ctx.moveTo(p.x,p.y);}
+  function onMove(e){
+    e.preventDefault();e.stopPropagation();const st=_sigState[cid];if(!st.drawing)return;
+    const p=getPos(e);const mx=(st.lastX+p.x)/2,my=(st.lastY+p.y)/2;
+    ctx.quadraticCurveTo(st.lastX,st.lastY,mx,my);ctx.stroke();ctx.beginPath();ctx.moveTo(mx,my);
+    st.lastX=p.x;st.lastY=p.y;
+    if(!st.hasSig){st.hasSig=true;const h=document.getElementById(hid);if(h)h.style.display='none';const w=document.getElementById(wid);if(w)w.classList.add('has');}
+    if(cb)cb(c.toDataURL('image/png'));
+  }
+  function onEnd(e){e.preventDefault();e.stopPropagation();const st=_sigState[cid];if(!st.drawing)return;st.drawing=false;ctx.beginPath();if(cb)cb(c.toDataURL('image/png'));}
+
+  c.addEventListener('mousedown',onStart,false);c.addEventListener('mousemove',onMove,false);
+  c.addEventListener('mouseup',onEnd,false);c.addEventListener('mouseleave',onEnd,false);
+  c.addEventListener('touchstart',onStart,{passive:false});c.addEventListener('touchmove',onMove,{passive:false});
+  c.addEventListener('touchend',onEnd,{passive:false});c.addEventListener('touchcancel',onEnd,{passive:false});
+  c.style.touchAction='none';c.style.userSelect='none';c.style.webkitUserSelect='none';
+}
+
+function clearSig(cid,hid,wid){
+  const c=document.getElementById(cid); if(!c)return;
+  const ctx=c.getContext('2d');
+  ctx.fillStyle='#fff';ctx.fillRect(0,0,c.width,c.height);
+  const h=document.getElementById(hid);if(h)h.style.display='flex';
+  const w=document.getElementById(wid);if(w)w.classList.remove('has');
+  const st=_sigState[cid];if(st)st.hasSig=false;
+}
+
+/* ══════════════════════════════════════════
+   INIT
+══════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded',()=>{
+  sbInit();
+  checkURLParams();
+});
+</script>
+
+<!--
+═══════════════════════════════════════════
+  SCHEMA SQL SUPABASE — v9
+  Cole no SQL Editor do Supabase
+═══════════════════════════════════════════
+
+-- Tabela solicitacoes (máquina de estados: pendente → aprovado → retirado)
+CREATE TABLE IF NOT EXISTS solicitacoes (
+  id                BIGSERIAL PRIMARY KEY,
+  protocolo         TEXT UNIQUE NOT NULL,
+  professor         TEXT NOT NULL,
+  sala              TEXT NOT NULL,
+  unidade           TEXT,
+  equipamentos      JSONB DEFAULT '[]',
+  observacao        TEXT,
+  tipo              TEXT DEFAULT 'agora',          -- 'agora' | 'agendar'
+  ag_data           DATE,                           -- data agendada
+  ag_hora           TIME,                           -- hora agendada
+  assinatura_prof   TEXT,                           -- base64 PNG
+  local_devolucao   TEXT,
+  local_detalhe     TEXT,
+  data_solicitacao  TIMESTAMPTZ DEFAULT NOW(),
+  status            TEXT DEFAULT 'pendente',        -- pendente | aprovado | retirado | cancelado
+  tecnico_aprovador TEXT,
+  data_aprovacao    TIMESTAMPTZ,
+  hora_aprovacao    TEXT,
+  data_retirada     TIMESTAMPTZ,
+  hora_retirada     TEXT
+);
+
+-- Tabela devolucoes (máquina de estados: aguardando_tecnico → confirmado)
+CREATE TABLE IF NOT EXISTS devolucoes (
+  id                  BIGSERIAL PRIMARY KEY,
+  protocolo           TEXT UNIQUE NOT NULL,
+  protocolo_original  TEXT,
+  professor           TEXT NOT NULL,
+  sala                TEXT,
+  equipamentos        JSONB DEFAULT '[]',
+  assinatura_prof     TEXT,                         -- base64 PNG (professor assinou ao devolver)
+  local_devolucao     TEXT NOT NULL,
+  local_detalhe       TEXT,
+  condicao            TEXT DEFAULT 'bom',
+  observacao          TEXT,
+  data_devolucao      TIMESTAMPTZ DEFAULT NOW(),
+  status              TEXT DEFAULT 'aguardando_tecnico',
+  -- Preenchido pelo técnico ao confirmar:
+  assinatura_tec      TEXT,
+  tecnico_nome        TEXT,
+  condicao_retorno    TEXT,
+  observacao_tec      TEXT,
+  data_confirmacao    TIMESTAMPTZ,
+  hora_confirmacao    TEXT
+);
+
+-- Habilitar Realtime
+ALTER PUBLICATION supabase_realtime ADD TABLE solicitacoes;
+ALTER PUBLICATION supabase_realtime ADD TABLE devolucoes;
+
+-- Row Level Security (aberto para demo — restrinja em produção)
+ALTER TABLE solicitacoes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE devolucoes ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "allow_all" ON solicitacoes FOR ALL USING (true);
+CREATE POLICY "allow_all" ON devolucoes FOR ALL USING (true);
+
+-- Índices para performance
+CREATE INDEX IF NOT EXISTS idx_solic_status ON solicitacoes(status);
+CREATE INDEX IF NOT EXISTS idx_solic_proto ON solicitacoes(protocolo);
+CREATE INDEX IF NOT EXISTS idx_dev_proto ON devolucoes(protocolo_original);
+CREATE INDEX IF NOT EXISTS idx_dev_status ON devolucoes(status);
+-->
+</body>
+</html>
