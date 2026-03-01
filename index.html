@@ -444,7 +444,6 @@ tbody tr:hover td{background:rgba(255,255,255,.012)}
         <div class="field"><label>Sala <span class="req">*</span></label><input type="text" id="pf-sala" placeholder="Ex: L101"></div>
       </div>
     </div>
-    <!-- EQUIPAMENTOS — renderizado dinamicamente do banco -->
     <div class="fcard">
       <div class="fc-title">💻 Equipamentos Disponíveis</div>
       <div class="eq-grid" id="eq-grid">
@@ -499,7 +498,7 @@ tbody tr:hover td{background:rgba(255,255,255,.012)}
     <p>Seu pedido chegou para a equipe técnica em tempo real. Aguarde a aprovação.</p>
     <div class="proto-card">
       <div class="proto-lbl">Número do Protocolo</div>
-      <div class="proto-num" id="proto-num">TL202500001</div>
+      <div class="proto-num" id="proto-num">—</div>
       <div class="proto-sub" id="proto-sub">Aguardando aprovação da equipe TI</div>
     </div>
     <div class="qr-section">
@@ -712,7 +711,7 @@ tbody tr:hover td{background:rgba(255,255,255,.012)}
       </div>
     </div>
 
-    <!-- EQUIPAMENTOS — TOTALMENTE SINCRONIZADO COM SUPABASE -->
+    <!-- EQUIPAMENTOS -->
     <div class="tec-page" id="pg-equip">
       <div class="pg-head">
         <div><h1>Equipamentos</h1><p>Inventário sincronizado com o banco de dados</p></div>
@@ -721,7 +720,6 @@ tbody tr:hover td{background:rgba(255,255,255,.012)}
           <button class="bs blue" onclick="openNovoEquipModal()">+ Cadastrar</button>
         </div>
       </div>
-      <!-- Stats dinâmicos -->
       <div class="stats-grid" style="margin-bottom:.2rem">
         <div class="stat-c" data-ico="✅" style="--accent-grad:linear-gradient(90deg,var(--green),var(--green2));--stat-clr:var(--green)"><div class="s-lbl">Disponíveis</div><div class="s-val" id="eq-stat-disp">—</div><div class="s-trend">Prontos para uso</div></div>
         <div class="stat-c" data-ico="🔄" style="--accent-grad:linear-gradient(90deg,var(--amber),var(--amber2));--stat-clr:var(--amber)"><div class="s-lbl">Em Uso</div><div class="s-val" id="eq-stat-uso">—</div><div class="s-trend">Emprestados</div></div>
@@ -922,7 +920,7 @@ tbody tr:hover td{background:rgba(255,255,255,.012)}
   </div>
 </div>
 
-<!-- MODAL: Novo Equipamento — SINCRONIZADO COM SUPABASE -->
+<!-- MODAL: Novo Equipamento -->
 <div class="overlay" id="ov-new-equip">
   <div class="modal">
     <div class="modal-h"><h3>💻 Cadastrar Equipamento</h3><button class="modal-x" onclick="closeOv('ov-new-equip')">✕</button></div>
@@ -1084,7 +1082,6 @@ function setupRealtime(){
       showBanner('↩️',`Devolução Pendente: ${d.professor}`,`${(d.equipamentos||[]).join(', ')} · ${d.local_devolucao}`,'dev');
     })
     .on('postgres_changes',{event:'*',schema:'public',table:'equipamentos'},()=>{
-      // Atualiza inventário e grid de solicitação em tempo real
       carregarEquipamentos();
       carregarEquipamentosForm();
     })
@@ -1092,11 +1089,10 @@ function setupRealtime(){
 }
 
 /* ═══════════════════════════════════════
-   EQUIPAMENTOS — SUPABASE CRUD COMPLETO
+   EQUIPAMENTOS — SUPABASE CRUD
 ═══════════════════════════════════════ */
 let equipamentosCache = [];
 
-// Ícones por categoria
 const EQUIP_ICONS = {
   'Chromebook':'💻','Notebook':'🖥️','Microfone':'🎙️',
   'USB-C → HDMI':'🔌','HDMI → VGA':'📺','Carregador':'⚡',
@@ -1142,7 +1138,6 @@ async function sbDeletarEquipamento(id){
   return {ok:!error, error};
 }
 
-// Carrega inventário e atualiza tabela + stats
 async function carregarEquipamentos(){
   const tbody=document.getElementById('equip-tbody');
   if(!tbody) return;
@@ -1162,7 +1157,6 @@ async function carregarEquipamentos(){
 
   equipamentosCache=res.data;
 
-  // Atualiza stats
   const total=res.data.length;
   const disp=res.data.filter(e=>e.status==='disponivel').length;
   const uso=res.data.filter(e=>e.status==='em_uso').length;
@@ -1200,21 +1194,12 @@ async function carregarEquipamentos(){
     </tr>`).join('');
 }
 
-// Carrega equipamentos no grid do formulário de solicitação (com disponibilidade real)
 async function carregarEquipamentosForm(){
   const grid=document.getElementById('eq-grid');
   if(!grid) return;
 
   if(!sbOnline){
-    // Fallback estático se offline
-    grid.innerHTML=`
-      <div class="eq-item" data-nome="Chromebook" data-qid="cb-qty" onclick="toggleEq(this)"><span class="eq-icon">💻</span><div class="eq-name">Chromebook</div><div class="eq-avail ok">— disp.</div></div>
-      <div class="eq-item" data-nome="Notebook" data-qid="nb-qty" onclick="toggleEq(this)"><span class="eq-icon">🖥️</span><div class="eq-name">Notebook</div><div class="eq-avail ok">— disp.</div></div>
-      <div class="eq-item" data-nome="Microfone" onclick="toggleEq(this)"><span class="eq-icon">🎙️</span><div class="eq-name">Microfone</div><div class="eq-avail ok">— disp.</div></div>
-      <div class="eq-item" data-nome="USB-C → HDMI" onclick="toggleEq(this)"><span class="eq-icon">🔌</span><div class="eq-name">USB-C → HDMI</div><div class="eq-avail ok">— disp.</div></div>
-      <div class="eq-item" data-nome="HDMI → VGA" onclick="toggleEq(this)"><span class="eq-icon">📺</span><div class="eq-name">HDMI → VGA</div><div class="eq-avail ok">— disp.</div></div>
-      <div class="eq-item" data-nome="Carregador" onclick="toggleEq(this)"><span class="eq-icon">⚡</span><div class="eq-name">Carregador</div><div class="eq-avail ok">— disp.</div></div>
-      <div class="eq-item" data-nome="Cabo HDMI" onclick="toggleEq(this)"><span class="eq-icon">🔗</span><div class="eq-name">Cabo HDMI</div><div class="eq-avail ok">— disp.</div></div>`;
+    grid.innerHTML=`<div class="empty" style="grid-column:1/-1"><i>⚠️</i><p>Sem conexão com o banco de dados</p></div>`;
     return;
   }
 
@@ -1225,7 +1210,6 @@ async function carregarEquipamentosForm(){
     return;
   }
 
-  // Agrupa por categoria e conta disponíveis
   const grupos={};
   res.data.forEach(e=>{
     const cat=e.categoria||'Outro';
@@ -1353,11 +1337,7 @@ async function sbConfirmarDevolucao(id, d){
 }
 
 async function sbBuscarTecnico(email, senha){
-  if(!sbOnline||!sbClient){
-    const u=USERS_LOCAL[email.toLowerCase()];
-    if(u&&u.senha===senha) return {ok:true,data:u};
-    return {ok:false};
-  }
+  if(!sbOnline||!sbClient) return {ok:false};
   const {data,error}=await sbClient
     .from('tecnicos').select('*')
     .eq('email',email.toLowerCase()).eq('senha',senha).eq('ativo',true).single();
@@ -1402,13 +1382,7 @@ async function sbEditarTecnico(emailOrig, dados){
 }
 
 async function sbBuscarProtocolo(proto){
-  if(!sbOnline||!sbClient){
-    const s=solicitacoes.find(x=>x.proto===proto.toUpperCase());
-    if(s) return {ok:true,data:{professor:s.prof,sala:s.sala,equipamentos:s.equips,hora:s.hora,id:s.id,proto:s.proto,status:s.status,tipo:s.tipo,agData:s.agData||'',agHora:s.agHora||''}};
-    if(proto.toUpperCase().startsWith('TL'))
-      return {ok:true,data:{professor:'Demo Professor',sala:'L100',equipamentos:['Chromebook (1×)'],hora:_agora(),id:null,proto:proto.toUpperCase(),status:'retirado',tipo:'agora',agData:'',agHora:''}};
-    return {ok:false,error:'Protocolo não encontrado'};
-  }
+  if(!sbOnline||!sbClient) return {ok:false, error:'Sem conexão com o banco de dados'};
   const {data,error}=await sbClient.from('solicitacoes').select('*').eq('protocolo',proto.toUpperCase()).single();
   if(error||!data) return {ok:false,error:'Protocolo não encontrado'};
   return {ok:true,data:{professor:data.professor,sala:data.sala,equipamentos:data.equipamentos,hora:data.data_solicitacao,id:data.id,proto:data.protocolo,status:data.status,tipo:data.tipo,agData:data.ag_data||'',agHora:data.ag_hora||''}};
@@ -1425,12 +1399,6 @@ let selEquips=[], tipoSolic='agora', profSig=null, tecSig=null, devProfSig=null;
 let protoSeq=0, localSelecionado='', localDevSelecionado='';
 let currentUser=null, _devBuscaResult=null, _cdSigProf=null, _cdDevId=null;
 let _meId=null, _sigFullData=null, _editUserData=null;
-
-const USERS_LOCAL={
-  'tecnico@una.edu.br':{senha:'1234',nome:'Bruno Técnico',role:'Técnico TI',av:'BT',nivel:'tecnico',email:'tecnico@una.edu.br',campus:'aimores'},
-  'admin@una.edu.br':  {senha:'admin',nome:'Admin TI',role:'Técnico TI',av:'AD',nivel:'tecnico',email:'admin@una.edu.br',campus:'liberdade'},
-  'master@una.edu.br': {senha:'master123',nome:'Admin Master',role:'Master',av:'MA',nivel:'master',email:'master@una.edu.br',campus:'todos'}
-};
 let tecUsers=[];
 
 /* ═══════════════════════════════════════
@@ -1528,7 +1496,7 @@ async function submitProf(){
   btn.disabled=true; btn.textContent='Enviando…';
 
   const sbRes=await sbInsertSolicitacao(nova);
-  if(sbOnline&&!sbRes.ok) toast('⚠️','Erro no servidor','Salvando localmente.','w');
+  if(sbOnline&&!sbRes.ok) toast('⚠️','Erro no servidor','Tente novamente.','w');
 
   solicitacoes.unshift(nova);
   updateBadges(); addLog('e','Solicitação Enviada',`${nome} → ${ef.join(', ')} · Sala ${sala}`);
@@ -1579,7 +1547,7 @@ async function buscarProtocolo(){
   if(!proto||proto.length<5){ toast('⚠️','Protocolo inválido','Digite um protocolo válido.','w'); return; }
   toast('🔍','Buscando…','Localizando empréstimo.','b');
   const res=await sbBuscarProtocolo(proto);
-  if(!res.ok){ toast('❌','Não encontrado','Verifique o protocolo digitado.','r'); return; }
+  if(!res.ok){ toast('❌','Não encontrado',res.error||'Verifique o protocolo digitado.','r'); return; }
   _devBuscaResult=res.data;
   document.getElementById('dr-nome').textContent=res.data.professor||'—';
   document.getElementById('dr-sala').textContent=res.data.sala||'—';
@@ -1636,6 +1604,14 @@ async function doLogin(){
   const btn=document.querySelector('#s-login .btn-main');
   if(!email||!senha){ err.style.display='block'; err.textContent='⚠️ Preencha e-mail e senha.'; return; }
   err.style.display='none';
+
+  if(!sbOnline){
+    err.style.display='block';
+    err.textContent='⚠️ Sem conexão com o banco de dados. Verifique sua conexão.';
+    if(btn){ btn.disabled=false; btn.textContent='🔐 Entrar no Painel'; }
+    return;
+  }
+
   if(btn){ btn.disabled=true; btn.textContent='Verificando…'; }
   const res=await sbBuscarTecnico(email, senha);
   if(btn){ btn.disabled=false; btn.textContent='🔐 Entrar no Painel'; }
@@ -1736,7 +1712,7 @@ function navTo(pid,btn){
   if(pid==='pg-usuarios') renderUsers();
   if(pid==='pg-aprov') renderAprovadosHoje();
   if(pid==='pg-emp') renderEmprestimos();
-  if(pid==='pg-equip') carregarEquipamentos(); // ← carrega do banco ao entrar na aba
+  if(pid==='pg-equip') carregarEquipamentos();
 }
 
 /* ═══════════════════════════════════════
@@ -1975,11 +1951,11 @@ function verAssinatura(sigData,proto,nome,hora){
   document.getElementById('sig-modal-time2').textContent=hora||'—';
   const img=document.getElementById('sig-modal-img');
   const box=document.getElementById('sig-modal-img-box');
-  if(sigData&&sigData!=='demo'&&sigData.length>100){
+  if(sigData&&sigData.length>100){
     img.src=sigData; img.style.display='block'; _sigFullData=sigData; box.style.background='#f8fafc';
   } else {
     img.style.display='none'; _sigFullData=null;
-    box.innerHTML='<div style="padding:1.5rem;color:#94a3b8;font-size:.78rem;text-align:center;line-height:1.6">📝 Assinatura de demonstração<br><small>Na versão com Supabase, a imagem real aparece aqui</small></div>';
+    box.innerHTML='<div style="padding:1.5rem;color:#94a3b8;font-size:.78rem;text-align:center;line-height:1.6">📝 Sem assinatura registrada</div>';
   }
   document.getElementById('ov-sig').classList.add('open');
 }
@@ -1996,13 +1972,10 @@ function openConfirmarDevPorId(id){
 }
 function openConfirmarDevPorProto(proto){
   const s=solicitacoes.find(x=>x.proto===proto); if(!s) return;
-  // Verifica se existe devolução pendente registrada para este protocolo
   const devPend=devsPendentes.find(d=>d.protoOrig===proto);
   if(devPend){
-    // Usa os dados da devolução pendente (tem assinatura do professor)
     openConfirmarDev(proto,devPend.prof,devPend.sala,devPend.sigProf,devPend.id,devPend.equips,devPend.localDev);
   } else {
-    // Devolução direta pelo técnico (sem registro prévio do professor)
     openConfirmarDev(s.proto,s.prof,s.sala,s.sig,null,s.equips,s.local||'');
   }
 }
@@ -2020,7 +1993,7 @@ function openConfirmarDev(proto,nome,sala,sigProf,devId,equips,localDev){
     document.getElementById('cd-sig-prof-box').style.display='block';
     document.getElementById('cd-no-sig-box').style.display='none';
   } else {
-    document.getElementById('cd-sig-prof-img-box').innerHTML='<div style="padding:1.2rem;color:#94a3b8;font-size:.76rem;text-align:center;line-height:1.5">📝 Assinatura registrada na solicitação original</div>';
+    document.getElementById('cd-sig-prof-img-box').innerHTML='<div style="padding:1.2rem;color:#94a3b8;font-size:.76rem;text-align:center;line-height:1.5">📝 Sem assinatura registrada</div>';
     imgEl.style.display='none';
     document.getElementById('cd-sig-prof-box').style.display='block';
     document.getElementById('cd-no-sig-box').style.display='none';
@@ -2041,17 +2014,14 @@ async function confirmarDevTec(){
   const tecNome=currentUser?.nome||'Técnico';
   const horaReal=_agora();
 
-  // Botão desabilita durante o envio
   const btnConf=document.querySelector('#ov-confirmar-dev .bs.green');
   if(btnConf){ btnConf.disabled=true; btnConf.textContent='Confirmando…'; }
 
-  // 1) Se veio de uma devolução pendente (professor registrou via app)
   if(_cdDevId){
     await sbConfirmarDevolucao(_cdDevId,{sigTec:tecSig,tecNome,cond,obs});
     devsPendentes=devsPendentes.filter(x=>x.id!==_cdDevId);
   }
 
-  // 2) Sempre atualiza a solicitação no Supabase para 'devolvido_confirmado'
   const s=solicitacoes.find(x=>x.proto===proto);
   if(s){
     s.status='devolvido_confirmado';
@@ -2095,7 +2065,6 @@ async function renderUsers(){
   el.innerHTML='<div style="padding:1rem;color:var(--muted);font-size:.8rem">Carregando…</div>';
   const res=await sbListarTecnicos();
   if(res.ok&&res.data.length){ tecUsers=res.data; }
-  else if(!sbOnline){ tecUsers=Object.entries(USERS_LOCAL).map(([email,u])=>({email,nome:u.nome,role:u.role,av:u.av,nivel:u.nivel,campus:u.campus||'aimores'})); }
   if(!tecUsers.length){ el.innerHTML='<div class="empty"><i>👥</i><p>Nenhum técnico cadastrado</p></div>'; return; }
   el.innerHTML=tecUsers.map((u,idx)=>{
     const camp=u.campus||'aimores'; const cor=CAMPUS_COR[camp]||'#526080';
@@ -2145,8 +2114,7 @@ async function criarUsuario(){
   if(btn){ btn.disabled=true; btn.textContent='Salvando…'; }
   const res=await sbCriarTecnico({email,senha,nome,nivel:nivelLabel,role:roleLabel,av,campus:campusVal});
   if(btn){ btn.disabled=false; btn.textContent='✓ Criar'; }
-  if(!res.ok&&sbOnline){ toast('❌','Erro ao criar','E-mail já cadastrado ou erro de conexão.','r'); return; }
-  USERS_LOCAL[email.toLowerCase()]={senha,nome,role:roleLabel,av,nivel:nivelLabel,email:email.toLowerCase(),campus:campusVal};
+  if(!res.ok){ toast('❌','Erro ao criar','E-mail já cadastrado ou erro de conexão.','r'); return; }
   closeOv('ov-new-user'); await renderUsers();
   toast('✅','Técnico Criado!',`${nome} já pode fazer login.`);
   addLog('m','Usuário Criado',`Master criou: ${nome} (${email})`);
@@ -2159,7 +2127,6 @@ async function deleteUser(email){
   const nome=u?u.nome:email;
   if(!confirm(`Remover ${nome} (${email})?\nO técnico perderá acesso imediatamente.`)) return;
   await sbDeletarTecnico(email);
-  delete USERS_LOCAL[email.toLowerCase()];
   await renderUsers();
   toast('🗑️','Removido',`${nome} removido.`,'r');
   addLog('r','Usuário Removido',`Master removeu: ${email}`);
@@ -2182,10 +2149,8 @@ async function salvarEdicaoUser(){
   const btn=document.getElementById('eu-save-btn'); btn.disabled=true; btn.textContent='Salvando…';
   const res=await sbEditarTecnico(emailOrig,dados);
   btn.disabled=false; btn.textContent='💾 Salvar Alterações';
-  if(!res.ok&&sbOnline){ toast('❌','Erro ao salvar','Tente novamente.','r'); return; }
-  const emailKey=emailOrig.toLowerCase();
-  if(USERS_LOCAL[emailKey]){ USERS_LOCAL[emailKey]={...USERS_LOCAL[emailKey],...dados}; if(dados.senha) USERS_LOCAL[emailKey].senha=dados.senha; }
-  if(currentUser&&currentUser.email.toLowerCase()===emailKey){
+  if(!res.ok){ toast('❌','Erro ao salvar','Tente novamente.','r'); return; }
+  if(currentUser&&currentUser.email.toLowerCase()===emailOrig.toLowerCase()){
     currentUser={...currentUser,...dados};
     document.getElementById('tc-nome').textContent=nome;
     document.getElementById('tc-role').textContent=roleLabel;
@@ -2199,7 +2164,7 @@ async function salvarEdicaoUser(){
 }
 
 /* ═══════════════════════════════════════
-   EQUIPAMENTO — CADASTRAR (SALVA NO BANCO)
+   EQUIPAMENTO — CADASTRAR
 ═══════════════════════════════════════ */
 function openNovoEquipModal(){
   ['ne-pat','ne-nome'].forEach(id=>document.getElementById(id).value='');
@@ -2235,11 +2200,8 @@ async function salvarEquipamento(){
   }
 
   closeOv('ov-new-equip');
-
-  // Recarrega inventário e grid do formulário
   await carregarEquipamentos();
   await carregarEquipamentosForm();
-
   toast('✅','Equipamento Cadastrado!',`${pat} — ${nome} adicionado ao inventário.`);
   addLog('m','Equipamento Cadastrado',`${pat} — ${nome} · ${cat} · ${CAMPUS_LABEL[uni]||uni}`);
   showBanner('💻','Novo Equipamento',`${nome} (${pat}) adicionado ao inventário`,'aprov');
@@ -2301,48 +2263,5 @@ document.addEventListener('DOMContentLoaded',()=>{
   checkURLParams();
 });
 </script>
-
-<!--
-═══════════════════════════════════════════
-  SCHEMA SQL — TABELA EQUIPAMENTOS (NOVA)
-  Execute no Supabase SQL Editor:
-═══════════════════════════════════════════
-
-CREATE TABLE IF NOT EXISTS equipamentos (
-  id           BIGSERIAL PRIMARY KEY,
-  patrimonio   TEXT UNIQUE NOT NULL,
-  nome         TEXT NOT NULL,
-  categoria    TEXT NOT NULL,
-  unidade      TEXT DEFAULT 'aimores',
-  condicao     TEXT DEFAULT 'bom',
-  status       TEXT DEFAULT 'disponivel',
-  criado_em    TIMESTAMPTZ DEFAULT NOW(),
-  atualizado_em TIMESTAMPTZ
-);
-
-ALTER TABLE equipamentos ENABLE ROW LEVEL SECURITY;
-
-DO $$ BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_policies
-    WHERE tablename = 'equipamentos' AND policyname = 'allow_all_equipamentos'
-  ) THEN
-    CREATE POLICY "allow_all_equipamentos" ON equipamentos FOR ALL USING (true) WITH CHECK (true);
-  END IF;
-END $$;
-
-DO $$ BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_publication_tables
-    WHERE pubname = 'supabase_realtime' AND tablename = 'equipamentos'
-  ) THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE equipamentos;
-  END IF;
-END $$;
-
-CREATE INDEX IF NOT EXISTS idx_equip_status    ON equipamentos(status);
-CREATE INDEX IF NOT EXISTS idx_equip_categoria ON equipamentos(categoria);
-CREATE INDEX IF NOT EXISTS idx_equip_unidade   ON equipamentos(unidade);
--->
 </body>
 </html>
