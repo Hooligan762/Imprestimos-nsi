@@ -701,7 +701,7 @@ tbody tr:hover td{background:rgba(255,255,255,.012)}
       <div class="tc">
         <div class="tc-head"><div class="tc-title">Todos os Registros</div><input class="sinp" placeholder="Buscar por nome, protocolo…" oninput="filterEmp(this)"></div>
         <div class="tbl-scroll"><table>
-          <thead><tr><th>Protocolo</th><th>Professor</th><th>Sala</th><th>Equipamentos</th><th>Campus</th><th>Local Dev.</th><th>Status</th><th>Assin.</th><th>Hora</th><th>Ação</th></tr></thead>
+          <thead><tr><th>Protocolo</th><th>Professor</th><th>Sala</th><th>Equipamentos</th><th>Campus</th><th>Local Dev.</th><th>Status</th><th>Assin. Prof.</th><th>Assin. Téc.</th><th>Hora</th><th>Ação</th></tr></thead>
           <tbody id="emp-tbody"></tbody>
         </table></div>
       </div>
@@ -814,6 +814,29 @@ tbody tr:hover td{background:rgba(255,255,255,.012)}
       </div>
     </div>
     <div class="modal-f"><button class="bs ghost" onclick="closeOv('ov-sig')">Fechar</button></div>
+  </div>
+</div>
+
+
+<!-- MODAL: Assinatura do Técnico -->
+<div class="overlay" id="ov-sig-tec">
+  <div class="modal" style="max-width:440px">
+    <div class="modal-h"><h3>🔏 Assinatura do Técnico</h3><button class="modal-x" onclick="closeOv('ov-sig-tec')">✕</button></div>
+    <div class="modal-b">
+      <div class="info-box">
+        <div class="info-row"><span class="info-lbl">Protocolo</span><span class="info-val mono-sm" id="sig-tec-proto" style="color:var(--blue)">—</span></div>
+        <div class="info-row"><span class="info-lbl">Técnico</span><span class="info-val" id="sig-tec-nome">—</span></div>
+        <div class="info-row"><span class="info-lbl">Confirmado em</span><span class="info-val mono-sm" id="sig-tec-hora">—</span></div>
+      </div>
+      <div>
+        <p style="font-size:.7rem;color:var(--muted);margin-bottom:.5rem">Assinatura registrada no momento da confirmação da devolução:</p>
+        <div class="sig-view-box"><img id="sig-tec-img" src="" alt="Assinatura Técnico" style="max-height:140px;width:100%;object-fit:contain"></div>
+      </div>
+      <div style="background:rgba(96,165,250,.05);border:1px solid rgba(96,165,250,.15);border-radius:var(--rs);padding:.75rem;font-size:.74rem;color:#93c5fd;line-height:1.5">
+        🔏 Assinatura do técnico responsável pela devolução · <span id="sig-tec-hora2" style="font-family:'JetBrains Mono',monospace">—</span>
+      </div>
+    </div>
+    <div class="modal-f"><button class="bs ghost" onclick="closeOv('ov-sig-tec')">Fechar</button></div>
   </div>
 </div>
 
@@ -1429,7 +1452,7 @@ let devsPendentes = [];
 let logs = [];
 
 let selEquips=[], tipoSolic='agora', profSig=null, tecSig=null, devProfSig=null;
-let localSelecionado='', localDevSelecionado='';
+let localSelecionado='', localDevSelecionado='', devsConfirmadas=[];
 let currentUser=null, _devBuscaResult=null, _cdSigProf=null, _cdDevId=null;
 let _meId=null, _sigFullData=null, _editUserData=null;
 let tecUsers=[];
@@ -1721,6 +1744,14 @@ async function carregarDadosBanco(){
     }
     const {data:dData}=await sbClient.from('devolucoes')
       .select('*').eq('status','aguardando_tecnico').order('data_devolucao',{ascending:false});
+    const {data:dcData}=await sbClient.from('devolucoes')
+      .select('id,protocolo_original,assinatura_tec,tecnico_nome,hora_confirmacao').eq('status','confirmado');
+    if(dcData){
+      devsConfirmadas=dcData.map(d=>({
+        protoOrig:d.protocolo_original, sigTec:d.assinatura_tec,
+        tecNome:d.tecnico_nome||'', horaConf:d.hora_confirmacao||''
+      }));
+    }
     if(dData){
       devsPendentes=dData.map(d=>({
         id:d.id, proto:d.protocolo, protoOrig:d.protocolo_original,
@@ -1744,7 +1775,7 @@ function _formatarData(iso){
 
 function doLogout(){
   if(currentUser) addLog('d','Logout',`${currentUser.nome} saiu do sistema`);
-  currentUser=null; solicitacoes=[]; devsPendentes=[]; logs=[];
+  currentUser=null; solicitacoes=[]; devsPendentes=[]; devsConfirmadas=[]; logs=[];
   show('s-home');
 }
 
@@ -1902,7 +1933,8 @@ function renderEmprestimos(){
       <td><span style="font-size:.68rem;color:${CAMPUS_COR[s.uni]||'var(--muted)'}">🏫 ${CAMPUS_LABEL[s.uni]||s.uni||'—'}</span></td>
       <td style="color:#c4b5fd;font-size:.7rem">📍 ${escHtml(s.local||'—')}</td>
       <td>${statusMap[s.status]||s.status}</td>
-      <td>${s.sig?`<button class="sc-sig-btn" data-sig-id="${s.id}" onclick="verAssinaturaPorId(this.dataset.sigId)">✍️ Ver</button>`:`<button class="bs ghost" data-emp-id="${s.id}" onclick="verDetalhesEmprestimo(this.dataset.empId)">🔍 Ver</button>`}</td>
+      <td>${s.sig?`<button class="sc-sig-btn" data-sig-id="${s.id}" onclick="verAssinaturaPorId(this.dataset.sigId)">✍️ Ver</button>`:`<span style="color:var(--muted);font-size:.7rem">—</span>`}</td>
+      <td>${(()=>{ const dc=devsConfirmadas.find(x=>x.protoOrig===s.proto); return dc&&dc.sigTec?`<button class="sc-sig-btn" onclick="verAssinaturaTec('${s.proto}')">🔏 Ver</button>`:'<span style="color:var(--muted);font-size:.7rem">—</span>'; })()}</td>
       <td><span class="mono-sm" style="color:var(--muted)">${s.hora}</span></td>
       <td>${s.status==='aprovado'?`<button class="bs amber" onclick="openMarcarEntregue(${s.id})">📦 Entregar</button>`:s.status==='retirado'?`<button class="bs amber" onclick="openConfirmarDevPorProto('${s.proto}')">↩ Devolver</button>`:`<button class="bs ghost" data-emp-id="${s.id}" onclick="verDetalhesEmprestimo(this.dataset.empId)">🔍 Ver</button>`}</td>
     </tr>`).join('');
@@ -1992,6 +2024,16 @@ function filterEmp(inp){ const q=inp.value.toLowerCase(); document.querySelector
    ASSINATURA MODAL
 ═══════════════════════════════════════ */
 function verAssinaturaPorId(id){ const s=solicitacoes.find(x=>String(x.id)===String(id)); if(!s) return; verAssinatura(s.sig,s.proto,s.prof,s.hora); }
+function verAssinaturaTec(proto){
+  const dc=devsConfirmadas.find(x=>x.protoOrig===proto);
+  if(!dc||!dc.sigTec){ toast('⚠️','Sem assinatura','Nenhuma assinatura de técnico encontrada.','w'); return; }
+  document.getElementById('sig-tec-proto').textContent = proto||'—';
+  document.getElementById('sig-tec-nome').textContent  = dc.tecNome||'—';
+  document.getElementById('sig-tec-hora').textContent  = dc.horaConf||'—';
+  document.getElementById('sig-tec-hora2').textContent = dc.horaConf||'—';
+  document.getElementById('sig-tec-img').src           = dc.sigTec;
+  document.getElementById('ov-sig-tec').classList.add('open');
+}
 function verAssinaturaDevPorId(id){ const d=devsPendentes.find(x=>String(x.id)===String(id)); if(!d) return; verAssinatura(d.sigProf,d.proto,d.prof,d.hora); }
 
 function verAssinatura(sigData,proto,nome,hora){
@@ -2074,6 +2116,7 @@ async function confirmarDevTec(){
 
   const s=solicitacoes.find(x=>x.proto===proto);
   if(s){
+    devsConfirmadas.push({protoOrig:devObj.protoOrig||devObj.proto, sigTec:tecSig, tecNome:tecNome, horaConf:_agora()});
     s.status='devolvido_confirmado';
     if(sbOnline&&sbClient){
       await sbClient.from('solicitacoes').update({
