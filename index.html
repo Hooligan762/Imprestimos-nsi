@@ -780,7 +780,7 @@ tbody tr:hover td{background:rgba(255,255,255,.012)}
     <div class="field" style="margin-bottom:1.5rem"><label>Senha</label><input type="password" id="l-senha" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
     <button class="btn-main" onclick="doLogin()">🔐 Entrar no Painel</button>
     <button class="btn-ghost" style="margin-top:.75rem" onclick="show('s-home')">← Voltar</button>
-    <div class="l-foot">Demo Técnico: <code>tecnico@una.edu.br</code> / <code>1234</code><br>Demo Master: <code>master@una.edu.br</code> / <code>master123</code></div>
+    <!-- credenciais removidas -->
   </div>
 </div>
 
@@ -1050,6 +1050,42 @@ tbody tr:hover td{background:rgba(255,255,255,.012)}
   </div>
 </div>
 
+<!-- Modal: Editar Técnico -->
+<div class="overlay" id="ov-edit-user">
+  <div class="modal" style="max-width:460px">
+    <div class="modal-h"><h3>✏️ Editar Técnico</h3><button class="modal-x" onclick="closeOv('ov-edit-user')">✕</button></div>
+    <div class="modal-b">
+      <div style="background:rgba(79,142,247,.05);border:1px solid rgba(79,142,247,.14);border-radius:var(--rs);padding:.75rem;font-size:.74rem;color:#93c5fd;line-height:1.55">
+        📋 Editando: <strong id="eu-email-label" style="color:#fff">—</strong>
+      </div>
+      <input type="hidden" id="eu-email-orig">
+      <div class="field"><label>Nome Completo <span class="req">*</span></label><input type="text" id="eu-nome" placeholder="Nome do técnico"></div>
+      <div class="field"><label>Nível de Acesso</label>
+        <select id="eu-role">
+          <option value="tecnico">Técnico TI</option>
+          <option value="senior">Técnico Sênior</option>
+          <option value="master">Master (Administrador)</option>
+        </select>
+      </div>
+      <div style="background:rgba(255,181,71,.04);border:1px solid rgba(255,181,71,.15);border-radius:var(--rs);padding:.82rem;margin-top:.1rem">
+        <p style="font-size:.72rem;color:var(--amber);font-weight:600;margin-bottom:.65rem">🔑 Alterar Senha</p>
+        <div class="field" style="margin-bottom:.65rem">
+          <label>Nova Senha <span class="opt-tag">OPCIONAL — deixe em branco para manter</span></label>
+          <input type="password" id="eu-senha" placeholder="Nova senha (mín. 6 caracteres)">
+        </div>
+        <div class="field" style="margin-bottom:0">
+          <label>Confirmar Nova Senha</label>
+          <input type="password" id="eu-senha2" placeholder="Repita a nova senha">
+        </div>
+      </div>
+    </div>
+    <div class="modal-f">
+      <button class="bs ghost" onclick="closeOv('ov-edit-user')">Cancelar</button>
+      <button class="bs blue" id="eu-save-btn" onclick="salvarEdicaoUser()">💾 Salvar Alterações</button>
+    </div>
+  </div>
+</div>
+
 <!-- Modal: Novo Equipamento -->
 <div class="overlay" id="ov-new-equip">
   <div class="modal">
@@ -1176,6 +1212,55 @@ async function sbConfirmarDevolucao(id, d){
   return {ok:!error,error};
 }
 
+/* ──── TÉCNICOS — Supabase ──── */
+async function sbBuscarTecnico(email, senha){
+  if(!sbOnline||!sbClient){
+    const u=USERS_LOCAL[email];
+    if(u&&u.senha===senha) return {ok:true,data:u};
+    return {ok:false};
+  }
+  const {data,error}=await sbClient
+    .from('tecnicos').select('*')
+    .eq('email',email.toLowerCase()).eq('senha',senha).eq('ativo',true).single();
+  if(error||!data) return {ok:false};
+  sbClient.from('tecnicos').update({ultimo_acesso:new Date().toISOString()}).eq('id',data.id);
+  return {ok:true,data:{email:data.email,nome:data.nome,nivel:data.nivel,role:data.role,
+    av:data.av||(data.nome.split(' ').map(n=>n[0]).slice(0,2).join('').toUpperCase()),senha:data.senha}};
+}
+
+async function sbListarTecnicos(){
+  if(!sbOnline||!sbClient) return {ok:false,data:[]};
+  const {data,error}=await sbClient.from('tecnicos')
+    .select('id,email,nome,nivel,role,av,ativo,criado_em,ultimo_acesso')
+    .eq('ativo',true).order('criado_em');
+  return {ok:!error,data:data||[]};
+}
+
+async function sbCriarTecnico(t){
+  if(!sbOnline||!sbClient) return {ok:false};
+  const {error}=await sbClient.from('tecnicos').insert({
+    email:t.email.toLowerCase(), senha:t.senha, nome:t.nome,
+    nivel:t.nivel, role:t.role, av:t.av, ativo:true,
+    criado_em:new Date().toISOString()
+  });
+  return {ok:!error,error};
+}
+
+async function sbDeletarTecnico(email){
+  if(!sbOnline||!sbClient) return {ok:false};
+  const {error}=await sbClient.from('tecnicos').update({ativo:false}).eq('email',email.toLowerCase());
+  return {ok:!error,error};
+}
+
+async function sbEditarTecnico(emailOrig, dados){
+  if(!sbOnline||!sbClient) return {ok:false};
+  const update={nome:dados.nome, nivel:dados.nivel, role:dados.role,
+    av:dados.av, atualizado_em:new Date().toISOString()};
+  if(dados.senha) update.senha=dados.senha;
+  const {error}=await sbClient.from('tecnicos').update(update).eq('email',emailOrig.toLowerCase());
+  return {ok:!error,error};
+}
+
 async function sbBuscarProtocolo(proto){
   if(!sbOnline||!sbClient){
     // busca local
@@ -1220,11 +1305,13 @@ let currentUser=null, _devBuscaResult=null, _cdSigProf=null, _cdDevId=null;
 let _meId=null; // for marcar entregue modal
 let _sigFullData=null;
 
-const USERS={};
-USERS['tecnico@una.edu.br']={senha:'1234',nome:'Bruno Técnico',role:'Técnico TI',av:'BT',nivel:'tecnico'};
-USERS['admin@una.edu.br']={senha:'admin',nome:'Admin TI',role:'Técnico TI',av:'AD',nivel:'tecnico'};
-USERS['master@una.edu.br']={senha:'master123',nome:'Admin Master',role:'Master',av:'MA',nivel:'master'};
-let tecUsers=[{email:'tecnico@una.edu.br',nome:'Bruno Técnico',role:'Técnico TI',av:'BT'},{email:'admin@una.edu.br',nome:'Admin TI',role:'Técnico TI',av:'AD'}];
+// Fallback local (só usado quando Supabase offline)
+const USERS_LOCAL={
+  'tecnico@una.edu.br':{senha:'1234',nome:'Bruno Técnico',role:'Técnico TI',av:'BT',nivel:'tecnico',email:'tecnico@una.edu.br'},
+  'admin@una.edu.br':  {senha:'admin',nome:'Admin TI',role:'Técnico TI',av:'AD',nivel:'tecnico',email:'admin@una.edu.br'},
+  'master@una.edu.br': {senha:'master123',nome:'Admin Master',role:'Master',av:'MA',nivel:'master',email:'master@una.edu.br'}
+};
+let tecUsers=[]; // carregado do Supabase via renderUsers()
 
 /* ══════════════════════════════════════════
    HELPERS
@@ -1462,26 +1549,34 @@ async function submitDevolucao(){
 /* ══════════════════════════════════════════
    LOGIN / LOGOUT
 ══════════════════════════════════════════ */
-function doLogin(){
+async function doLogin(){
   const email=document.getElementById('l-email').value.trim();
   const senha=document.getElementById('l-senha').value;
-  const u=USERS[email];
   const err=document.getElementById('l-err');
-  if(u&&u.senha===senha){
-    err.style.display='none';
-    currentUser={...u,email};
-    document.getElementById('tc-nome').textContent=u.nome;
-    document.getElementById('tc-role').textContent=u.role;
-    const av=document.getElementById('tc-av');
-    av.textContent=u.av; av.className='sb-av'+(u.nivel==='master'?' master':'');
-    document.getElementById('nav-usuarios').style.display=u.nivel==='master'?'flex':'none';
-    show('s-tec');
-    renderAll(); renderLogs(); renderUsers(); updateBadges();
-    setTimeout(()=>toast('✅','Bem-vindo!',`Logado como ${u.nome}`),300);
-    addLog('d','Login',`${u.nome} acessou o painel`);
-    const tb=document.getElementById('access-log-tbody');
-    if(tb){ const tr=document.createElement('tr'); tr.innerHTML=`<td>${u.nome}</td><td style="color:var(--green)">Login</td><td style="color:var(--muted);font-family:'JetBrains Mono',monospace">${_agora()}</td>`; tb.prepend(tr); }
-  } else { err.style.display='block'; }
+  const btn=document.querySelector('#s-login .btn-main');
+  if(!email||!senha){ err.style.display='block'; err.textContent='⚠️ Preencha e-mail e senha.'; return; }
+  err.style.display='none';
+  if(btn){ btn.disabled=true; btn.textContent='Verificando…'; }
+
+  const res=await sbBuscarTecnico(email, senha);
+
+  if(btn){ btn.disabled=false; btn.textContent='🔐 Entrar no Painel'; }
+
+  if(!res.ok){ err.style.display='block'; err.textContent='⚠️ E-mail ou senha inválidos.'; return; }
+
+  const u=res.data;
+  currentUser={...u,email};
+  document.getElementById('tc-nome').textContent=u.nome;
+  document.getElementById('tc-role').textContent=u.role;
+  const av=document.getElementById('tc-av');
+  av.textContent=u.av; av.className='sb-av'+(u.nivel==='master'?' master':'');
+  document.getElementById('nav-usuarios').style.display=u.nivel==='master'?'flex':'none';
+  show('s-tec');
+  renderAll(); renderLogs(); renderUsers(); updateBadges();
+  setTimeout(()=>toast('✅','Bem-vindo!',`Logado como ${u.nome}`),300);
+  addLog('d','Login',`${u.nome} acessou o painel`);
+  const tb=document.getElementById('access-log-tbody');
+  if(tb){ const tr=document.createElement('tr'); tr.innerHTML=`<td>${u.nome}</td><td style="color:var(--green)">Login</td><td style="color:var(--muted);font-family:'JetBrains Mono',monospace">${_agora()}</td>`; tb.prepend(tr); }
 }
 function doLogout(){ if(currentUser) addLog('d','Logout',`${currentUser.nome} saiu do sistema`); currentUser=null; show('s-home'); }
 
@@ -1820,43 +1915,66 @@ function renderLogs(){
 function filterLogs(inp){ const q=inp.value.toLowerCase(); document.querySelectorAll('#log-list .log-entry').forEach(e=>e.style.display=e.textContent.toLowerCase().includes(q)?'':'none'); }
 
 /* ══════════════════════════════════════════
-   USERS
+   USERS — Supabase conectado
 ══════════════════════════════════════════ */
-function renderUsers(){
+async function renderUsers(){
   const el=document.getElementById('users-list'); if(!el) return;
+  el.innerHTML='<div style="padding:1rem;color:var(--muted);font-size:.8rem">Carregando…</div>';
+  const res=await sbListarTecnicos();
+  if(res.ok&&res.data.length){
+    tecUsers=res.data;
+  } else if(!sbOnline){
+    // fallback local
+    tecUsers=Object.entries(USERS_LOCAL).map(([email,u])=>({email,nome:u.nome,role:u.role,av:u.av,nivel:u.nivel}));
+  }
   el.innerHTML=tecUsers.map(u=>`
     <div class="user-card">
-      <div class="u-av">${u.av}</div>
-      <div><div class="u-name">${u.nome}</div><div class="u-info">${u.email} · ${u.role}</div></div>
-      <div class="u-actions"><button class="bs ghost" style="font-size:.64rem">Editar</button><button class="bs red" style="font-size:.64rem" onclick="deleteUser('${u.email}')">Remover</button></div>
-    </div>`).join('');
+      <div class="u-av${u.nivel==='master'?' master':''}">${u.av||u.nome.split(' ').map(n=>n[0]).slice(0,2).join('').toUpperCase()}</div>
+      <div>
+        <div class="u-name">${u.nome}</div>
+        <div class="u-info">${u.email} · ${u.role}${u.ultimo_acesso?` · Último acesso: ${new Date(u.ultimo_acesso).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}`:''}</div>
+      </div>
+      <div class="u-actions">
+        <button class="bs blue" style="font-size:.64rem" onclick="openEditUser(${JSON.stringify(u)})">✏️ Editar</button>
+        <button class="bs red" style="font-size:.64rem" onclick="deleteUser('${u.email}')">Remover</button>
+      </div>
+    </div>`).join('')||'<div class="empty"><i>👥</i><p>Nenhum técnico cadastrado</p></div>';
 }
 function openNovoUserModal(){ document.getElementById('ov-new-user').classList.add('open'); }
-function criarUsuario(){
+async function criarUsuario(){
   const nome=document.getElementById('nu-nome').value.trim();
   const email=document.getElementById('nu-email').value.trim();
   const senha=document.getElementById('nu-senha').value;
-  const role=document.getElementById('nu-role').value;
+  const roleVal=document.getElementById('nu-role').value;
   if(!nome||!email||!senha){ toast('⚠️','Campos obrigatórios','Preencha tudo.','w'); return; }
   if(senha.length<6){ toast('⚠️','Senha fraca','Mín. 6 caracteres.','w'); return; }
+  if(!/^[^@]+@[^@]+\.[^@]+$/.test(email)){ toast('⚠️','E-mail inválido','Verifique o e-mail.','w'); return; }
   const av=nome.split(' ').map(n=>n[0]).slice(0,2).join('').toUpperCase();
-  const roleLabel=role==='senior'?'Técnico Sênior':'Técnico TI';
-  USERS[email]={senha,nome,role:roleLabel,av,nivel:'tecnico'};
-  tecUsers.push({email,nome,role:roleLabel,av});
+  const roleLabel=roleVal==='senior'?'Técnico Sênior':'Técnico TI';
+  const nivelLabel=roleVal==='senior'?'senior':'tecnico';
+  const btn=document.querySelector('#ov-new-user .bs.blue');
+  if(btn){ btn.disabled=true; btn.textContent='Salvando…'; }
+  const res=await sbCriarTecnico({email,senha,nome,nivel:nivelLabel,role:roleLabel,av});
+  if(btn){ btn.disabled=false; btn.textContent='✓ Criar'; }
+  if(!res.ok&&sbOnline){
+    toast('❌','Erro ao criar','E-mail já cadastrado ou erro de conexão.','r'); return;
+  }
+  // fallback local também
+  USERS_LOCAL[email]={senha,nome,role:roleLabel,av,nivel:nivelLabel,email};
   closeOv('ov-new-user');
-  renderUsers();
-  toast('✅','Técnico Criado!',`${nome} pode fazer login.`);
+  await renderUsers();
+  toast('✅','Técnico Criado!',`${nome} já pode fazer login.`);
   addLog('m','Usuário Criado',`Master criou: ${nome} (${email})`);
   ['nu-nome','nu-email','nu-senha'].forEach(id=>document.getElementById(id).value='');
 }
-function deleteUser(email){
-  if(!confirm(`Remover ${email}?`)) return;
-  const u=tecUsers.find(x=>x.email===email);
-  tecUsers=tecUsers.filter(x=>x.email!==email);
-  delete USERS[email];
-  renderUsers();
-  toast('🗑️','Removido',`${u?.nome} removido.`,'r');
-  addLog('r','Usuário Removido',`Master removeu: ${u?.nome} (${email})`);
+async function deleteUser(email){
+  if(email===currentUser?.email){ toast('⚠️','Ação negada','Você não pode remover a si mesmo.','w'); return; }
+  if(!confirm(`Remover ${email}?\nO técnico perderá acesso imediatamente.`)) return;
+  const res=await sbDeletarTecnico(email);
+  delete USERS_LOCAL[email];
+  await renderUsers();
+  toast('🗑️','Removido',`${email} removido.`,'r');
+  addLog('r','Usuário Removido',`Master removeu: ${email}`);
 }
 function openNovoEquipModal(){ document.getElementById('ov-new-equip').classList.add('open'); }
 function salvarEquipamento(){
@@ -1871,6 +1989,61 @@ function salvarEquipamento(){
 /* ══════════════════════════════════════════
    MODALS
 ══════════════════════════════════════════ */
+function openEditUser(u){
+  document.getElementById('eu-email-orig').value=u.email;
+  document.getElementById('eu-email-label').textContent=u.email;
+  document.getElementById('eu-nome').value=u.nome||'';
+  document.getElementById('eu-senha').value='';
+  document.getElementById('eu-senha2').value='';
+  const sel=document.getElementById('eu-role');
+  // map role label back to value
+  const nivelMap={'master':'master','senior':'senior','tecnico':'tecnico'};
+  sel.value=nivelMap[u.nivel]||'tecnico';
+  document.getElementById('ov-edit-user').classList.add('open');
+}
+
+async function salvarEdicaoUser(){
+  const emailOrig=document.getElementById('eu-email-orig').value;
+  const nome=document.getElementById('eu-nome').value.trim();
+  const roleVal=document.getElementById('eu-role').value;
+  const senha=document.getElementById('eu-senha').value;
+  const senha2=document.getElementById('eu-senha2').value;
+
+  if(!nome){ toast('⚠️','Nome obrigatório','Informe o nome do técnico.','w'); return; }
+  if(senha&&senha.length<6){ toast('⚠️','Senha fraca','Mínimo 6 caracteres.','w'); return; }
+  if(senha&&senha!==senha2){ toast('⚠️','Senhas diferentes','A confirmação não confere.','w'); return; }
+
+  const roleLabel=roleVal==='master'?'Master':roleVal==='senior'?'Técnico Sênior':'Técnico TI';
+  const av=nome.split(' ').map(n=>n[0]).slice(0,2).join('').toUpperCase();
+  const dados={nome,nivel:roleVal,role:roleLabel,av};
+  if(senha) dados.senha=senha;
+
+  const btn=document.getElementById('eu-save-btn');
+  btn.disabled=true; btn.textContent='Salvando…';
+
+  const res=await sbEditarTecnico(emailOrig,dados);
+  btn.disabled=false; btn.textContent='💾 Salvar Alterações';
+
+  if(!res.ok&&sbOnline){ toast('❌','Erro ao salvar','Tente novamente.','r'); return; }
+
+  // atualiza fallback local
+  if(USERS_LOCAL[emailOrig]){
+    USERS_LOCAL[emailOrig]={...USERS_LOCAL[emailOrig],...dados};
+    if(dados.senha) USERS_LOCAL[emailOrig].senha=dados.senha;
+  }
+  // se editou o próprio usuário logado, atualiza UI
+  if(currentUser&&currentUser.email===emailOrig){
+    currentUser={...currentUser,...dados};
+    document.getElementById('tc-nome').textContent=nome;
+    document.getElementById('tc-role').textContent=roleLabel;
+  }
+
+  closeOv('ov-edit-user');
+  await renderUsers();
+  toast('✅','Alterado!',`${nome} atualizado com sucesso.`);
+  addLog('m','Técnico Editado',`Master editou: ${nome} (${emailOrig})${senha?' — senha alterada':''}`);
+}
+
 function closeOv(id){ document.getElementById(id).classList.remove('open'); }
 
 /* ══════════════════════════════════════════
@@ -1953,10 +2126,40 @@ document.addEventListener('DOMContentLoaded',()=>{
 <!--
 ═══════════════════════════════════════════
   SCHEMA SQL SUPABASE — v9
-  Cole no SQL Editor do Supabase
+  Cole TUDO no SQL Editor do Supabase
 ═══════════════════════════════════════════
 
--- Tabela solicitacoes (máquina de estados: pendente → aprovado → retirado)
+-- ═══ TABELA DE TÉCNICOS / USUÁRIOS DO SISTEMA ═══
+CREATE TABLE IF NOT EXISTS tecnicos (
+  id            BIGSERIAL PRIMARY KEY,
+  email         TEXT UNIQUE NOT NULL,
+  senha         TEXT NOT NULL,
+  nome          TEXT NOT NULL,
+  nivel         TEXT DEFAULT 'tecnico',   -- 'tecnico' | 'senior' | 'master'
+  role          TEXT DEFAULT 'Técnico TI',
+  av            TEXT,                     -- iniciais para o avatar
+  ativo         BOOLEAN DEFAULT true,
+  criado_em     TIMESTAMPTZ DEFAULT NOW(),
+  ultimo_acesso TIMESTAMPTZ
+);
+
+-- Inserir usuários iniciais (altere as senhas antes de ir para produção!)
+INSERT INTO tecnicos (email, senha, nome, nivel, role, av) VALUES
+  ('tecnico@una.edu.br', '1234',       'Bruno Técnico', 'tecnico', 'Técnico TI', 'BT'),
+  ('admin@una.edu.br',   'admin',      'Admin TI',      'tecnico', 'Técnico TI', 'AD'),
+  ('master@una.edu.br',  'master123',  'Admin Master',  'master',  'Master',     'MA')
+ON CONFLICT (email) DO NOTHING;
+
+-- Habilitar Realtime na tabela de técnicos (opcional)
+ALTER PUBLICATION supabase_realtime ADD TABLE tecnicos;
+
+-- RLS para técnicos
+ALTER TABLE tecnicos ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "allow_all_tecnicos" ON tecnicos FOR ALL USING (true);
+
+
+-- ═══ TABELA DE SOLICITAÇÕES ═══
+-- Máquina de estados: pendente → aprovado → retirado
 CREATE TABLE IF NOT EXISTS solicitacoes (
   id                BIGSERIAL PRIMARY KEY,
   protocolo         TEXT UNIQUE NOT NULL,
