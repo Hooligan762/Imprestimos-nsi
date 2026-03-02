@@ -195,6 +195,47 @@ code,.mono{font-family:'JetBrains Mono',monospace}
 .qr-detected{background:rgba(0,217,126,.06);border:1px solid rgba(0,217,126,.2);border-radius:var(--r);padding:.82rem 1rem;display:flex;align-items:center;gap:.75rem;font-size:clamp(.72rem,2vw,.8rem);color:#6ee7b7}
 .qr-detected i{font-size:1.5rem;flex-shrink:0}
 
+/* PUSH NOTIFICATION PERMISSION BANNER */
+.push-banner{position:fixed;bottom:0;left:0;right:0;z-index:9999;background:linear-gradient(135deg,rgba(8,13,28,.98),rgba(12,18,37,.98));border-top:1px solid rgba(79,142,247,.3);padding:clamp(.85rem,2.5vw,1.1rem) clamp(1rem,3vw,1.5rem);display:flex;align-items:center;gap:1rem;backdrop-filter:blur(16px);transform:translateY(100%);transition:transform .35s cubic-bezier(.16,1,.3,1);box-shadow:0 -8px 32px rgba(0,0,0,.5)}
+.push-banner.show{transform:translateY(0)}
+.push-banner-ico{font-size:1.6rem;flex-shrink:0;animation:bellRing 1.2s ease-in-out infinite}
+@keyframes bellRing{0%,100%{transform:rotate(0)}10%{transform:rotate(12deg)}20%{transform:rotate(-10deg)}30%{transform:rotate(8deg)}40%{transform:rotate(-6deg)}50%{transform:rotate(0)}}
+.push-banner-txt{flex:1;min-width:0}
+.push-banner-txt strong{display:block;font-size:clamp(.82rem,2.5vw,.92rem);color:#fff;font-weight:700}
+.push-banner-txt small{font-size:clamp(.64rem,1.9vw,.72rem);color:var(--muted);line-height:1.4}
+.push-banner-acts{display:flex;gap:.55rem;flex-shrink:0;flex-wrap:wrap}
+.push-allow-btn{background:var(--blue);border:none;border-radius:var(--rs);padding:.5rem 1rem;color:#fff;font-family:'Syne',sans-serif;font-size:.78rem;font-weight:700;cursor:pointer;transition:.15s;white-space:nowrap}
+.push-allow-btn:hover{background:var(--blue2);transform:translateY(-1px)}
+.push-deny-btn{background:rgba(255,255,255,.06);border:1px solid var(--bdr2);border-radius:var(--rs);padding:.5rem .75rem;color:var(--muted);font-family:'Outfit',sans-serif;font-size:.74rem;cursor:pointer;transition:.15s;white-space:nowrap}
+.push-deny-btn:hover{color:var(--text)}
+
+/* STATUS REALTIME INDICATOR */
+.realtime-pill{display:inline-flex;align-items:center;gap:.38rem;font-size:.65rem;padding:.28rem .65rem;border-radius:99px;font-weight:600;transition:all .3s}
+.realtime-pill.live{background:rgba(0,217,126,.08);border:1px solid rgba(0,217,126,.22);color:var(--green)}
+.realtime-pill.live::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);animation:glow 1.5s infinite;flex-shrink:0}
+.realtime-pill.polling{background:rgba(79,142,247,.08);border:1px solid rgba(79,142,247,.2);color:var(--blue)}
+.realtime-pill.polling::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--blue);animation:pulse 1s infinite;flex-shrink:0}
+
+/* DEVOLUÇÃO ALERT CARD */
+.dev-alert-card{background:rgba(255,77,109,.06);border:1px solid rgba(255,77,109,.22);border-radius:var(--r);padding:.85rem 1rem;display:flex;align-items:flex-start;gap:.75rem;animation:fadeInDown .4s ease}
+@keyframes fadeInDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+.dev-alert-card .alert-ico{font-size:1.4rem;flex-shrink:0;margin-top:.05rem}
+.dev-alert-card .alert-body strong{display:block;font-size:.84rem;color:var(--red);font-weight:700;margin-bottom:.2rem}
+.dev-alert-card .alert-body p{font-size:.74rem;color:var(--text2);line-height:1.5}
+.dev-alert-card .alert-body .alert-actions{display:flex;gap:.5rem;margin-top:.65rem;flex-wrap:wrap}
+.dev-alert-btn{background:var(--red);border:none;border-radius:var(--rs);padding:.42rem .95rem;color:#fff;font-family:'Syne',sans-serif;font-size:.74rem;font-weight:700;cursor:pointer;transition:.15s}
+.dev-alert-btn:hover{opacity:.88;transform:translateY(-1px)}
+.dev-alert-btn.ghost{background:rgba(255,77,109,.1);border:1px solid rgba(255,77,109,.2);color:var(--red)}
+
+/* STATUS PULSE ANIMATION */
+@keyframes statusPulse{0%{box-shadow:0 0 0 0 rgba(0,217,126,.5)}70%{box-shadow:0 0 0 10px rgba(0,217,126,0)}100%{box-shadow:0 0 0 0 rgba(0,217,126,0)}}
+.status-changed{animation:statusPulse .8s ease-out 2}
+
+/* CONSULTA AUTO REFRESH INDICATOR */
+.auto-refresh-bar{display:flex;align-items:center;justify-content:space-between;padding:.5rem .75rem;background:rgba(79,142,247,.04);border:1px solid rgba(79,142,247,.12);border-radius:var(--rs);font-size:.66rem;color:var(--muted);margin-top:.5rem}
+.auto-refresh-progress{height:2px;background:rgba(79,142,247,.15);border-radius:99px;overflow:hidden;margin-top:.3rem}
+.auto-refresh-progress-bar{height:100%;background:var(--blue);border-radius:99px;transition:width 1s linear}
+
 /* LOGIN */
 #s-login{align-items:center;justify-content:center;padding:clamp(1.5rem,5vw,2.5rem);position:relative}
 .l-card{background:var(--card);border:1px solid var(--bdr);border-radius:var(--rxl);padding:clamp(2rem,5vw,2.7rem) clamp(1.4rem,4vw,2.1rem);width:100%;max-width:400px;position:relative;overflow:hidden;z-index:1}
@@ -384,6 +425,41 @@ tbody tr:hover td{background:rgba(255,255,255,.012)}
 /* ── EMPRÉSTIMOS FILTROS ── */
 .remp-btn.on{background:rgba(79,142,247,.18)!important;color:#93c5fd!important;border-color:rgba(79,142,247,.35)!important}
 
+/* ── PUSH NOTIFICATIONS ── */
+.push-banner{position:fixed;top:0;left:0;right:0;z-index:9999;background:linear-gradient(135deg,#0c1225,#10172e);border-bottom:2px solid var(--green);padding:1rem 1.2rem;display:flex;align-items:center;gap:.85rem;box-shadow:0 8px 32px rgba(0,0,0,.5);animation:pushIn .38s cubic-bezier(.175,.885,.32,1.275);font-size:.88rem}
+@keyframes pushIn{from{transform:translateY(-100%);opacity:0}to{transform:translateY(0);opacity:1}}
+.push-banner.aprov{border-color:var(--green);background:linear-gradient(135deg,rgba(0,217,126,.15),#0c1225)}
+.push-banner.warn{border-color:var(--amber);background:linear-gradient(135deg,rgba(255,181,71,.15),#0c1225)}
+.push-banner.info{border-color:var(--blue);background:linear-gradient(135deg,rgba(79,142,247,.15),#0c1225)}
+.push-ico{font-size:2rem;flex-shrink:0;animation:pulse 1s ease 3}
+.push-content{flex:1}
+.push-title{font-family:'Syne',sans-serif;font-size:clamp(.9rem,3vw,1.05rem);font-weight:800;color:#fff;margin-bottom:.15rem}
+.push-msg{font-size:clamp(.7rem,2vw,.8rem);color:var(--text2);line-height:1.4}
+.push-time{font-size:.6rem;color:var(--muted);margin-top:.25rem;font-family:'JetBrains Mono',monospace}
+.push-close{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:var(--muted);font-size:.82rem;padding:.38rem .65rem;cursor:pointer;flex-shrink:0;transition:.14s;font-family:'Outfit',sans-serif}
+.push-close:hover{border-color:var(--red);color:var(--red)}
+
+/* ── POLLING LIVE STATUS ── */
+.live-status-pill{display:inline-flex;align-items:center;gap:.38rem;font-size:.62rem;font-weight:700;padding:.25rem .65rem;border-radius:99px;letter-spacing:.3px}
+.live-status-pill.polling{background:rgba(79,142,247,.1);border:1px solid rgba(79,142,247,.25);color:var(--blue)}
+.live-status-pill.polling::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--blue);animation:glow 1.2s infinite;flex-shrink:0}
+.cons-live-box{background:rgba(0,217,126,.04);border:1px solid rgba(0,217,126,.15);border-radius:var(--rs);padding:.65rem .88rem;display:flex;align-items:center;justify-content:space-between;gap:.5rem;margin-bottom:.75rem;flex-wrap:wrap}
+.push-perm-box{background:rgba(79,142,247,.06);border:1px solid rgba(79,142,247,.2);border-radius:var(--r);padding:.88rem 1rem;display:flex;align-items:center;gap:.75rem;width:100%;cursor:pointer;transition:.18s}
+.push-perm-box:hover{background:rgba(79,142,247,.1);border-color:rgba(79,142,247,.4)}
+.push-perm-ico{font-size:1.5rem;flex-shrink:0}
+.push-perm-txt{flex:1}
+.push-perm-txt strong{display:block;font-size:.82rem;color:#fff;margin-bottom:.1rem}
+.push-perm-txt small{font-size:.68rem;color:var(--muted);line-height:1.4;display:block}
+.push-perm-btn{background:var(--blue);border:none;border-radius:var(--rs);padding:.44rem .88rem;color:#fff;font-size:.72rem;font-weight:700;cursor:pointer;white-space:nowrap;font-family:'Syne',sans-serif;flex-shrink:0}
+
+/* ── ALERTA DEVOLUÇÃO ATRASADA ── */
+.late-return-card{background:rgba(255,77,109,.06);border:1.5px solid rgba(255,77,109,.25);border-radius:var(--rl);padding:1rem 1.2rem;width:100%;animation:pulse-border 2s infinite}
+@keyframes pulse-border{0%,100%{border-color:rgba(255,77,109,.25)}50%{border-color:rgba(255,77,109,.6)}}
+.late-return-card strong{display:block;color:var(--red);font-family:'Syne',sans-serif;font-size:.9rem;margin-bottom:.3rem}
+.late-return-card p{font-size:.76rem;color:var(--text2);line-height:1.55}
+.late-return-card .late-btn{margin-top:.75rem;background:rgba(255,77,109,.12);border:1px solid rgba(255,77,109,.3);border-radius:var(--rs);color:var(--red);font-size:.75rem;font-weight:700;padding:.52rem 1rem;cursor:pointer;transition:.15s;font-family:'Outfit',sans-serif;width:100%}
+.late-return-card .late-btn:hover{background:rgba(255,77,109,.2)}
+
 /* ── RELATÓRIOS ── */
 .rper-btn.on,.rcamp-btn.on{background:rgba(79,142,247,.18)!important;color:#93c5fd!important;border-color:rgba(79,142,247,.35)!important}
 .relat-tbl{width:100%;border-collapse:collapse;font-size:.72rem}
@@ -428,8 +504,18 @@ tbody tr:hover td{background:rgba(255,255,255,.012)}
 <div id="s-consulta" class="screen">
   <div class="pf-wrap" style="z-index:1">
     <div class="pf-topbar">
-      <button class="btn-back" onclick="show('s-home')">←</button>
-      <div><div class="tb-title">🔎 Consultar Status</div><div class="tb-sub">Acompanhe seu protocolo</div></div>
+      <button class="btn-back" onclick="show('s-home');pararConsultaLive()">←</button>
+      <div><div class="tb-title">🔎 Consultar Status</div><div class="tb-sub">Acompanhamento em tempo real</div></div>
+    </div>
+
+    <!-- Banner solicitar permissão de notificação push -->
+    <div id="push-perm-banner" class="push-perm-box" onclick="solicitarPermissaoPush()" style="display:none">
+      <span class="push-perm-ico">🔔</span>
+      <div class="push-perm-txt">
+        <strong>Receba alertas automáticos</strong>
+        <small>Ative as notificações para ser avisado assim que seu pedido for aprovado — mesmo com a tela fechada.</small>
+      </div>
+      <button class="push-perm-btn">Ativar</button>
     </div>
 
     <!-- Protocolos salvos na sessão -->
@@ -453,15 +539,30 @@ tbody tr:hover td{background:rgba(255,255,255,.012)}
         <div class="dr-row"><span class="dr-lbl">Professor</span><span class="dr-val" id="cons-nome">—</span></div>
         <div class="dr-row"><span class="dr-lbl">Equipamentos</span><div class="dev-tags" id="cons-equips" style="margin-top:.2rem"></div></div>
         <div class="dr-row"><span class="dr-lbl">Solicitado em</span><span class="dr-val mono-sm" id="cons-hora">—</span></div>
-        <div style="margin-top:.75rem;padding:.85rem;border-radius:var(--rs);text-align:center" id="cons-status-box">
+
+        <!-- Indicador de atualização ao vivo -->
+        <div class="cons-live-box" id="cons-live-indicator" style="display:none">
+          <div class="live-status-pill polling" id="cons-live-pill">⟳ Monitorando ao vivo…</div>
+          <span style="font-size:.62rem;color:var(--muted)" id="cons-live-timer">Próx. atualização em 30s</span>
+        </div>
+
+        <div style="margin-top:.75rem;padding:.85rem;border-radius:var(--rs);text-align:center;transition:.4s" id="cons-status-box">
           <div style="font-size:1.6rem;margin-bottom:.3rem" id="cons-status-ico">⏳</div>
           <div style="font-size:.9rem;font-weight:700" id="cons-status-txt">—</div>
           <div style="font-size:.72rem;color:var(--muted);margin-top:.2rem" id="cons-status-sub">—</div>
+          <div style="font-size:.6rem;color:var(--muted);margin-top:.4rem;font-family:'JetBrains Mono',monospace" id="cons-ultima-att"></div>
+        </div>
+
+        <!-- Alerta de devolução atrasada (aparece quando status=retirado e passou mais de 4h) -->
+        <div id="cons-late-alert" style="display:none" class="late-return-card">
+          <strong>⚠️ Lembrete de Devolução</strong>
+          <p>Você está com os equipamentos há mais de <strong id="cons-late-tempo">—</strong>. Não esqueça de devolver ao término da aula! Use o QR Code do comprovante.</p>
+          <button class="late-btn" onclick="pararConsultaLive();abrirDevolucao()">↩️ Registrar Devolução Agora</button>
         </div>
       </div>
     </div>
 
-    <button class="btn-ghost" onclick="show('s-home')">← Voltar ao Início</button>
+    <button class="btn-ghost" onclick="pararConsultaLive();show('s-home')">← Voltar ao Início</button>
   </div>
 </div>
 
@@ -560,6 +661,16 @@ tbody tr:hover td{background:rgba(255,255,255,.012)}
     <div style="background:rgba(79,142,247,.06);border:1px solid rgba(79,142,247,.15);border-radius:var(--rs);padding:.75rem 1rem;font-size:.72rem;color:#93c5fd;line-height:1.6;text-align:left">
       <strong style="display:block;margin-bottom:.2rem">💡 Dica: salve o site nos favoritos!</strong>
       Abra o menu do navegador e toque em <strong>"Adicionar à tela inicial"</strong> — assim você acessa o NSI Locker como um app e consulta o status quando quiser.
+    </div>
+
+    <!-- Solicitar notificação push na tela de sucesso -->
+    <div id="suc-push-banner" class="push-perm-box" onclick="solicitarPermissaoPush()" style="display:none">
+      <span class="push-perm-ico">🔔</span>
+      <div class="push-perm-txt">
+        <strong>Seja notificado na hora!</strong>
+        <small>Ative as notificações e receba um alerta no celular assim que seu pedido for aprovado, sem precisar ficar consultando.</small>
+      </div>
+      <button class="push-perm-btn">Ativar alertas</button>
     </div>
 
     <div class="qr-section">
@@ -691,7 +802,7 @@ tbody tr:hover td{background:rgba(255,255,255,.012)}
     <div class="sb-section">Aprovações</div>
     <div class="nav-btn" data-pg="pg-aprov" onclick="navTo('pg-aprov',this)"><span class="nb-icon">📦</span>Aprovados Hoje<span class="nb-badge amber" id="bdg-aprov" style="display:none">0</span></div>
     <div class="sb-section">Gestão</div>
-    <div class="nav-btn" data-pg="pg-emp" onclick="navTo('pg-emp',this)"><span class="nb-icon">🔄</span>Empréstimos</div>
+    <div class="nav-btn" data-pg="pg-emp" onclick="navTo('pg-emp',this)"><span class="nb-icon">🔄</span>Empréstimos<span class="nb-badge warn" id="bdg-atrasados" style="display:none;background:var(--amber);color:#000">0</span></div>
     <div class="nav-btn" data-pg="pg-equip" onclick="navTo('pg-equip',this)"><span class="nb-icon">💻</span>Equipamentos</div>
     <div class="nav-btn" data-pg="pg-log" onclick="navTo('pg-log',this)"><span class="nb-icon">📋</span>Logs</div>
     <div class="nav-btn" id="nav-usuarios" data-pg="pg-usuarios" onclick="navTo('pg-usuarios',this)" style="display:none"><span class="nb-icon">👥</span>Usuários</div>
@@ -1261,6 +1372,19 @@ tbody tr:hover td{background:rgba(255,255,255,.012)}
   </div>
 </div>
 
+<!-- PUSH NOTIFICATION BANNER -->
+<div id="push-banner" class="push-banner">
+  <span class="push-banner-ico">🔔</span>
+  <div class="push-banner-txt">
+    <strong>Receber alertas do seu pedido?</strong>
+    <small>Você será notificado quando aprovado, pronto para retirada ou com devolução pendente — mesmo com a tela fechada.</small>
+  </div>
+  <div class="push-banner-acts">
+    <button class="push-allow-btn" onclick="permitirNotificacoes()">✓ Ativar alertas</button>
+    <button class="push-deny-btn" onclick="fecharPushBanner()">Agora não</button>
+  </div>
+</div>
+
 <div id="toasts"></div>
 
 <script>
@@ -1658,7 +1782,7 @@ async function sbBuscarProtocolo(proto){
   if(!sbOnline||!sbClient) return {ok:false, error:'Sem conexão com o banco de dados'};
   const {data,error}=await sbClient.from('solicitacoes').select('*').eq('protocolo',proto.toUpperCase()).single();
   if(error||!data) return {ok:false,error:'Protocolo não encontrado'};
-  return {ok:true,data:{professor:data.professor,sala:data.sala,equipamentos:data.equipamentos,hora:_formatarData(data.data_solicitacao),id:data.id,proto:data.protocolo,status:data.status,tipo:data.tipo,agData:data.ag_data||'',agHora:data.ag_hora||''}};
+  return {ok:true,data:{professor:data.professor,sala:data.sala,equipamentos:data.equipamentos,hora:_formatarData(data.data_solicitacao),id:data.id,proto:data.protocolo,status:data.status,tipo:data.tipo,agData:data.ag_data||'',agHora:data.ag_hora||'',horaRetirada:data.hora_retirada||''}};
 }
 
 /* ═══════════════════════════════════════
@@ -2044,6 +2168,7 @@ async function doLogin(){
   renderAll(); renderLogs(); renderUsers(); updateBadges();
   await carregarDadosBanco();
   setTimeout(()=>toast('✅','Bem-vindo!',`Logado como ${u.nome}`),300);
+  setTimeout(()=>iniciarMonitoramentoAtraso(),3000);
   const tb=document.getElementById('access-log-tbody');
   if(tb){
     if(tb.children.length===1&&tb.children[0].cells[0].textContent==='Nenhum acesso registrado') tb.innerHTML='';
@@ -2342,6 +2467,20 @@ function renderEmprestimos(pagina){
   const inicio=(_empPagina-1)*_empPorPagina;
   const pagAtual=todos.slice(inicio,inicio+_empPorPagina);
   const statusMap={ pendente:'<span class="bdg pend">Pendente</span>', aprovado:'<span class="bdg aprov">Aprovado</span>', retirado:'<span class="bdg retir">Retirado</span>', cancelado:'<span class="bdg atr">Cancelado</span>', devolucao_pendente:'<span class="bdg devpend">Dev. Pend.</span>', devolvido_confirmado:'<span class="bdg dev">✅ Devolvido</span>' };
+
+  function _isAtrasado(s){
+    if(s.status!=='retirado') return false;
+    try{
+      const horaRef=s.horaRetirada||s.hora;
+      if(!horaRef) return false;
+      const m=horaRef.match(/(\d{2})\/(\d{2})\/(\d{4}) (\d{2}):(\d{2})/)||horaRef.match(/(\d{2})\/(\d{2}) (\d{2}):(\d{2})/);
+      if(!m) return false;
+      let d;
+      if(m[3]&&m[3].length===4){ d=new Date(+m[3],+m[2]-1,+m[1],+m[4],+m[5]); }
+      else { const n=new Date(); d=new Date(n.getFullYear(),n.getMonth(),+m[1],+m[2],+m[3]); }
+      return (Date.now()-d)/(1000*60*60)>=4;
+    }catch(e){ return false; }
+  }
   tbody.innerHTML=pagAtual.map(s=>`
     <tr>
       <td><span class="mono-sm" style="color:var(--blue)">${s.proto}</span></td>
@@ -2355,7 +2494,7 @@ function renderEmprestimos(pagina){
         if(dc&&dc.localDev) return '📍 '+escHtml(dc.localDev);
         return '<span style="color:var(--muted)">—</span>';
       })()}</td>
-      <td>${statusMap[s.status]||s.status}</td>
+      <td>${(statusMap[s.status]||s.status)+(_isAtrasado(s)?'<span class="bdg atr" style="margin-left:.3rem;font-size:.52rem">⚠️ +4h</span>':'')}</td>
       <td>${s.sig?`<button class="sc-sig-btn" data-sig-id="${s.id}" onclick="verAssinaturaPorId(this.dataset.sigId)">✍️ Ver</button>`:`<span style="color:var(--muted);font-size:.7rem">—</span>`}</td>
       <td>${(()=>{ const dc=devsConfirmadas.find(x=>x.protoOrig===s.proto); return dc&&dc.sigTec?`<button class="sc-sig-btn" onclick="verAssinaturaTec('${s.proto}')">🔏 Ver</button>`:'<span style="color:var(--muted);font-size:.7rem">—</span>'; })()}</td>
       <td><span class="mono-sm" style="color:var(--muted)">${s.hora}</span></td>
@@ -2607,6 +2746,69 @@ async function confirmarDevTec(){
 
 
 /* ═══════════════════════════════════════
+   MONITORAMENTO DE DEVOLUÇÕES ATRASADAS
+   (Painel do Técnico)
+═══════════════════════════════════════ */
+let _atrasoTimer=null;
+
+function iniciarMonitoramentoAtraso(){
+  if(_atrasoTimer) clearInterval(_atrasoTimer);
+  _verificarAtrasados();
+  // Verificar a cada 5 minutos
+  _atrasoTimer=setInterval(_verificarAtrasados, 5*60*1000);
+}
+
+function _verificarAtrasados(){
+  if(!solicitacoes||!solicitacoes.length||!currentUser) return;
+  const agora=Date.now();
+  const LIMITE_HORAS=4; // Alerta se > 4 horas retirado sem devolução
+
+  const atrasados=solicitacoes.filter(s=>{
+    if(s.status!=='retirado') return false;
+    if(!_campusOk(s.uni)) return false;
+    // Calcular tempo desde a retirada
+    try{
+      const horaRef=s.horaRetirada||s.hora;
+      if(!horaRef) return false;
+      const m=horaRef.match(/(\d{2})\/(\d{2})\/(\d{4}) (\d{2}):(\d{2})/)||horaRef.match(/(\d{2})\/(\d{2}) (\d{2}):(\d{2})/);
+      if(!m) return false;
+      let d;
+      if(m[3]&&m[3].length===4){
+        d=new Date(+m[3],+m[2]-1,+m[1],+m[4],+m[5]);
+      } else {
+        const now=new Date();
+        d=new Date(now.getFullYear(),now.getMonth(),+m[1],+m[2],+m[3]);
+      }
+      const hrs=(agora-d)/(1000*60*60);
+      return hrs>=LIMITE_HORAS;
+    }catch(e){ return false; }
+  });
+
+  // Atualizar badge de atrasados na sidebar
+  const bdgAtr=document.getElementById('bdg-atrasados');
+  if(bdgAtr){
+    if(atrasados.length>0){
+      bdgAtr.textContent=atrasados.length;
+      bdgAtr.style.display='flex';
+    } else {
+      bdgAtr.style.display='none';
+    }
+  }
+
+  // Mostrar banner no painel se houver atrasados (apenas uma vez por sessão de verificação)
+  if(atrasados.length>0 && _atrasoUltimoAviso!==atrasados.length){
+    _atrasoUltimoAviso=atrasados.length;
+    const nomes=atrasados.slice(0,2).map(s=>s.prof.split(' ')[0]).join(', ');
+    const extra=atrasados.length>2?` e mais ${atrasados.length-2}`:'';
+    showBanner('⚠️',`${atrasados.length} equipamento(s) não devolvido(s)`,`${nomes}${extra} — em uso por mais de ${LIMITE_HORAS}h`,'warn');
+    addLog('w','Alerta Devolução',`${atrasados.length} professor(es) com equipamentos há mais de ${LIMITE_HORAS}h: ${atrasados.map(s=>s.prof).join(', ')}`);
+  }
+}
+let _atrasoUltimoAviso=0;
+
+
+
+/* ═══════════════════════════════════════
    ACOMPANHAMENTO VIVO DA SOLICITAÇÃO
 ═══════════════════════════════════════ */
 let _pollingTimer=null;
@@ -2709,13 +2911,18 @@ function iniciarPolling(proto){
   _pollingProto=proto;
   _pollingUltimoStatus='pendente';
   _atualizarStatusBox('pendente');
-  // Atualiza a cada 15 segundos
-  _pollingTimer=setInterval(_pollingStatus, 15000);
+  // Polling de segurança a cada 20 segundos
+  _pollingTimer=setInterval(_pollingStatus, 20000);
+  // Supabase Realtime para atualização instantânea (professor)
+  iniciarRealtimeProf(proto);
+  // Mostrar banner para ativar notificações push
+  setTimeout(()=>_mostrarBannerPushSeNecessario('suc'), 1500);
 }
 
 function pararPolling(){
   if(_pollingTimer){ clearInterval(_pollingTimer); _pollingTimer=null; }
   _pollingProto='';
+  pararRealtimeProf();
 }
 
 /* ═══════════════════════════════════════
@@ -2774,6 +2981,7 @@ async function consultarStatus(){
     document.getElementById('cons-status-txt').textContent='Protocolo não encontrado';
     document.getElementById('cons-status-sub').textContent='Verifique o número digitado';
     document.getElementById('cons-status-box').style.background='rgba(255,77,109,.06)';
+    document.getElementById('cons-live-indicator').style.display='none';
     return;
   }
   const d=res.data;
@@ -2781,19 +2989,271 @@ async function consultarStatus(){
   document.getElementById('cons-nome').textContent=d.professor||'—';
   document.getElementById('cons-equips').innerHTML=(d.equipamentos||[]).map(e=>`<span class="dev-tag">${escHtml(e)}</span>`).join('');
   document.getElementById('cons-hora').textContent=d.hora||'—';
+  _aplicarStatusConsulta(d.status, d);
+
+  // Iniciar monitoramento ao vivo se status ainda ativo
+  if(!['cancelado','devolvido_confirmado'].includes(d.status)){
+    iniciarConsultaLive(proto, d.status);
+  } else {
+    pararConsultaLive();
+    document.getElementById('cons-live-indicator').style.display='none';
+  }
+
+  // Verificar alerta de devolução atrasada
+  _verificarAlertaAtraso(d);
+
+  // Mostrar banner de push se ainda não foi pedido
+  _mostrarBannerPushSeNecessario('cons');
+}
+
+function _aplicarStatusConsulta(status, data){
   const statusInfo={
-    pendente:      {ico:'⏳',txt:'Aguardando Aprovação',sub:'A equipe de TI irá analisar em breve.',bg:'rgba(255,181,71,.06)'},
-    aprovado:      {ico:'✅',txt:'Aprovado! Dirija-se ao balcão de TI',sub:'Seu pedido foi aprovado. Retire os equipamentos.',bg:'rgba(0,217,126,.06)'},
-    retirado:      {ico:'🔄',txt:'Equipamentos em uso',sub:'Você está com os equipamentos. Devolva ao término.',bg:'rgba(79,142,247,.06)'},
-    cancelado:     {ico:'❌',txt:'Solicitação Cancelada',sub:'Entre em contato com o setor de TI.',bg:'rgba(255,77,109,.06)'},
-    devolucao_pendente:{ico:'↩️',txt:'Devolução Registrada',sub:'Aguardando confirmação do técnico.',bg:'rgba(255,181,71,.06)'},
-    devolvido_confirmado:{ico:'🏁',txt:'Devolvido e Confirmado',sub:'Devolução concluída com sucesso.',bg:'rgba(0,217,126,.06)'},
+    pendente:      {ico:'⏳',txt:'Aguardando Aprovação',sub:'A equipe de TI irá analisar em breve.',bg:'rgba(255,181,71,.07)',bdr:'rgba(255,181,71,.25)',cor:'var(--amber)'},
+    aprovado:      {ico:'✅',txt:'✅ APROVADO! Dirija-se ao balcão de TI',sub:'Seu pedido foi aprovado — retire os equipamentos agora!',bg:'rgba(0,217,126,.09)',bdr:'rgba(0,217,126,.35)',cor:'var(--green)'},
+    retirado:      {ico:'🔄',txt:'Equipamentos em uso',sub:'Você está com os equipamentos. Devolva ao término da aula.',bg:'rgba(79,142,247,.07)',bdr:'rgba(79,142,247,.25)',cor:'var(--blue)'},
+    cancelado:     {ico:'❌',txt:'Solicitação Cancelada',sub:'Entre em contato com o setor de TI.',bg:'rgba(255,77,109,.07)',bdr:'rgba(255,77,109,.25)',cor:'var(--red)'},
+    devolucao_pendente:{ico:'↩️',txt:'Devolução Registrada',sub:'Aguardando confirmação do técnico.',bg:'rgba(255,181,71,.07)',bdr:'rgba(255,181,71,.25)',cor:'var(--amber)'},
+    devolvido_confirmado:{ico:'🏁',txt:'Devolvido e Confirmado ✅',sub:'Devolução concluída com sucesso. Obrigado!',bg:'rgba(0,217,126,.09)',bdr:'rgba(0,217,126,.35)',cor:'var(--green)'},
   };
-  const si=statusInfo[d.status]||{ico:'❓',txt:d.status,sub:'',bg:'rgba(255,255,255,.04)'};
+  const si=statusInfo[status]||{ico:'❓',txt:status,sub:'',bg:'rgba(255,255,255,.04)',bdr:'rgba(255,255,255,.1)',cor:'var(--muted)'};
   document.getElementById('cons-status-ico').textContent=si.ico;
-  document.getElementById('cons-status-txt').textContent=si.txt;
+  const txtEl=document.getElementById('cons-status-txt');
+  txtEl.textContent=si.txt;
+  txtEl.style.color=si.cor;
   document.getElementById('cons-status-sub').textContent=si.sub;
-  document.getElementById('cons-status-box').style.background=si.bg;
+  const box=document.getElementById('cons-status-box');
+  box.style.background=si.bg;
+  box.style.border=`1px solid ${si.bdr}`;
+  document.getElementById('cons-ultima-att').textContent='Atualizado: '+_agora();
+}
+
+function _verificarAlertaAtraso(data){
+  const lateEl=document.getElementById('cons-late-alert');
+  if(!lateEl) return;
+  // Só mostrar se status=retirado
+  if(data.status!=='retirado'){ lateEl.style.display='none'; return; }
+  // Calcular tempo desde a retirada/solicitação
+  try{
+    const hora=data.horaRetirada||data.hora;
+    if(!hora){ lateEl.style.display='none'; return; }
+    const m=hora.match(/(\d{2})\/(\d{2})\/(\d{4}) (\d{2}):(\d{2})/)||hora.match(/(\d{2})\/(\d{2}) (\d{2}):(\d{2})/);
+    if(!m){ lateEl.style.display='none'; return; }
+    let d;
+    if(m[3]&&m[3].length===4){
+      d=new Date(+m[3],+m[2]-1,+m[1],+m[4],+m[5]);
+    } else {
+      const now=new Date();
+      d=new Date(now.getFullYear(),now.getMonth(),+m[1],+m[2],+m[3]);
+    }
+    const mins=Math.floor((Date.now()-d)/60000);
+    if(mins>=120){ // 2 horas
+      const hrs=Math.floor(mins/60);
+      const min=mins%60;
+      const tempoTxt=hrs>=1?(hrs+'h'+(min>0?' '+min+'min':'')):(mins+'min');
+      const tempoEl=document.getElementById('cons-late-tempo');
+      if(tempoEl) tempoEl.textContent=tempoTxt;
+      lateEl.style.display='block';
+    } else {
+      lateEl.style.display='none';
+    }
+  }catch(e){ lateEl.style.display='none'; }
+}
+
+/* ═══════════════════════════════════════
+   CONSULTA AO VIVO — POLLING AUTOMÁTICO
+═══════════════════════════════════════ */
+let _consultaLiveTimer=null;
+let _consultaLiveCountdown=null;
+let _consultaLiveProto='';
+let _consultaLiveUltimoStatus='';
+let _consultaLiveSegundos=30;
+
+function iniciarConsultaLive(proto, statusAtual){
+  pararConsultaLive();
+  _consultaLiveProto=proto;
+  _consultaLiveUltimoStatus=statusAtual;
+  _consultaLiveSegundos=30;
+
+  const ind=document.getElementById('cons-live-indicator');
+  if(ind) ind.style.display='flex';
+
+  // Countdown visual
+  _consultaLiveCountdown=setInterval(()=>{
+    _consultaLiveSegundos--;
+    const timerEl=document.getElementById('cons-live-timer');
+    if(timerEl) timerEl.textContent=`Próx. atualização em ${_consultaLiveSegundos}s`;
+    if(_consultaLiveSegundos<=0) _consultaLiveSegundos=30;
+  },1000);
+
+  // Polling real a cada 30s
+  _consultaLiveTimer=setInterval(async()=>{
+    _consultaLiveSegundos=30;
+    const res=await sbBuscarProtocolo(_consultaLiveProto);
+    if(!res.ok) return;
+    const novoStatus=res.data.status;
+    if(novoStatus!==_consultaLiveUltimoStatus){
+      const anterior=_consultaLiveUltimoStatus;
+      _consultaLiveUltimoStatus=novoStatus;
+      _aplicarStatusConsulta(novoStatus, res.data);
+      _verificarAlertaAtraso(res.data);
+
+      // Disparar notificação push ao professor
+      if(anterior==='pendente'&&novoStatus==='aprovado'){
+        _notifAprovado();
+        _dispararPushLocal('✅ Pedido APROVADO!','Dirija-se ao balcão de TI para retirar os equipamentos agora.');
+        _mostrarPushBanner('✅ Pedido APROVADO!','Dirija-se ao balcão de TI para retirar os equipamentos.','aprov');
+      } else if(novoStatus==='devolvido_confirmado'){
+        _dispararPushLocal('🏁 Devolução confirmada!','Equipamentos confirmados pelo técnico. Obrigado!');
+        _mostrarPushBanner('🏁 Devolução Confirmada!','O técnico confirmou o recebimento dos equipamentos.','aprov');
+      } else if(novoStatus==='cancelado'){
+        _dispararPushLocal('❌ Solicitação cancelada','Entre em contato com o setor de TI.');
+        _mostrarPushBanner('❌ Solicitação Cancelada','Entre em contato com o setor de TI para mais informações.','warn');
+      } else if(novoStatus==='devolucao_pendente'){
+        _mostrarPushBanner('↩️ Devolução Registrada','O técnico irá confirmar em breve.','info');
+      }
+
+      // Parar polling em status finais
+      if(['cancelado','devolvido_confirmado'].includes(novoStatus)){
+        pararConsultaLive();
+      }
+    }
+  }, 30000);
+}
+
+function pararConsultaLive(){
+  if(_consultaLiveTimer){ clearInterval(_consultaLiveTimer); _consultaLiveTimer=null; }
+  if(_consultaLiveCountdown){ clearInterval(_consultaLiveCountdown); _consultaLiveCountdown=null; }
+  _consultaLiveProto='';
+  _consultaLiveUltimoStatus='';
+  const ind=document.getElementById('cons-live-indicator');
+  if(ind) ind.style.display='none';
+}
+
+/* ═══════════════════════════════════════
+   WEB PUSH NOTIFICATIONS
+═══════════════════════════════════════ */
+let _pushPermission='default'; // default | granted | denied
+
+function _mostrarBannerPushSeNecessario(ctx){
+  if(!('Notification' in window)) return;
+  const permAtual=Notification.permission;
+  _pushPermission=permAtual;
+  if(permAtual==='granted') return; // já tem permissão
+  if(permAtual==='denied') return;  // usuário recusou, não pedir de novo
+
+  // Mostrar banner no contexto correto
+  const bannerId=ctx==='cons'?'push-perm-banner':'suc-push-banner';
+  const el=document.getElementById(bannerId);
+  if(el) el.style.display='flex';
+}
+
+async function solicitarPermissaoPush(){
+  if(!('Notification' in window)){
+    toast('⚠️','Notificações não suportadas','Use um navegador moderno.','w');
+    return;
+  }
+  try{
+    const result=await Notification.requestPermission();
+    _pushPermission=result;
+    // Esconder todos os banners de push
+    ['push-perm-banner','suc-push-banner'].forEach(id=>{
+      const el=document.getElementById(id);
+      if(el) el.style.display='none';
+    });
+    if(result==='granted'){
+      toast('🔔','Notificações ativadas!','Você será avisado quando seu pedido for aprovado.','b');
+      // Enviar notificação de teste
+      setTimeout(()=>{
+        _dispararPushLocal('🔔 NSI Locker — Alertas ativos!','Você receberá notificações sobre seus pedidos de equipamentos.');
+      },800);
+    } else {
+      toast('⚠️','Permissão negada','Continue consultando o status manualmente.','w');
+    }
+  }catch(e){ console.warn('Push permission error:',e); }
+}
+
+function _dispararPushLocal(titulo, corpo){
+  if(!('Notification' in window)||Notification.permission!=='granted') return;
+  try{
+    const n=new Notification(titulo,{
+      body:corpo,
+      icon:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="16" fill="%230c1225"/><text y="44" x="32" text-anchor="middle" font-size="36">🔒</text></svg>',
+      badge:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="16" fill="%230c1225"/><text y="44" x="32" text-anchor="middle" font-size="36">🔒</text></svg>',
+      tag:'nsilocker-status',
+      renotify:true,
+      vibrate:[300,100,300,100,500]
+    });
+    n.onclick=()=>{ window.focus(); n.close(); };
+    setTimeout(()=>n.close(), 10000);
+  }catch(e){ console.warn('Push notification error:',e); }
+}
+
+function _mostrarPushBanner(titulo, msg, tipo){
+  // Remove banner anterior se existir
+  document.querySelectorAll('.push-banner').forEach(b=>b.remove());
+  const b=document.createElement('div');
+  b.className=`push-banner ${tipo||''}`;
+  b.innerHTML=`
+    <span class="push-ico">${tipo==='aprov'?'✅':tipo==='warn'?'⚠️':'🔔'}</span>
+    <div class="push-content">
+      <div class="push-title">${escHtml(titulo)}</div>
+      <div class="push-msg">${escHtml(msg)}</div>
+      <div class="push-time">NSI Locker · ${_agora()}</div>
+    </div>
+    <button class="push-close" onclick="this.parentNode.remove()">✕ Fechar</button>
+  `;
+  document.body.appendChild(b);
+  // Auto-fechar após 12s
+  setTimeout(()=>{ b.style.transition='.4s'; b.style.opacity='0'; b.style.transform='translateY(-100%)'; setTimeout(()=>b.remove(),400); }, 12000);
+}
+
+/* ═══════════════════════════════════════
+   SUPABASE REALTIME — LADO DO PROFESSOR
+   (monitora status do próprio protocolo)
+═══════════════════════════════════════ */
+let _profRealtimeChannel=null;
+let _profRealtimeProto='';
+
+function iniciarRealtimeProf(proto){
+  if(!sbClient||!sbOnline||!proto) return;
+  pararRealtimeProf();
+  _profRealtimeProto=proto;
+
+  _profRealtimeChannel=sbClient.channel('prof-status-'+Date.now())
+    .on('postgres_changes',{event:'UPDATE',schema:'public',table:'solicitacoes',filter:`protocolo=eq.${proto}`},p=>{
+      const s=p.new;
+      const novoStatus=s.status;
+      const anterior=_pollingUltimoStatus;
+
+      // Atualizar status na tela de sucesso
+      _pollingUltimoStatus=novoStatus;
+      _atualizarStatusBox(novoStatus);
+
+      // Notificações
+      if(anterior==='pendente'&&novoStatus==='aprovado'){
+        _notifAprovado();
+        _dispararPushLocal('✅ Pedido APROVADO!','Dirija-se ao balcão de TI para retirar os equipamentos agora.');
+        _mostrarPushBanner('✅ Pedido APROVADO!','Dirija-se ao balcão de TI para retirar os equipamentos.','aprov');
+        toast('✅','APROVADO!','Dirija-se ao balcão de TI para retirar.','b');
+      } else if(novoStatus==='cancelado'){
+        _dispararPushLocal('❌ Solicitação cancelada','Entre em contato com o setor de TI.');
+        _mostrarPushBanner('❌ Solicitação Cancelada','Entre em contato com o setor de TI.','warn');
+      }
+
+      if(['cancelado','devolvido_confirmado'].includes(novoStatus)){
+        clearInterval(_pollingTimer); _pollingTimer=null;
+        pararRealtimeProf();
+      }
+    })
+    .subscribe();
+}
+
+function pararRealtimeProf(){
+  if(_profRealtimeChannel){
+    try{ sbClient.removeChannel(_profRealtimeChannel); }catch(e){}
+    _profRealtimeChannel=null;
+  }
+  _profRealtimeProto='';
 }
 
 /* ═══════════════════════════════════════
