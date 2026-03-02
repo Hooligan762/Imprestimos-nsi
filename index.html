@@ -538,26 +538,38 @@ tbody tr:hover td{background:rgba(255,255,255,.012)}
 <!-- SUCCESS SOLICITAÇÃO -->
 <div id="s-success" class="screen">
   <div class="suc-wrap" style="z-index:1">
-    <div class="suc-circle green">✅</div>
-    <h1>Solicitação Enviada!</h1>
-    <p>Seu pedido chegou para a equipe técnica em tempo real. Aguarde a aprovação.</p>
+    <div class="suc-circle green" id="suc-ico">✅</div>
+    <h1 id="suc-titulo">Solicitação Enviada!</h1>
+    <p id="suc-desc">Seu pedido chegou para a equipe técnica. Acompanhe o status abaixo.</p>
+
+    <!-- STATUS VIVO -->
+    <div id="suc-status-box" style="width:100%;border-radius:var(--rl);padding:1rem 1.2rem;text-align:center;margin:.25rem 0;transition:.4s;background:rgba(255,181,71,.07);border:1px solid rgba(255,181,71,.2)">
+      <div style="font-size:2rem;margin-bottom:.3rem" id="suc-st-ico">⏳</div>
+      <div style="font-size:1rem;font-weight:700;color:var(--amber)" id="suc-st-txt">Aguardando aprovação…</div>
+      <div style="font-size:.72rem;color:var(--muted);margin-top:.25rem" id="suc-st-sub">A equipe de TI está analisando seu pedido</div>
+      <div style="font-size:.6rem;color:var(--muted);margin-top:.5rem" id="suc-att-txt">Atualizando automaticamente…</div>
+    </div>
+
     <div class="proto-card">
       <div class="proto-lbl">Número do Protocolo</div>
       <div class="proto-num" id="proto-num">—</div>
-      <div class="proto-sub" id="proto-sub">Aguardando aprovação da equipe TI</div>
+      <div class="proto-sub" id="proto-sub"></div>
     </div>
+
+    <!-- INSTRUÇÃO FAVORITOS -->
+    <div style="background:rgba(79,142,247,.06);border:1px solid rgba(79,142,247,.15);border-radius:var(--rs);padding:.75rem 1rem;font-size:.72rem;color:#93c5fd;line-height:1.6;text-align:left">
+      <strong style="display:block;margin-bottom:.2rem">💡 Dica: salve o site nos favoritos!</strong>
+      Abra o menu do navegador e toque em <strong>"Adicionar à tela inicial"</strong> — assim você acessa o NSI Locker como um app e consulta o status quando quiser.
+    </div>
+
     <div class="qr-section">
       <div class="qr-badge">📱 QR Code para Devolução</div>
       <div id="qr-canvas"></div>
-      <p class="qr-lbl"><strong>Guarde este QR Code!</strong> Ao terminar sua aula, escaneie-o para iniciar a devolução automaticamente.</p>
-    </div>
-    <div class="suc-info">
-      <strong>⏳ Próximos Passos</strong>
-      A equipe de TI irá revisar e aprovar sua solicitação. Dirija-se ao balcão de TI para retirar os equipamentos após a aprovação.
+      <p class="qr-lbl"><strong>Guarde este QR Code!</strong> Ao terminar sua aula, escaneie-o para devolver automaticamente.</p>
     </div>
     <div style="width:100%;display:flex;flex-direction:column;gap:.75rem;margin-top:.15rem">
-      <button class="btn-main g" onclick="abrirFormulario()">✚ Nova Solicitação</button>
-      <button class="btn-ghost" onclick="show('s-home')">← Voltar ao Início</button>
+      <button class="btn-main g" onclick="pararPolling();abrirFormulario()">✚ Nova Solicitação</button>
+      <button class="btn-ghost" onclick="pararPolling();show('s-home')">← Voltar ao Início</button>
     </div>
   </div>
 </div>
@@ -1729,10 +1741,10 @@ function renderQR(canvasId, proto){
    PROFESSOR — SOLICITAR
 ═══════════════════════════════════════ */
 function _salvarDadosProf(nome,sala,uni){
-  try{ sessionStorage.setItem('nsi_prof',JSON.stringify({nome,sala,uni})); }catch(e){}
+  try{ localStorage.setItem('nsi_prof',JSON.stringify({nome,sala,uni})); }catch(e){}
 }
 function _carregarDadosProf(){
-  try{ return JSON.parse(sessionStorage.getItem('nsi_prof')||'null'); }catch(e){ return null; }
+  try{ return JSON.parse(localStorage.getItem('nsi_prof')||'null'); }catch(e){ return null; }
 }
 
 function abrirFormulario(){
@@ -1839,11 +1851,11 @@ async function submitProf(){
   updateBadges(); addLog('e','Solicitação Enviada',`${nome} → ${ef.join(', ')} · Sala ${sala}`);
 
   document.getElementById('proto-num').textContent=proto;
-  // Salvar protocolo na sessão para consulta posterior
+  // Salvar protocolo no localStorage permanente para consulta posterior
   try{
-    const protos=JSON.parse(sessionStorage.getItem('nsi_protos')||'[]');
-    protos.unshift({proto,nome,sala,equips:ef,hora:_agora()});
-    sessionStorage.setItem('nsi_protos',JSON.stringify(protos.slice(0,5)));
+    const protos=JSON.parse(localStorage.getItem('nsi_protos')||'[]');
+    protos.unshift({proto,nome,sala,uni,equips:ef,hora:_agora()});
+    localStorage.setItem('nsi_protos',JSON.stringify(protos.slice(0,10)));
   }catch(e){}
   document.getElementById('proto-sub').textContent=tipoSolic==='agora'?`${nome} · Sala ${sala} · Retirada imediata`:`${nome} · Sala ${sala} · Agendado ${agData||'—'} às ${agHora||'—'}`;
 
@@ -1851,6 +1863,7 @@ async function submitProf(){
   btn.disabled=false; btn.textContent='📤 Enviar Solicitação';
   show('s-success');
   setTimeout(()=>renderQR('qr-canvas',proto),300);
+  iniciarPolling(proto);
 
   setTimeout(()=>{
     if(document.getElementById('s-tec').classList.contains('active')){
@@ -2582,16 +2595,135 @@ async function confirmarDevTec(){
 ═══════════════════════════════════════ */
 
 
+
+/* ═══════════════════════════════════════
+   ACOMPANHAMENTO VIVO DA SOLICITAÇÃO
+═══════════════════════════════════════ */
+let _pollingTimer=null;
+let _pollingProto='';
+let _pollingUltimoStatus='';
+
+const _statusInfo={
+  pendente:{
+    ico:'⏳', txt:'Aguardando aprovação…',
+    sub:'A equipe de TI está analisando seu pedido',
+    bg:'rgba(255,181,71,.07)', bdr:'rgba(255,181,71,.2)', cor:'var(--amber)'
+  },
+  aprovado:{
+    ico:'✅', txt:'APROVADO! Dirija-se ao balcão de TI',
+    sub:'Seu pedido foi aprovado — retire os equipamentos agora',
+    bg:'rgba(0,217,126,.08)', bdr:'rgba(0,217,126,.25)', cor:'var(--green)'
+  },
+  retirado:{
+    ico:'🔄', txt:'Equipamentos em uso',
+    sub:'Você está com os equipamentos — devolva ao término da aula',
+    bg:'rgba(79,142,247,.07)', bdr:'rgba(79,142,247,.2)', cor:'var(--blue)'
+  },
+  cancelado:{
+    ico:'❌', txt:'Solicitação Cancelada',
+    sub:'Entre em contato com o setor de TI para mais informações',
+    bg:'rgba(255,77,109,.07)', bdr:'rgba(255,77,109,.2)', cor:'var(--red)'
+  },
+  devolucao_pendente:{
+    ico:'↩️', txt:'Devolução em análise',
+    sub:'O técnico irá confirmar a devolução em breve',
+    bg:'rgba(255,181,71,.07)', bdr:'rgba(255,181,71,.2)', cor:'var(--amber)'
+  },
+  devolvido_confirmado:{
+    ico:'🏁', txt:'Devolvido e Confirmado!',
+    sub:'Devolução concluída com sucesso. Obrigado!',
+    bg:'rgba(0,217,126,.08)', bdr:'rgba(0,217,126,.25)', cor:'var(--green)'
+  },
+};
+
+function _atualizarStatusBox(status){
+  const box=document.getElementById('suc-status-box'); if(!box) return;
+  const si=_statusInfo[status]||{ico:'❓',txt:status,sub:'',bg:'rgba(255,255,255,.04)',bdr:'rgba(255,255,255,.1)',cor:'var(--muted)'};
+  document.getElementById('suc-st-ico').textContent=si.ico;
+  document.getElementById('suc-st-txt').textContent=si.txt;
+  document.getElementById('suc-st-txt').style.color=si.cor;
+  document.getElementById('suc-st-sub').textContent=si.sub;
+  box.style.background=si.bg;
+  box.style.borderColor=si.bdr;
+  const attEl=document.getElementById('suc-att-txt');
+  if(attEl) attEl.textContent='Atualizado: '+_agora();
+}
+
+function _notifAprovado(){
+  // Som de notificação
+  try{
+    const ctx=new (window.AudioContext||window.webkitAudioContext)();
+    const notas=[523,659,784,1047]; // Dó Mi Sol Dó
+    notas.forEach((freq,i)=>{
+      const osc=ctx.createOscillator();
+      const gain=ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.frequency.value=freq;
+      osc.type='sine';
+      gain.gain.setValueAtTime(0,ctx.currentTime+i*0.12);
+      gain.gain.linearRampToValueAtTime(0.25,ctx.currentTime+i*0.12+0.05);
+      gain.gain.linearRampToValueAtTime(0,ctx.currentTime+i*0.12+0.22);
+      osc.start(ctx.currentTime+i*0.12);
+      osc.stop(ctx.currentTime+i*0.12+0.25);
+    });
+  }catch(e){}
+  // Vibração
+  try{ if(navigator.vibrate) navigator.vibrate([200,100,200,100,400]); }catch(e){}
+}
+
+async function _pollingStatus(){
+  if(!_pollingProto) return;
+  try{
+    const res=await sbBuscarProtocolo(_pollingProto);
+    if(!res.ok) return;
+    const novoStatus=res.data.status;
+    if(novoStatus!==_pollingUltimoStatus){
+      const anterior=_pollingUltimoStatus;
+      _pollingUltimoStatus=novoStatus;
+      _atualizarStatusBox(novoStatus);
+      // Notificar apenas quando aprovado (mudança de pendente → aprovado)
+      if(anterior==='pendente'&&novoStatus==='aprovado'){
+        _notifAprovado();
+        toast('✅','APROVADO!','Dirija-se ao balcão de TI para retirar.','b');
+      }
+      // Parar polling quando status final
+      if(['cancelado','devolvido_confirmado'].includes(novoStatus)){
+        clearInterval(_pollingTimer); _pollingTimer=null;
+      }
+    }
+  }catch(e){}
+}
+
+function iniciarPolling(proto){
+  if(_pollingTimer) clearInterval(_pollingTimer);
+  _pollingProto=proto;
+  _pollingUltimoStatus='pendente';
+  _atualizarStatusBox('pendente');
+  // Atualiza a cada 15 segundos
+  _pollingTimer=setInterval(_pollingStatus, 15000);
+}
+
+function pararPolling(){
+  if(_pollingTimer){ clearInterval(_pollingTimer); _pollingTimer=null; }
+  _pollingProto='';
+}
+
 /* ═══════════════════════════════════════
    CONSULTA DE STATUS (PROFESSOR)
 ═══════════════════════════════════════ */
+function limparHistoricoProtos(){
+  try{ localStorage.removeItem('nsi_protos'); }catch(e){}
+  const recEl=document.getElementById('consulta-recentes');
+  if(recEl) recEl.style.display='none';
+  toast('🗑️','Histórico apagado','','b');
+}
+
 function abrirConsultaStatus(){
   show('s-consulta');
   document.getElementById('cons-proto-inp').value='';
   document.getElementById('cons-result').style.display='none';
-  // Mostrar protocolos recentes da sessão
   try{
-    const protos=JSON.parse(sessionStorage.getItem('nsi_protos')||'[]');
+    const protos=JSON.parse(localStorage.getItem('nsi_protos')||'[]');
     const recEl=document.getElementById('consulta-recentes');
     const listEl=document.getElementById('consulta-recentes-list');
     if(protos.length&&recEl&&listEl){
@@ -2602,11 +2734,17 @@ function abrirConsultaStatus(){
           onmouseover="this.style.borderColor='var(--blue)'" onmouseout="this.style.borderColor='var(--bdr)'">
           <div style="display:flex;justify-content:space-between;align-items:center">
             <span class="mono-sm" style="color:var(--blue);font-size:.75rem">${escHtml(p.proto)}</span>
-            <span style="font-size:.62rem;color:var(--muted)">${escHtml(p.hora)}</span>
+            <span style="font-size:.62rem;color:var(--muted)">${escHtml(p.hora||'')}</span>
           </div>
-          <div style="font-size:.75rem;color:var(--text2);margin-top:.15rem">${escHtml(p.nome)} · ${p.equips.join(', ')}</div>
-        </div>`).join('');
+          <div style="font-size:.75rem;color:var(--text2);margin-top:.15rem">${escHtml(p.nome||'')} · ${(p.equips||[]).join(', ')}</div>
+        </div>`).join('')+
+        `<button onclick="limparHistoricoProtos()" style="font-size:.62rem;color:var(--muted);background:none;border:none;cursor:pointer;padding:.3rem 0;margin-top:.2rem;font-family:'Outfit',sans-serif">🗑️ Limpar histórico</button>`;
     } else if(recEl){ recEl.style.display='none'; }
+    // Se só tiver 1 protocolo no histórico, consultar automaticamente
+    if(protos.length===1){
+      document.getElementById('cons-proto-inp').value=protos[0].proto;
+      setTimeout(()=>consultarStatus(),200);
+    }
   }catch(e){}
 }
 
