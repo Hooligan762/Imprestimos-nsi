@@ -2868,7 +2868,10 @@ function verDetalhesEmprestimo(id){
   document.getElementById('de-sala').textContent  = s.sala  || '—';
   document.getElementById('de-campus').textContent = campusLabel[s.uni] || s.uni || '—';
   document.getElementById('de-equips').innerHTML  = (s.equips||[]).map(e=>`<span class="dev-tag">${escHtml(e)}</span>`).join('') || '—';
-  document.getElementById('de-local').textContent  = s.local ? (s.local + (s.localDet?' · '+s.localDet:'')) : '—';
+  // Buscar local: primeiro na solicitação, depois nas devoluções confirmadas
+  const _dcLocal = devsConfirmadas.find(x=>x.protoOrig===s.proto);
+  const _localTxt = s.local ? (s.local + (s.localDet?' · '+s.localDet:'')) : (_dcLocal&&_dcLocal.localDev ? _dcLocal.localDev : '—');
+  document.getElementById('de-local').textContent = _localTxt;
   document.getElementById('de-tipo').textContent   = s.tipo === 'agendar' ? 'Agendado' : 'Retirada imediata';
   document.getElementById('de-status-val').innerHTML = statusMap[s.status] || s.status || '—';
   document.getElementById('de-hora').textContent  = s.hora || '—';
