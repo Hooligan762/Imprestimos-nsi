@@ -1305,7 +1305,7 @@ function setupRealtime(){
         if(solicitacoes.find(x=>x.id===s.id)) return; // evitar duplicata
         const nova={ id:s.id, proto:s.protocolo, prof:s.professor, sala:s.sala, uni:s.unidade,
           equips:s.equipamentos||[], obs:s.observacao||'', tipo:s.tipo||'agora',
-          hora:s.data_solicitacao?_formatarData(s.data_solicitacao):_agora(),
+          hora:s.data_solicitacao?_formatarDataCurta(s.data_solicitacao):_agora(),
           nova:true, sig:s.assinatura_prof, local:s.local_devolucao,
           localDet:s.local_detalhe||'', status:s.status||'pendente', agData:s.ag_data||'', agHora:s.ag_hora||'' };
         solicitacoes.unshift(nova);
@@ -1658,7 +1658,7 @@ async function sbBuscarProtocolo(proto){
   if(!sbOnline||!sbClient) return {ok:false, error:'Sem conexão com o banco de dados'};
   const {data,error}=await sbClient.from('solicitacoes').select('*').eq('protocolo',proto.toUpperCase()).single();
   if(error||!data) return {ok:false,error:'Protocolo não encontrado'};
-  return {ok:true,data:{professor:data.professor,sala:data.sala,equipamentos:data.equipamentos,hora:data.data_solicitacao,id:data.id,proto:data.protocolo,status:data.status,tipo:data.tipo,agData:data.ag_data||'',agHora:data.ag_hora||''}};
+  return {ok:true,data:{professor:data.professor,sala:data.sala,equipamentos:data.equipamentos,hora:_formatarData(data.data_solicitacao),id:data.id,proto:data.protocolo,status:data.status,tipo:data.tipo,agData:data.ag_data||'',agHora:data.ag_hora||''}};
 }
 
 /* ═══════════════════════════════════════
@@ -2089,7 +2089,7 @@ async function carregarDadosBanco(){
       devsPendentes=dData.map(d=>({
         id:d.id, proto:d.protocolo, protoOrig:d.protocolo_original,
         prof:d.professor, sala:d.sala||'', equips:d.equipamentos||[],
-        hora:d.data_devolucao?_formatarData(d.data_devolucao):_agora(),
+        hora:d.data_devolucao?_formatarDataCurta(d.data_devolucao):_agora(),
         nova:false, sigProf:d.assinatura_prof,
         localDev:d.local_devolucao||'', localDet:d.local_detalhe||''
       }));
@@ -2102,7 +2102,17 @@ async function carregarDadosBanco(){
 function _formatarData(iso){
   try{
     const d=new Date(iso);
-    return `${_p(d.getDate())}/${_p(d.getMonth()+1)} ${_p(d.getHours())}:${_p(d.getMinutes())}`;
+    const dias=['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
+    const meses=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+    return dias[d.getDay()]+', '+_p(d.getDate())+' de '+meses[d.getMonth()]+' de '+d.getFullYear()+' às '+_p(d.getHours())+':'+_p(d.getMinutes());
+  }catch(e){ return '—'; }
+}
+
+function _formatarDataCurta(iso){
+  try{
+    const d=new Date(iso);
+    const meses=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+    return _p(d.getDate())+' '+meses[d.getMonth()]+' · '+_p(d.getHours())+':'+_p(d.getMinutes());
   }catch(e){ return '—'; }
 }
 
