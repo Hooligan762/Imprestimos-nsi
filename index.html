@@ -8,6 +8,7 @@
 <title>TechLocker UNA</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" defer></script>
 <style>
 :root{
   --bg:#040810;--surf:#080d1c;--card:#0c1225;--card2:#10172e;
@@ -379,6 +380,15 @@ tbody tr:hover td{background:rgba(255,255,255,.012)}
   .nb-icon{font-size:.88rem;width:auto}
   .tec-main{padding:.82rem}
 }
+
+/* ── RELATÓRIOS ── */
+.rper-btn.on,.rcamp-btn.on{background:rgba(79,142,247,.18)!important;color:#93c5fd!important;border-color:rgba(79,142,247,.35)!important}
+.relat-tbl{width:100%;border-collapse:collapse;font-size:.72rem}
+.relat-tbl th{color:var(--muted);font-weight:600;text-align:left;padding:.3rem .5rem;border-bottom:1px solid var(--bdr)}
+.relat-tbl td{padding:.32rem .5rem;border-bottom:1px solid rgba(255,255,255,.04);color:var(--text2)}
+.relat-tbl td:last-child{text-align:right;font-family:'JetBrains Mono',monospace;color:var(--blue)}
+.relat-bar-bg{background:rgba(255,255,255,.06);border-radius:4px;height:5px;margin-top:.25rem}
+.relat-bar-fill{height:5px;border-radius:4px;background:var(--blue);transition:width .4s}
 </style>
 </head>
 <body>
@@ -621,6 +631,7 @@ tbody tr:hover td{background:rgba(255,255,255,.012)}
     <div class="nav-btn" data-pg="pg-equip" onclick="navTo('pg-equip',this)"><span class="nb-icon">💻</span>Equipamentos</div>
     <div class="nav-btn" data-pg="pg-log" onclick="navTo('pg-log',this)"><span class="nb-icon">📋</span>Logs</div>
     <div class="nav-btn" id="nav-usuarios" data-pg="pg-usuarios" onclick="navTo('pg-usuarios',this)" style="display:none"><span class="nb-icon">👥</span>Usuários</div>
+    <div class="nav-btn" data-pg="pg-relat" onclick="navTo('pg-relat',this)"><span class="nb-icon">📈</span>Relatórios</div>
     <div class="sb-foot">
       <div class="sb-user"><div class="sb-av" id="tc-av">TI</div><div><div class="sb-uname" id="tc-nome">Técnico</div><div class="sb-role" id="tc-role">Técnico TI</div><div id="tc-campus-badge" style="display:none;margin-top:.28rem;font-size:.58rem;font-weight:700;padding:.14rem .45rem;border-radius:5px;letter-spacing:.3px;text-transform:uppercase">Campus</div></div></div>
       <button class="sb-logout" onclick="doLogout()">← Sair</button>
@@ -739,6 +750,81 @@ tbody tr:hover td{background:rgba(255,255,255,.012)}
           <tbody id="access-log-tbody"><tr><td colspan="3" style="color:var(--muted);text-align:center">Nenhum acesso registrado</td></tr></tbody>
         </table></div>
       </div>
+    </div>
+
+
+    <!-- RELATÓRIOS -->
+    <div class="tec-page" id="pg-relat">
+      <div class="pg-head">
+        <div><h1>📈 Relatórios</h1><p id="relat-campus-sub">Análise do seu campus</p></div>
+        <div style="display:flex;gap:.5rem;flex-wrap:wrap;align-items:center">
+          <div id="relat-campus-filter" style="display:none;gap:.4rem;display:none">
+            <button class="bs ghost rcamp-btn on" data-camp="todos" onclick="relatSetCampus(this,'todos')">Todos</button>
+            <button class="bs ghost rcamp-btn" data-camp="aimores" onclick="relatSetCampus(this,'aimores')">Aimorés</button>
+            <button class="bs ghost rcamp-btn" data-camp="liberdade" onclick="relatSetCampus(this,'liberdade')">Liberdade</button>
+          </div>
+          <div style="display:flex;gap:.35rem">
+            <button class="bs ghost rper-btn on" data-per="hoje" onclick="relatSetPeriodo(this,'hoje')">Hoje</button>
+            <button class="bs ghost rper-btn" data-per="semana" onclick="relatSetPeriodo(this,'semana')">Semana</button>
+            <button class="bs ghost rper-btn" data-per="mes" onclick="relatSetPeriodo(this,'mes')">Mês</button>
+            <button class="bs ghost rper-btn" data-per="ano" onclick="relatSetPeriodo(this,'ano')">Ano</button>
+          </div>
+          <button class="bs blue" onclick="carregarRelatorios()">🔄 Atualizar</button>
+        </div>
+      </div>
+
+      <!-- KPIs -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:.75rem">
+        <div class="stat-card"><div class="stat-num" id="rk-total">—</div><div class="stat-lbl">Solicitações</div></div>
+        <div class="stat-card"><div class="stat-num" id="rk-retirados" style="color:var(--blue)">—</div><div class="stat-lbl">Retirados</div></div>
+        <div class="stat-card"><div class="stat-num" id="rk-devolvidos" style="color:var(--green)">—</div><div class="stat-lbl">Devolvidos</div></div>
+        <div class="stat-card"><div class="stat-num" id="rk-cancelados" style="color:var(--red)">—</div><div class="stat-lbl">Cancelados</div></div>
+      </div>
+
+      <!-- Gráficos linha 1 -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.85rem">
+        <div class="tc">
+          <div class="tc-head"><div class="tc-title">💻 Equipamentos Mais Pedidos</div></div>
+          <div style="padding:1rem 1rem .5rem">
+            <canvas id="chart-equips" height="200"></canvas>
+          </div>
+          <div id="tbl-equips" style="padding:0 1rem 1rem"></div>
+        </div>
+        <div class="tc">
+          <div class="tc-head"><div class="tc-title">🏫 Salas / Laboratórios</div></div>
+          <div style="padding:1rem 1rem .5rem">
+            <canvas id="chart-salas" height="200"></canvas>
+          </div>
+          <div id="tbl-salas" style="padding:0 1rem 1rem"></div>
+        </div>
+      </div>
+
+      <!-- Gráficos linha 2 -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.85rem">
+        <div class="tc">
+          <div class="tc-head"><div class="tc-title">👨‍🏫 Professores que Mais Pedem</div></div>
+          <div style="padding:1rem 1rem .5rem">
+            <canvas id="chart-profs" height="200"></canvas>
+          </div>
+          <div id="tbl-profs" style="padding:0 1rem 1rem"></div>
+        </div>
+        <div class="tc">
+          <div class="tc-head"><div class="tc-title">⏰ Horários de Pico</div></div>
+          <div style="padding:1rem 1rem .5rem">
+            <canvas id="chart-horas" height="200"></canvas>
+          </div>
+          <div id="tbl-horas" style="padding:0 1rem 1rem"></div>
+        </div>
+      </div>
+
+      <!-- Campus comparison (Master only) -->
+      <div class="tc" id="relat-campus-comp" style="display:none">
+        <div class="tc-head"><div class="tc-title">🏫 Comparativo entre Campus</div></div>
+        <div style="padding:1rem 1rem .5rem">
+          <canvas id="chart-campus" height="120"></canvas>
+        </div>
+      </div>
+
     </div>
 
   </main>
@@ -1813,6 +1899,14 @@ function navTo(pid,btn){
   if(pid==='pg-usuarios') renderUsers();
   if(pid==='pg-aprov') renderAprovadosHoje();
   if(pid==='pg-emp') renderEmprestimos();
+  if(pid==='pg-relat'){
+    // Mostrar filtro de campus só para Master
+    const campFilter=document.getElementById('relat-campus-filter');
+    if(campFilter) campFilter.style.display=currentUser.nivel==='master'?'flex':'none';
+    const sub=document.getElementById('relat-campus-sub');
+    if(sub) sub.textContent=currentUser.nivel==='master'?'Visão geral de todos os campus':('Campus '+( CAMPUS_LABEL[currentUser.campus]||currentUser.campus||''));
+    renderRelatorios();
+  }
   if(pid==='pg-equip') carregarEquipamentos();
 }
 
@@ -2158,6 +2252,276 @@ async function confirmarDevTec(){
 /* ═══════════════════════════════════════
    LOGS
 ═══════════════════════════════════════ */
+
+/* ═══════════════════════════════════════
+   RELATÓRIOS
+═══════════════════════════════════════ */
+let _relatPeriodo = 'hoje';
+let _relatCampus  = 'todos';
+let _charts       = {};
+
+function relatSetPeriodo(btn, per){
+  document.querySelectorAll('.rper-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  _relatPeriodo = per;
+  renderRelatorios();
+}
+
+function relatSetCampus(btn, camp){
+  document.querySelectorAll('.rcamp-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  _relatCampus = camp;
+  renderRelatorios();
+}
+
+function _relatFiltrarPorPeriodo(lista){
+  const agora = new Date();
+  return lista.filter(s=>{
+    if(!s.hora) return false;
+    // hora está no formato dd/mm/yyyy HH:MM
+    const partes = s.hora.match(/(\d{2})\/(\d{2})\/(\d{4}) (\d{2}):(\d{2})/);
+    if(!partes) return true;
+    const d = new Date(+partes[3], +partes[2]-1, +partes[1], +partes[4], +partes[5]);
+    if(_relatPeriodo==='hoje'){
+      return d.toDateString()===agora.toDateString();
+    } else if(_relatPeriodo==='semana'){
+      const diff=(agora-d)/(1000*60*60*24);
+      return diff<=7;
+    } else if(_relatPeriodo==='mes'){
+      return d.getMonth()===agora.getMonth()&&d.getFullYear()===agora.getFullYear();
+    } else { // ano
+      return d.getFullYear()===agora.getFullYear();
+    }
+  });
+}
+
+function _relatFiltrarPorCampus(lista){
+  if(currentUser.nivel!=='master') return lista.filter(s=>_campusOk(s.uni));
+  if(_relatCampus==='todos') return lista;
+  return lista.filter(s=>(s.uni||'')=== _relatCampus);
+}
+
+function _contarTop(lista, campo, limite=7){
+  const map = {};
+  lista.forEach(s=>{
+    if(campo==='equips'){
+      (s.equips||[]).forEach(e=>{
+        const k=e.replace(/\s*\(.*\)/,'').trim();
+        map[k]=(map[k]||0)+1;
+      });
+    } else {
+      const v=(s[campo]||'—').trim();
+      map[v]=(map[v]||0)+1;
+    }
+  });
+  return Object.entries(map).sort((a,b)=>b[1]-a[1]).slice(0,limite);
+}
+
+function _contarHoras(lista){
+  const map = {};
+  lista.forEach(s=>{
+    const m=s.hora?s.hora.match(/(\d{2}):(\d{2})/):null;
+    if(m){
+      const h=parseInt(m[1]);
+      const label=`${String(h).padStart(2,'0')}h`;
+      map[label]=(map[label]||0)+1;
+    }
+  });
+  // ordenar por hora
+  return Object.entries(map).sort((a,b)=>a[0].localeCompare(b[0]));
+}
+
+const CHART_COLORS=['#4f8ef7','#9b72f7','#00d97e','#ffa94d','#ff6b6b','#38bdf8','#e879f9'];
+
+function _destroyChart(id){ if(_charts[id]){ _charts[id].destroy(); delete _charts[id]; } }
+
+function _renderBarChart(canvasId, labels, data, label){
+  _destroyChart(canvasId);
+  const ctx=document.getElementById(canvasId);
+  if(!ctx) return;
+  _charts[canvasId]=new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels,
+      datasets:[{
+        label,
+        data,
+        backgroundColor:CHART_COLORS.slice(0,labels.length),
+        borderRadius:6,
+        borderSkipped:false
+      }]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.parsed.y} solicitação(ões)`}}},
+      scales:{
+        x:{ticks:{color:'#94a3b8',font:{size:10}},grid:{display:false}},
+        y:{ticks:{color:'#94a3b8',font:{size:10},stepSize:1},grid:{color:'rgba(255,255,255,.04)'}}
+      }
+    }
+  });
+}
+
+function _renderHeatChart(canvasId, labels, data){
+  _destroyChart(canvasId);
+  const ctx=document.getElementById(canvasId);
+  if(!ctx) return;
+  const maxVal=Math.max(...data,1);
+  const bgs=data.map(v=>{
+    const ratio=v/maxVal;
+    if(ratio>0.7) return '#ff6b6b';
+    if(ratio>0.4) return '#ffa94d';
+    return '#4f8ef7';
+  });
+  _charts[canvasId]=new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels,
+      datasets:[{label:'Solicitações',data,backgroundColor:bgs,borderRadius:4,borderSkipped:false}]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.parsed.y} no horário`}}},
+      scales:{
+        x:{ticks:{color:'#94a3b8',font:{size:9}},grid:{display:false}},
+        y:{ticks:{color:'#94a3b8',font:{size:9},stepSize:1},grid:{color:'rgba(255,255,255,.04)'}}
+      }
+    }
+  });
+}
+
+function _renderComparativoChart(canvasId, dados){
+  _destroyChart(canvasId);
+  const ctx=document.getElementById(canvasId);
+  if(!ctx) return;
+  _charts[canvasId]=new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels:['UNA Aimorés','UNA Liberdade'],
+      datasets:[
+        {label:'Solicitações',data:[dados.aimores.total,dados.liberdade.total],backgroundColor:'#4f8ef744',borderColor:'#4f8ef7',borderWidth:2,borderRadius:6},
+        {label:'Devolvidos',data:[dados.aimores.devolvidos,dados.liberdade.devolvidos],backgroundColor:'#00d97e44',borderColor:'#00d97e',borderWidth:2,borderRadius:6}
+      ]
+    },
+    options:{
+      responsive:true,
+      plugins:{legend:{labels:{color:'#94a3b8',font:{size:11}}}},
+      scales:{
+        x:{ticks:{color:'#94a3b8'},grid:{display:false}},
+        y:{ticks:{color:'#94a3b8',stepSize:1},grid:{color:'rgba(255,255,255,.04)'}}
+      }
+    }
+  });
+}
+
+function _renderTabelaTop(containerId, entries, total){
+  const el=document.getElementById(containerId);
+  if(!el) return;
+  if(!entries.length){ el.innerHTML='<p style="font-size:.72rem;color:var(--muted);padding:.5rem 0">Sem dados no período</p>'; return; }
+  const max=entries[0][1];
+  el.innerHTML=`<table class="relat-tbl"><thead><tr><th>#</th><th>Nome</th><th>Qtd</th></tr></thead><tbody>
+    ${entries.map(([nome,qtd],i)=>`
+      <tr>
+        <td style="color:var(--muted)">${i+1}</td>
+        <td>
+          ${escHtml(nome)}
+          <div class="relat-bar-bg"><div class="relat-bar-fill" style="width:${Math.round(qtd/max*100)}%"></div></div>
+        </td>
+        <td>${qtd}</td>
+      </tr>`).join('')}
+  </tbody></table>`;
+}
+
+function renderRelatorios(){
+  // Filtrar base
+  let base = _relatFiltrarPorCampus(_relatFiltrarPorPeriodo(solicitacoes));
+
+  // KPIs
+  document.getElementById('rk-total').textContent     = base.length;
+  document.getElementById('rk-retirados').textContent = base.filter(s=>['retirado','devolucao_pendente','devolvido_confirmado'].includes(s.status)).length;
+  document.getElementById('rk-devolvidos').textContent= base.filter(s=>s.status==='devolvido_confirmado').length;
+  document.getElementById('rk-cancelados').textContent= base.filter(s=>s.status==='cancelado').length;
+
+  // Equipamentos
+  const topEquips = _contarTop(base,'equips');
+  _renderBarChart('chart-equips', topEquips.map(e=>e[0]), topEquips.map(e=>e[1]), 'Solicitações');
+  _renderTabelaTop('tbl-equips', topEquips, base.length);
+
+  // Salas
+  const topSalas = _contarTop(base,'sala');
+  _renderBarChart('chart-salas', topSalas.map(e=>e[0]), topSalas.map(e=>e[1]), 'Solicitações');
+  _renderTabelaTop('tbl-salas', topSalas, base.length);
+
+  // Professores
+  const topProfs = _contarTop(base,'prof');
+  _renderBarChart('chart-profs', topProfs.map(e=>e[0].split(' ')[0]), topProfs.map(e=>e[1]), 'Solicitações');
+  _renderTabelaTop('tbl-profs', topProfs, base.length);
+
+  // Horários de pico
+  const topHoras = _contarHoras(base);
+  _renderHeatChart('chart-horas', topHoras.map(e=>e[0]), topHoras.map(e=>e[1]));
+  _renderTabelaTop('tbl-horas', topHoras, base.length);
+
+  // Comparativo campus (Master only)
+  const compEl=document.getElementById('relat-campus-comp');
+  if(currentUser.nivel==='master'){
+    compEl.style.display='block';
+    const dadosComp={
+      aimores:{
+        total: _relatFiltrarPorPeriodo(solicitacoes.filter(s=>s.uni==='aimores')).length,
+        devolvidos: _relatFiltrarPorPeriodo(solicitacoes.filter(s=>s.uni==='aimores'&&s.status==='devolvido_confirmado')).length
+      },
+      liberdade:{
+        total: _relatFiltrarPorPeriodo(solicitacoes.filter(s=>s.uni==='liberdade')).length,
+        devolvidos: _relatFiltrarPorPeriodo(solicitacoes.filter(s=>s.uni==='liberdade'&&s.status==='devolvido_confirmado')).length
+      }
+    };
+    _renderComparativoChart('chart-campus', dadosComp);
+  } else {
+    compEl.style.display='none';
+  }
+}
+
+async function carregarRelatorios(){
+  // Buscar todos os dados do período do banco para ter histórico completo
+  if(!sbOnline||!sbClient){ toast('⚠️','Sem conexão','','r'); return; }
+  try{
+    let query=sbClient.from('solicitacoes').select('protocolo,professor,sala,unidade,equipamentos,status,data_solicitacao');
+    if(currentUser.nivel!=='master') query=query.eq('unidade',currentUser.campus);
+    if(_relatPeriodo==='hoje'){
+      const hoje=new Date(); hoje.setHours(0,0,0,0);
+      query=query.gte('data_solicitacao',hoje.toISOString());
+    } else if(_relatPeriodo==='semana'){
+      const s=new Date(); s.setDate(s.getDate()-7);
+      query=query.gte('data_solicitacao',s.toISOString());
+    } else if(_relatPeriodo==='mes'){
+      const m=new Date(); m.setDate(1); m.setHours(0,0,0,0);
+      query=query.gte('data_solicitacao',m.toISOString());
+    } else {
+      const a=new Date(); a.setMonth(0,1); a.setHours(0,0,0,0);
+      query=query.gte('data_solicitacao',a.toISOString());
+    }
+    const {data,error}=await query.order('data_solicitacao',{ascending:false});
+    if(error||!data){ toast('❌','Erro ao buscar dados','','r'); return; }
+    // Mesclar com dados em memória para não perder registros novos
+    const protos=new Set(solicitacoes.map(s=>s.proto));
+    const extras=data
+      .filter(d=>!protos.has(d.protocolo))
+      .map(d=>({
+        id:d.id, proto:d.protocolo, prof:d.professor, sala:d.sala, uni:d.unidade,
+        equips:d.equipamentos||[], status:d.status,
+        hora:d.data_solicitacao?_formatarData(d.data_solicitacao):''
+      }));
+    const baseCompleta=[...solicitacoes,...extras];
+    // Renderizar com base completa temporária
+    const _orig=solicitacoes;
+    solicitacoes=baseCompleta;
+    renderRelatorios();
+    solicitacoes=_orig;
+    toast('✅','Relatório atualizado',`${data.length} registros carregados`,'b');
+  }catch(e){ console.error(e); toast('❌','Erro','','r'); }
+}
+
 function addLog(tipo,acao,detalhe){ logs.unshift({tipo,acao,detalhe,hora:_agora()}); }
 function renderLogs(){
   const el=document.getElementById('log-list'); if(!el) return;
