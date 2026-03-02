@@ -1761,18 +1761,23 @@ function abrirDevolucao(fromQR=false){
   document.getElementById('btn-submit-dev').style.display='none';
   document.getElementById('qr-detected-banner').style.display='none';
   document.querySelectorAll('#dev-local-grid .local-opt').forEach(e=>e.classList.remove('sel'));
-  localDevSelecionado=''; devProfSig=null; _devBuscaResult=null;
+  localDevSelecionado=''; devProfSig=null; _devBuscaResult=null; _devSigIniciada=false;
   clearSig('sig-dp','sig-hdp','sig-wdp');
   show('s-dev-prof');
 }
 
+let _devSigIniciada=false;
 function selLocalDev(el,nome){
   document.querySelectorAll('#dev-local-grid .local-opt').forEach(e=>e.classList.remove('sel'));
   el.classList.add('sel'); localDevSelecionado=nome;
   document.getElementById('dev-cond-card').style.display='block';
   document.getElementById('dev-sig-card').style.display='block';
   document.getElementById('btn-submit-dev').style.display='flex';
-  setTimeout(()=>initSig('sig-dp','sig-hdp','sig-wdp',v=>devProfSig=v),150);
+  // Inicializa assinatura apenas uma vez — trocar local não apaga a assinatura
+  if(!_devSigIniciada){
+    _devSigIniciada=true;
+    setTimeout(()=>initSig('sig-dp','sig-hdp','sig-wdp',v=>devProfSig=v),150);
+  }
 }
 
 async function buscarProtocolo(){
