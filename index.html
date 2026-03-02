@@ -381,6 +381,9 @@ tbody tr:hover td{background:rgba(255,255,255,.012)}
   .tec-main{padding:.82rem}
 }
 
+/* ── EMPRÉSTIMOS FILTROS ── */
+.remp-btn.on{background:rgba(79,142,247,.18)!important;color:#93c5fd!important;border-color:rgba(79,142,247,.35)!important}
+
 /* ── RELATÓRIOS ── */
 .rper-btn.on,.rcamp-btn.on{background:rgba(79,142,247,.18)!important;color:#93c5fd!important;border-color:rgba(79,142,247,.35)!important}
 .relat-tbl{width:100%;border-collapse:collapse;font-size:.72rem}
@@ -479,6 +482,7 @@ tbody tr:hover td{background:rgba(255,255,255,.012)}
       <div class="sig-acts"><button class="sig-clr" onclick="clearSig('sig-p','sig-hp','sig-wp')">Limpar assinatura</button></div>
     </div>
     <button class="btn-main" id="btn-submit-prof" onclick="submitProf()">📤 Enviar Solicitação</button>
+    <div id="prof-conn-err" style="display:none;background:rgba(255,77,109,.08);border:1px solid rgba(255,77,109,.25);border-radius:var(--rs);padding:.65rem .85rem;font-size:.75rem;color:var(--red);margin-bottom:.75rem;line-height:1.5"></div>
     <button class="btn-ghost" onclick="show('s-home')">← Cancelar</button>
   </div>
 </div>
@@ -643,7 +647,7 @@ tbody tr:hover td{background:rgba(255,255,255,.012)}
 
     <!-- DASHBOARD -->
     <div class="tec-page on" id="pg-dash">
-      <div class="pg-head"><div><h1>Dashboard</h1><p>Monitoramento em tempo real</p></div><div class="live-pill">Ao Vivo</div></div>
+      <div class="pg-head"><div><h1>Dashboard</h1><p id="dash-ultima-att">Monitoramento em tempo real</p></div><div class="live-pill">Ao Vivo</div></div>
       <div class="stats-grid">
         <div class="stat-c" data-ico="🔔" style="--accent-grad:linear-gradient(90deg,var(--amber),var(--amber2));--stat-clr:var(--amber)"><div class="s-lbl">Pendentes</div><div class="s-val" id="st-pend">0</div><div class="s-trend">Aguardando aprovação</div></div>
         <div class="stat-c" data-ico="📦" style="--accent-grad:linear-gradient(90deg,var(--blue),var(--purple));--stat-clr:var(--blue)"><div class="s-lbl">Aprovados Hoje</div><div class="s-val" id="st-aprov">0</div><div class="s-trend">Aguardando retirada</div></div>
@@ -699,7 +703,18 @@ tbody tr:hover td{background:rgba(255,255,255,.012)}
     <div class="tec-page" id="pg-emp">
       <div class="pg-head"><div><h1>Empréstimos</h1><p>Histórico completo</p></div></div>
       <div class="tc">
-        <div class="tc-head"><div class="tc-title">Todos os Registros</div><input class="sinp" placeholder="Buscar por nome, protocolo…" oninput="filterEmp(this)"></div>
+        <div class="tc-head" style="flex-wrap:wrap;gap:.5rem">
+          <div class="tc-title">Todos os Registros</div>
+          <div style="display:flex;gap:.35rem;flex-wrap:wrap;align-items:center">
+            <button class="bs ghost remp-btn on" data-st="todos" onclick="filterEmpStatus(this,'todos')">Todos</button>
+            <button class="bs ghost remp-btn" data-st="pendente" onclick="filterEmpStatus(this,'pendente')">Pendentes</button>
+            <button class="bs ghost remp-btn" data-st="aprovado" onclick="filterEmpStatus(this,'aprovado')">Aprovados</button>
+            <button class="bs ghost remp-btn" data-st="retirado" onclick="filterEmpStatus(this,'retirado')">Retirados</button>
+            <button class="bs ghost remp-btn" data-st="devolvido_confirmado" onclick="filterEmpStatus(this,'devolvido_confirmado')">Devolvidos</button>
+            <button class="bs ghost remp-btn" data-st="cancelado" onclick="filterEmpStatus(this,'cancelado')">Cancelados</button>
+            <input class="sinp" placeholder="Buscar por nome, protocolo…" oninput="filterEmp(this)" style="margin-left:.25rem">
+          </div>
+        </div>
         <div class="tbl-scroll"><table>
           <thead><tr><th>Protocolo</th><th>Professor</th><th>Sala</th><th>Equipamentos</th><th>Campus</th><th>Local Dev.</th><th>Status</th><th>Assin. Prof.</th><th>Assin. Téc.</th><th>Hora</th><th>Ação</th></tr></thead>
           <tbody id="emp-tbody"></tbody>
@@ -871,6 +886,7 @@ tbody tr:hover td{background:rgba(255,255,255,.012)}
         <div class="info-row"><span class="info-lbl">Local Dev.</span><span class="info-val" id="de-local" style="color:#c4b5fd">—</span></div>
         <div class="info-row"><span class="info-lbl">Tipo</span><span class="info-val" id="de-tipo">—</span></div>
         <div class="info-row" id="de-ag-row" style="display:none"><span class="info-lbl">Agendado</span><span class="info-val" id="de-ag" style="color:var(--blue)">—</span></div>
+        <div class="info-row" id="de-obs-row" style="display:none"><span class="info-lbl">Observação</span><span class="info-val" id="de-obs" style="color:var(--amber);font-style:italic">—</span></div>
       </div>
       <div class="info-box">
         <div style="font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:.7rem">Status &amp; Datas</div>
@@ -1709,9 +1725,13 @@ async function submitProf(){
     hora:_agora(), nova:true, sig:profSig, local:'', localDet:'', status:'pendente', agData, agHora };
 
   if(!sbOnline){
-    toast('⚠️','Sem conexão','Não foi possível conectar ao banco de dados.','r');
+    const errEl=document.getElementById('prof-conn-err');
+    if(errEl){ errEl.style.display='block'; errEl.textContent='⚠️ Sem conexão com o servidor. Verifique sua internet e tente novamente.'; }
+    toast('⚠️','Sem conexão','Verifique sua internet e tente novamente.','r');
     return;
   }
+  const errEl=document.getElementById('prof-conn-err');
+  if(errEl) errEl.style.display='none';
 
   // Timeout de segurança — libera botão após 15s mesmo se banco não responder
   const _submitTimeout = setTimeout(()=>{
@@ -2002,7 +2022,7 @@ function navTo(pid,btn){
   if(btn) btn.classList.add('on');
   if(pid==='pg-solics') markReadSolics();
   if(pid==='pg-devs') markReadDevs();
-  if(pid==='pg-log') renderLogs();
+  if(pid==='pg-log'){ renderLogs(); sbCarregarLogs(); }
   if(pid==='pg-usuarios') renderUsers();
   if(pid==='pg-aprov') renderAprovadosHoje();
   if(pid==='pg-emp') renderEmprestimos();
@@ -2020,7 +2040,7 @@ function navTo(pid,btn){
 /* ═══════════════════════════════════════
    RENDER FUNCTIONS
 ═══════════════════════════════════════ */
-function renderAll(){ renderDash(); renderSolics(); renderDevs(); renderAprovadosHoje(); renderEmprestimos(); }
+function renderAll(){ renderDash(); renderSolics(); renderDevs(); renderAprovadosHoje(); renderEmprestimos(); verificarAgendamentosHoje(); }
 
 function solicCardHTML(s){
   const isAgendado=s.tipo==='agendar';
@@ -2100,6 +2120,25 @@ function devCardHTML(d){
   </div>`;
 }
 
+function _atualizarUltimaAtt(){
+  const el=document.getElementById('dash-ultima-att');
+  if(el) el.textContent='Última atualização: '+_agora();
+}
+
+function verificarAgendamentosHoje(){
+  const hoje=new Date().toISOString().slice(0,10);
+  const agHoje=solicitacoes.filter(s=>
+    s.tipo==='agendar' &&
+    s.agData===hoje &&
+    s.status==='aprovado' &&
+    _campusOk(s.uni)
+  );
+  if(agHoje.length>0){
+    const nomes=agHoje.map(s=>s.prof.split(' ')[0]).join(', ');
+    showBanner('🗓️',`${agHoje.length} agendamento(s) para hoje`,`${nomes} — verifique a aba Aprovados`,'aprov');
+  }
+}
+
 function renderDash(){
   const pendentes=solicitacoes.filter(s=>s.status==='pendente'&&_campusOk(s.uni));
   const aprovados=solicitacoes.filter(s=>s.status==='aprovado'&&_campusOk(s.uni));
@@ -2114,6 +2153,7 @@ function renderDash(){
   const sa=document.getElementById('st-aprov'); if(sa) sa.textContent=aprovados.length;
   const sd=document.getElementById('st-devs'); if(sd) sd.textContent=devsVisiveis.length;
   const sat=document.getElementById('st-ativos'); if(sat) sat.textContent=solicitacoes.filter(s=>s.status==='retirado'&&_campusOk(s.uni)).length;
+  _atualizarUltimaAtt();
 }
 
 function renderSolics(){
@@ -2143,11 +2183,23 @@ function renderAprovadosHoje(){
 
 let _empPagina=1;
 const _empPorPagina=25;
+let _empFiltroStatus='todos';
+let _empFiltroTexto='';
+
+function filterEmpStatus(btn, status){
+  document.querySelectorAll('.remp-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  _empFiltroStatus=status;
+  _empPagina=1;
+  renderEmprestimos();
+}
 
 function renderEmprestimos(pagina){
   if(pagina) _empPagina=pagina;
   const tbody=document.getElementById('emp-tbody'); if(!tbody) return;
-  const todos=solicitacoes.filter(s=>_campusOk(s.uni));
+  let todos=solicitacoes.filter(s=>_campusOk(s.uni));
+  if(_empFiltroStatus!=='todos') todos=todos.filter(s=>s.status===_empFiltroStatus);
+  if(_empFiltroTexto) todos=todos.filter(s=>JSON.stringify(s).toLowerCase().includes(_empFiltroTexto));
   const total=todos.length;
   const totalPags=Math.max(1,Math.ceil(total/_empPorPagina));
   if(_empPagina>totalPags) _empPagina=totalPags;
@@ -2295,7 +2347,7 @@ async function confirmarEntrega(){
   addLog('d','Equipamento Entregue',`${s.prof} retirou ${s.equips.join(', ')} · ${s.proto}`);
 }
 
-function filterEmp(inp){ const q=inp.value.toLowerCase(); document.querySelectorAll('#emp-tbody tr').forEach(tr=>tr.style.display=tr.textContent.toLowerCase().includes(q)?'':'none'); }
+function filterEmp(inp){ _empFiltroTexto=inp.value.toLowerCase(); _empPagina=1; renderEmprestimos(); }
 
 /* ═══════════════════════════════════════
    ASSINATURA MODAL
@@ -2685,7 +2737,37 @@ async function carregarRelatorios(){
   }catch(e){ console.error(e); toast('❌','Erro','','r'); }
 }
 
-function addLog(tipo,acao,detalhe){ logs.unshift({tipo,acao,detalhe,hora:_agora()}); }
+function addLog(tipo,acao,detalhe){
+  const entry={tipo,acao,detalhe,hora:_agora()};
+  logs.unshift(entry);
+  // Salvar no banco de forma assíncrona (não bloqueia)
+  if(sbOnline&&sbClient){
+    sbClient.from('logs_atividade').insert({
+      tipo, acao, detalhe,
+      tecnico: currentUser?.nome||'Sistema',
+      campus:  currentUser?.campus||'',
+      hora:    new Date().toISOString()
+    }).then(()=>{}).catch(()=>{});
+  }
+}
+
+async function sbCarregarLogs(){
+  if(!sbOnline||!sbClient) return;
+  try{
+    const {data}=await sbClient.from('logs_atividade')
+      .select('tipo,acao,detalhe,tecnico,hora')
+      .order('hora',{ascending:false}).limit(200);
+    if(data&&data.length){
+      const existentes=new Set(logs.map(l=>l.acao+l.detalhe+l.hora));
+      const novos=data
+        .filter(d=>!existentes.has(d.acao+d.detalhe+(d.hora?_formatarData(d.hora):'')))
+        .map(d=>({tipo:d.tipo,acao:d.acao,detalhe:d.detalhe,hora:d.hora?_formatarData(d.hora):_agora()}));
+      logs=[...logs,...novos];
+      logs.sort((a,b)=>b.hora.localeCompare(a.hora));
+      renderLogs();
+    }
+  }catch(e){}
+}
 function renderLogs(){
   const el=document.getElementById('log-list'); if(!el) return;
   el.innerHTML=logs.length?logs.map(l=>`
@@ -2902,6 +2984,12 @@ function verDetalhesEmprestimo(id){
   document.getElementById('de-tipo').textContent   = s.tipo === 'agendar' ? 'Agendado' : 'Retirada imediata';
   document.getElementById('de-status-val').innerHTML = statusMap[s.status] || s.status || '—';
   document.getElementById('de-hora').textContent  = s.hora || '—';
+
+  const obsRow = document.getElementById('de-obs-row');
+  if(s.obs && s.obs.trim()){
+    document.getElementById('de-obs').textContent = s.obs;
+    obsRow.style.display = 'flex';
+  } else { obsRow.style.display = 'none'; }
 
   const agRow = document.getElementById('de-ag-row');
   if(s.tipo === 'agendar' && s.agData){
