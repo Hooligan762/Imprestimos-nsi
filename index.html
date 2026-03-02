@@ -1953,11 +1953,12 @@ async function carregarDadosBanco(){
     const {data:dData}=await sbClient.from('devolucoes')
       .select('*').eq('status','aguardando_tecnico').order('data_devolucao',{ascending:false});
     const {data:dcData}=await sbClient.from('devolucoes')
-      .select('id,protocolo_original,assinatura_tec,tecnico_nome,hora_confirmacao').eq('status','confirmado');
+      .select('id,protocolo_original,assinatura_tec,tecnico_nome,hora_confirmacao,local_devolucao').eq('status','confirmado');
     if(dcData){
       devsConfirmadas=dcData.map(d=>({
         protoOrig:d.protocolo_original, sigTec:d.assinatura_tec,
-        tecNome:d.tecnico_nome||'', horaConf:d.hora_confirmacao||''
+        tecNome:d.tecnico_nome||'', horaConf:d.hora_confirmacao||'',
+        localDev:d.local_devolucao||''
       }));
     }
     if(dData){
@@ -2148,7 +2149,7 @@ function renderEmprestimos(pagina){
   if(_empPagina>totalPags) _empPagina=totalPags;
   const inicio=(_empPagina-1)*_empPorPagina;
   const pagAtual=todos.slice(inicio,inicio+_empPorPagina);
-  const statusMap={ pendente:'<span class="bdg pend">Pendente</span>', aprovado:'<span class="bdg aprov">Aprovado</span>', retirado:'<span class="bdg retir">Retirado</span>', cancelado:'<span class="bdg atr">Cancelado</span>', devolucao_pendente:'<span class="bdg devpend">Dev. Pend.</span>' };
+  const statusMap={ pendente:'<span class="bdg pend">Pendente</span>', aprovado:'<span class="bdg aprov">Aprovado</span>', retirado:'<span class="bdg retir">Retirado</span>', cancelado:'<span class="bdg atr">Cancelado</span>', devolucao_pendente:'<span class="bdg devpend">Dev. Pend.</span>', devolvido_confirmado:'<span class="bdg dev">✅ Devolvido</span>' };
   tbody.innerHTML=pagAtual.map(s=>`
     <tr>
       <td><span class="mono-sm" style="color:var(--blue)">${s.proto}</span></td>
@@ -2156,7 +2157,12 @@ function renderEmprestimos(pagina){
       <td>${escHtml(s.sala)}</td>
       <td style="font-size:.75rem">${s.equips.map(e=>escHtml(e)).join(', ')}</td>
       <td><span style="font-size:.68rem;color:${CAMPUS_COR[s.uni]||'var(--muted)'}">🏫 ${CAMPUS_LABEL[s.uni]||s.uni||'—'}</span></td>
-      <td style="color:#c4b5fd;font-size:.7rem">📍 ${escHtml(s.local||'—')}</td>
+      <td style="color:#c4b5fd;font-size:.7rem">${(()=>{ 
+        if(s.local) return '📍 '+escHtml(s.local);
+        const dc=devsConfirmadas.find(x=>x.protoOrig===s.proto);
+        if(dc&&dc.localDev) return '📍 '+escHtml(dc.localDev);
+        return '<span style="color:var(--muted)">—</span>';
+      })()}</td>
       <td>${statusMap[s.status]||s.status}</td>
       <td>${s.sig?`<button class="sc-sig-btn" data-sig-id="${s.id}" onclick="verAssinaturaPorId(this.dataset.sigId)">✍️ Ver</button>`:`<span style="color:var(--muted);font-size:.7rem">—</span>`}</td>
       <td>${(()=>{ const dc=devsConfirmadas.find(x=>x.protoOrig===s.proto); return dc&&dc.sigTec?`<button class="sc-sig-btn" onclick="verAssinaturaTec('${s.proto}')">🔏 Ver</button>`:'<span style="color:var(--muted);font-size:.7rem">—</span>'; })()}</td>
@@ -2383,7 +2389,7 @@ async function confirmarDevTec(){
 
   const s=solicitacoes.find(x=>x.proto===proto);
   if(s){
-    const _dOrig=devsPendentes.find(x=>x.id===_cdDevId); devsConfirmadas.push({protoOrig:(_dOrig&&(_dOrig.protoOrig||_dOrig.proto))||proto, sigTec:tecSig, tecNome:tecNome, horaConf:_agora()});
+    const _dOrig=devsPendentes.find(x=>x.id===_cdDevId); devsConfirmadas.push({protoOrig:(_dOrig&&(_dOrig.protoOrig||_dOrig.proto))||proto, sigTec:tecSig, tecNome:tecNome, horaConf:_agora(), localDev:(_dOrig&&_dOrig.localDev)||''});
     s.status='devolvido_confirmado';
     if(sbOnline&&sbClient){
       await sbClient.from('solicitacoes').update({
