@@ -1080,7 +1080,11 @@ tbody tr:hover td{background:rgba(255,255,255,.012)}
     <div class="modal-h"><h3>💻 Cadastrar Equipamento</h3><button class="modal-x" onclick="closeOv('ov-new-equip')">✕</button></div>
     <div class="modal-b">
       <div class="frow">
-        <div class="field"><label>N° Patrimônio <span class="req">*</span></label><input type="text" id="ne-pat" placeholder="UNA-0025"></div>
+        <div class="field">
+          <label>N° Patrimônio <span class="req">*</span></label>
+          <input type="text" id="ne-pat" placeholder="UNA-0025 ou SN (sem patrimônio)">
+          <div style="font-size:.62rem;color:var(--muted);margin-top:.3rem">Equipamento sem patrimônio? Digite <strong style="color:#93c5fd">SN</strong> no campo acima.</div>
+        </div>
         <div class="field"><label>Categoria <span class="req">*</span></label>
           <select id="ne-cat">
             <option value="Chromebook">Chromebook</option>
@@ -1311,7 +1315,7 @@ async function sbInserirEquipamento(e){
     status:     e.status||'disponivel',
     criado_em:  new Date().toISOString()
   }).select().single();
-  return {ok:!error, data, error};
+  return {ok:!error, data, error: error||null};
 }
 
 async function sbAtualizarEquipamento(id, campos){
@@ -1371,7 +1375,7 @@ async function carregarEquipamentos(){
 
   tbody.innerHTML=res.data.map((e,idx)=>`
     <tr>
-      <td><span class="mono-sm" style="color:var(--muted)">${escHtml(e.patrimonio||'—')}</span></td>
+      <td><span class="mono-sm" style="color:var(--muted)">${escHtml(_exibirPatrimonio(e.patrimonio))}</span></td>
       <td><strong>${escHtml(e.nome||'—')}</strong></td>
       <td>${escHtml(e.categoria||'—')}</td>
       <td><span style="font-size:.7rem;color:${CAMPUS_COR[e.unidade]||'var(--muted)'}">🏫 ${escHtml(campusLabel[e.unidade]||e.unidade||'—')}</span></td>
@@ -1428,7 +1432,7 @@ function openEditEquip(idx){
   const e=equipamentosCache[parseInt(idx)];
   if(!e){ toast('❌','Erro','Equipamento não encontrado.','r'); return; }
   document.getElementById('ee-id').value=e.id;
-  document.getElementById('ee-pat').value=e.patrimonio||'';
+  document.getElementById('ee-pat').value=_exibirPatrimonio(e.patrimonio)||'';
   document.getElementById('ee-cat').value=e.categoria||'Chromebook';
   document.getElementById('ee-nome').value=e.nome||'';
   document.getElementById('ee-uni').value=e.unidade||'aimores';
@@ -2811,17 +2815,38 @@ function openNovoEquipModal(){
   document.getElementById('ov-new-equip').classList.add('open');
 }
 
+function _exibirPatrimonio(pat){
+  if(!pat) return '—';
+  // Se começa com SN- ou SP- e tem sufixo gerado, mostra só SN ou SP
+  if(/^SN-[A-Z0-9]{5,}$/.test(pat)) return 'SN';
+  if(/^SP-[A-Z0-9]{5,}$/.test(pat)) return 'SP';
+  return pat;
+}
+
+async function gerarPatrimonioSN(){
+  // Gera SN único baseado em timestamp para evitar duplicata
+  const sn = 'SN-' + Date.now().toString(36).toUpperCase().slice(-5);
+  document.getElementById('ne-pat').value = sn;
+  toast('💡','SN gerado',`Patrimônio: ${sn}`,'b');
+}
+
 async function salvarEquipamento(){
-  const pat=document.getElementById('ne-pat').value.trim();
+  const patDigitado=document.getElementById('ne-pat').value.trim().toUpperCase();
   const nome=document.getElementById('ne-nome').value.trim();
   const cat=document.getElementById('ne-cat').value;
   const uni=document.getElementById('ne-uni').value;
   const cond=document.getElementById('ne-cond').value;
   const status=document.getElementById('ne-status').value;
 
-  if(!pat||!nome){ toast('⚠️','Campos obrigatórios','Preencha patrimônio e nome.','w'); return; }
+  if(!patDigitado||!nome){ toast('⚠️','Campos obrigatórios','Preencha patrimônio e nome.','w'); return; }
 
   if(!sbOnline){ toast('⚠️','Supabase offline','Não é possível cadastrar sem conexão.','w'); return; }
+
+  // SN ou SP sem patrimônio — gera sufixo único internamente para não conflitar no banco
+  const _semPatrimonio = ['SN','SP'].includes(patDigitado);
+  const pat = _semPatrimonio
+    ? patDigitado + '-' + Date.now().toString(36).toUpperCase().slice(-6)
+    : patDigitado;
 
   const btn=document.getElementById('ne-save-btn');
   btn.disabled=true; btn.textContent='Salvando…';
@@ -2831,15 +2856,17 @@ async function salvarEquipamento(){
   btn.disabled=false; btn.textContent='✓ Cadastrar';
 
   if(!res.ok){
-    toast('❌','Erro ao cadastrar','Verifique se o patrimônio já existe ou há erro de conexão.','r');
+    const errMsg = res.error?.message||res.error?.code||'';
+    toast('❌','Erro ao cadastrar',errMsg||'Verifique a conexão e tente novamente.','r');
     return;
   }
 
   closeOv('ov-new-equip');
   await carregarEquipamentos();
   await carregarEquipamentosForm();
-  toast('✅','Equipamento Cadastrado!',`${pat} — ${nome} adicionado ao inventário.`);
-  addLog('m','Equipamento Cadastrado',`${pat} — ${nome} · ${cat} · ${CAMPUS_LABEL[uni]||uni}`);
+  const _patExib=_exibirPatrimonio(pat);
+  toast('✅','Equipamento Cadastrado!',`${_patExib} — ${nome} adicionado ao inventário.`);
+  addLog('m','Equipamento Cadastrado',`${_patExib} — ${nome} · ${cat} · ${CAMPUS_LABEL[uni]||uni}`);
   showBanner('💻','Novo Equipamento',`${nome} (${pat}) adicionado ao inventário`,'aprov');
 }
 
