@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>TechLocker UNA</title>
+<title>NSI Locker</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" defer></script>
@@ -400,7 +400,7 @@ tbody tr:hover td{background:rgba(255,255,255,.012)}
 <div id="s-home" class="screen active">
   <div class="home-logo" style="position:relative;z-index:1">
     <div class="home-mark">🔒</div>
-    <div class="home-wordmark">Tech<em>Locker</em></div>
+    <div class="home-wordmark">NSI<em>Locker</em></div>
     <div class="home-sub">UNA · Gestão de Equipamentos TI</div>
   </div>
   <div class="home-btns">
@@ -547,7 +547,7 @@ tbody tr:hover td{background:rgba(255,255,255,.012)}
       <div class="fc-title warn">🔍 Localizar Empréstimo</div>
       <p style="font-size:.74rem;color:var(--muted);margin-bottom:.88rem;line-height:1.55">Digite o número do protocolo ou escaneie o QR Code do comprovante.</p>
       <div class="proto-search-bar">
-        <input type="text" id="dev-proto-inp" class="proto-inp" placeholder="Ex: TL202500005" oninput="this.value=this.value.toUpperCase()">
+        <input type="text" id="dev-proto-inp" class="proto-inp" placeholder="Ex: NSI2025-XXXX" oninput="this.value=this.value.toUpperCase()">
         <button class="proto-search-btn" onclick="buscarProtocolo()">🔍 Buscar</button>
       </div>
       <div id="proto-result" class="proto-result">
@@ -606,7 +606,7 @@ tbody tr:hover td{background:rgba(255,255,255,.012)}
     <div class="l-top">
       <div class="l-icon">🛡️</div>
       <h2>Área do Técnico</h2>
-      <p>Acesso restrito · Tech Locker UNA</p>
+      <p>Acesso restrito · NSI Locker</p>
     </div>
     <div class="l-err" id="l-err">⚠️ E-mail ou senha inválidos.</div>
     <div class="field"><label>E-mail</label><input type="email" id="l-email" placeholder="tecnico@una.edu.br" autocomplete="email"></div>
@@ -619,7 +619,7 @@ tbody tr:hover td{background:rgba(255,255,255,.012)}
 <!-- PAINEL TÉCNICO -->
 <div id="s-tec" class="screen">
   <nav class="sb">
-    <div class="sb-logo"><div class="sb-logo-icon">🔒</div>Tech<em>Locker</em></div>
+    <div class="sb-logo"><div class="sb-logo-icon">🔒</div>NSI<em>Locker</em></div>
     <div class="sb-section">Monitor</div>
     <div class="nav-btn on" data-pg="pg-dash" onclick="navTo('pg-dash',this)"><span class="nb-icon">📊</span>Dashboard</div>
     <div class="nav-btn" data-pg="pg-solics" onclick="navTo('pg-solics',this)"><span class="nb-icon">🔔</span>Solicitações<span class="nb-badge" id="bdg" style="display:none">0</span></div>
@@ -634,7 +634,8 @@ tbody tr:hover td{background:rgba(255,255,255,.012)}
     <div class="nav-btn" data-pg="pg-relat" onclick="navTo('pg-relat',this)"><span class="nb-icon">📈</span>Relatórios</div>
     <div class="sb-foot">
       <div class="sb-user"><div class="sb-av" id="tc-av">TI</div><div><div class="sb-uname" id="tc-nome">Técnico</div><div class="sb-role" id="tc-role">Técnico TI</div><div id="tc-campus-badge" style="display:none;margin-top:.28rem;font-size:.58rem;font-weight:700;padding:.14rem .45rem;border-radius:5px;letter-spacing:.3px;text-transform:uppercase">Campus</div></div></div>
-      <button class="sb-logout" onclick="doLogout()">← Sair</button>
+      <button class="bs ghost" style="width:100%;margin-bottom:.4rem;font-size:.72rem" onclick="_somAtivo=!_somAtivo;this.textContent=_somAtivo?'🔔 Som: Ativado':'🔕 Som: Desativado'">🔔 Som: Ativado</button>
+    <button class="sb-logout" onclick="doLogout()">← Sair</button>
     </div>
   </nav>
 
@@ -703,6 +704,7 @@ tbody tr:hover td{background:rgba(255,255,255,.012)}
           <thead><tr><th>Protocolo</th><th>Professor</th><th>Sala</th><th>Equipamentos</th><th>Campus</th><th>Local Dev.</th><th>Status</th><th>Assin. Prof.</th><th>Assin. Téc.</th><th>Hora</th><th>Ação</th></tr></thead>
           <tbody id="emp-tbody"></tbody>
         </table></div>
+      <div id="emp-paginacao"></div>
       </div>
     </div>
 
@@ -828,6 +830,27 @@ tbody tr:hover td{background:rgba(255,255,255,.012)}
     </div>
 
   </main>
+</div>
+
+<!-- MODAL: Recusar -->
+<div class="overlay" id="ov-recusar">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-h"><h3>✕ Recusar</h3><button class="modal-x" onclick="closeOv('ov-recusar')">✕</button></div>
+    <div class="modal-b">
+      <div style="background:rgba(255,77,109,.06);border:1px solid rgba(255,77,109,.18);border-radius:var(--rs);padding:.75rem;margin-bottom:1rem">
+        <div style="font-size:.82rem;font-weight:700;color:var(--text)" id="rcz-titulo">Recusar?</div>
+        <div style="font-size:.72rem;color:var(--muted);margin-top:.2rem" id="rcz-sub"></div>
+      </div>
+      <div class="field" style="margin-bottom:0">
+        <label>Motivo <span class="opt-tag">OPCIONAL</span></label>
+        <input type="text" id="rcz-motivo" placeholder="Ex: Equipamento indisponível, horário conflitante…">
+      </div>
+    </div>
+    <div class="modal-f">
+      <button class="bs ghost" onclick="closeOv('ov-recusar')">Cancelar</button>
+      <button class="bs red" onclick="confirmarRecusa()">✕ Confirmar Recusa</button>
+    </div>
+  </div>
 </div>
 
 <!-- MODAL: Detalhes do Empréstimo -->
@@ -1191,31 +1214,68 @@ function setSbStatus(t,txt){}
 
 function setupRealtime(){
   if(!sbClient||!sbOnline) return;
-  sbClient.channel('tl-changes')
-    .on('postgres_changes',{event:'INSERT',schema:'public',table:'solicitacoes'},p=>{
-      const s=p.new;
-      const nova={ id:s.id, proto:s.protocolo, prof:s.professor, sala:s.sala, uni:s.unidade,
-        equips:s.equipamentos||[], obs:s.observacao||'', tipo:s.tipo||'agora',
-        hora:_agora(), nova:true, sig:s.assinatura_prof, local:s.local_devolucao,
-        localDet:s.local_detalhe||'', status:'pendente', agData:s.ag_data||'', agHora:s.ag_hora||'' };
-      solicitacoes.unshift(nova);
-      updateBadges(); renderAll();
-      showBanner('🔔',`Nova Solicitação: ${s.professor}`,`${(s.equipamentos||[]).join(', ')} · Sala ${s.sala}`,'new');
-    })
-    .on('postgres_changes',{event:'INSERT',schema:'public',table:'devolucoes'},p=>{
-      const d=p.new;
-      const nova={ id:d.id, proto:d.protocolo, protoOrig:d.protocolo_original, prof:d.professor,
-        sala:d.sala, equips:d.equipamentos||[], hora:_agora(), nova:true,
-        sigProf:d.assinatura_prof, localDev:d.local_devolucao, localDet:d.local_detalhe||'' };
-      devsPendentes.unshift(nova);
-      updateBadges(); renderAll();
-      showBanner('↩️',`Devolução Pendente: ${d.professor}`,`${(d.equipamentos||[]).join(', ')} · ${d.local_devolucao}`,'dev');
-    })
-    .on('postgres_changes',{event:'*',schema:'public',table:'equipamentos'},()=>{
-      carregarEquipamentos();
-      carregarEquipamentosForm();
-    })
-    .subscribe();
+  let _rtChannel = null;
+  let _rtRetryTimer = null;
+
+  function _initRealtime(){
+    if(_rtChannel){ try{ sbClient.removeChannel(_rtChannel); }catch(e){} }
+    _rtChannel = sbClient.channel('nsi-changes-'+Date.now())
+      .on('postgres_changes',{event:'INSERT',schema:'public',table:'solicitacoes'},p=>{
+        const s=p.new;
+        if(solicitacoes.find(x=>x.id===s.id)) return; // evitar duplicata
+        const nova={ id:s.id, proto:s.protocolo, prof:s.professor, sala:s.sala, uni:s.unidade,
+          equips:s.equipamentos||[], obs:s.observacao||'', tipo:s.tipo||'agora',
+          hora:s.data_solicitacao?_formatarData(s.data_solicitacao):_agora(),
+          nova:true, sig:s.assinatura_prof, local:s.local_devolucao,
+          localDet:s.local_detalhe||'', status:s.status||'pendente', agData:s.ag_data||'', agHora:s.ag_hora||'' };
+        solicitacoes.unshift(nova);
+        updateBadges(); renderAll();
+        _notifSom();
+        showBanner('🔔',`Nova Solicitação: ${s.professor}`,`${(s.equipamentos||[]).join(', ')} · Sala ${s.sala}`,'new');
+      })
+      .on('postgres_changes',{event:'UPDATE',schema:'public',table:'solicitacoes'},p=>{
+        const s=p.new;
+        const idx=solicitacoes.findIndex(x=>x.id===s.id);
+        if(idx>=0){
+          solicitacoes[idx]={...solicitacoes[idx], status:s.status,
+            horaAprovacao:s.hora_aprovacao||'', tecAprovador:s.tecnico_aprovador||'',
+            horaRetirada:s.hora_retirada||''};
+          updateBadges(); renderAll();
+        }
+      })
+      .on('postgres_changes',{event:'INSERT',schema:'public',table:'devolucoes'},p=>{
+        const d=p.new;
+        if(devsPendentes.find(x=>x.id===d.id)) return;
+        const nova={ id:d.id, proto:d.protocolo, protoOrig:d.protocolo_original, prof:d.professor,
+          sala:d.sala, equips:d.equipamentos||[], hora:_agora(), nova:true,
+          sigProf:d.assinatura_prof, localDev:d.local_devolucao, localDet:d.local_detalhe||'' };
+        devsPendentes.unshift(nova);
+        updateBadges(); renderAll();
+        _notifSom();
+        showBanner('↩️',`Devolução Pendente: ${d.professor}`,`${(d.equipamentos||[]).join(', ')} · ${d.local_devolucao}`,'dev');
+      })
+      .on('postgres_changes',{event:'UPDATE',schema:'public',table:'devolucoes'},p=>{
+        const d=p.new;
+        if(d.status==='confirmado'){
+          devsPendentes=devsPendentes.filter(x=>x.id!==d.id);
+          const solOrig=solicitacoes.find(s=>s.proto===d.protocolo_original);
+          if(solOrig) solOrig.status='devolvido_confirmado';
+          updateBadges(); renderAll();
+        }
+      })
+      .on('postgres_changes',{event:'*',schema:'public',table:'equipamentos'},()=>{
+        carregarEquipamentos(); carregarEquipamentosForm();
+      })
+      .subscribe((status)=>{
+        if(status==='SUBSCRIBED'){
+          clearTimeout(_rtRetryTimer);
+        } else if(status==='CHANNEL_ERROR'||status==='TIMED_OUT'||status==='CLOSED'){
+          clearTimeout(_rtRetryTimer);
+          _rtRetryTimer=setTimeout(()=>{ if(sbOnline) _initRealtime(); }, 5000);
+        }
+      });
+  }
+  _initRealtime();
 }
 
 /* ═══════════════════════════════════════
@@ -1525,6 +1585,23 @@ async function sbBuscarProtocolo(proto){
    STATE
 ═══════════════════════════════════════ */
 let solicitacoes = [];
+let _somAtivo = true;
+
+function _notifSom(){
+  if(!_somAtivo) return;
+  try{
+    const ctx = new (window.AudioContext||window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.frequency.setValueAtTime(880, ctx.currentTime);
+    osc.frequency.setValueAtTime(1100, ctx.currentTime+0.1);
+    gain.gain.setValueAtTime(0.15, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+0.4);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime+0.4);
+  }catch(e){}
+}
 let devsPendentes = [];
 let logs = [];
 
@@ -1620,7 +1697,7 @@ async function submitProf(){
   const nbQ=parseInt(document.getElementById('nb-n').textContent);
   const ef=selEquips.map(e=>{ if(e==='Chromebook')return`Chromebook (${cbQ}×)`; if(e==='Notebook')return`Notebook (${nbQ}×)`; return e; });
 
-  const proto = gerarProtocolo('TL');
+  const proto = gerarProtocolo('NSI');
   const agData=tipoSolic==='agendar'?(document.getElementById('pf-ag-data').value||''):'';
   const agHora=tipoSolic==='agendar'?(document.getElementById('pf-ag-hora').value||''):'';
 
@@ -1631,6 +1708,13 @@ async function submitProf(){
     toast('⚠️','Sem conexão','Não foi possível conectar ao banco de dados.','r');
     return;
   }
+
+  // Timeout de segurança — libera botão após 15s mesmo se banco não responder
+  const _submitTimeout = setTimeout(()=>{
+    const b=document.getElementById('btn-submit-prof');
+    if(b&&b.disabled){ b.disabled=false; b.textContent='📤 Enviar Solicitação';
+    toast('⚠️','Tempo esgotado','Verifique sua conexão e tente novamente.','w'); }
+  }, 15000);
 
   const btn=document.getElementById('btn-submit-prof');
   btn.disabled=true; btn.textContent='Enviando…';
@@ -1652,6 +1736,7 @@ async function submitProf(){
   document.getElementById('proto-num').textContent=proto;
   document.getElementById('proto-sub').textContent=tipoSolic==='agora'?`${nome} · Sala ${sala} · Retirada imediata`:`${nome} · Sala ${sala} · Agendado ${agData||'—'} às ${agHora||'—'}`;
 
+  clearTimeout(_submitTimeout);
   btn.disabled=false; btn.textContent='📤 Enviar Solicitação';
   show('s-success');
   setTimeout(()=>renderQR('qr-canvas',proto),300);
@@ -1777,7 +1862,14 @@ async function submitDevolucao(){
 /* ═══════════════════════════════════════
    LOGIN / LOGOUT
 ═══════════════════════════════════════ */
+let _loginTentativas=0, _loginBloqueadoAte=0;
 async function doLogin(){
+  if(Date.now()<_loginBloqueadoAte){
+    const seg=Math.ceil((_loginBloqueadoAte-Date.now())/1000);
+    document.getElementById('l-err').style.display='block';
+    document.getElementById('l-err').textContent=`⏳ Muitas tentativas. Aguarde ${seg}s.`;
+    return;
+  }
   const email=document.getElementById('l-email').value.trim();
   const senha=document.getElementById('l-senha').value;
   const err=document.getElementById('l-err');
@@ -1795,7 +1887,12 @@ async function doLogin(){
   if(btn){ btn.disabled=true; btn.textContent='Verificando…'; }
   const res=await sbBuscarTecnico(email, senha);
   if(btn){ btn.disabled=false; btn.textContent='🔐 Entrar no Painel'; }
-  if(!res.ok){ err.style.display='block'; err.textContent='⚠️ E-mail ou senha inválidos.'; return; }
+  if(!res.ok){
+    _loginTentativas++;
+    if(_loginTentativas>=5){ _loginBloqueadoAte=Date.now()+30000; _loginTentativas=0; }
+    err.style.display='block'; err.textContent='⚠️ E-mail ou senha inválidos.'; return;
+  }
+  _loginTentativas=0;
   const u=res.data;
   currentUser={...u,email};
   document.getElementById('tc-nome').textContent=u.nome;
@@ -1834,7 +1931,7 @@ async function carregarDadosBanco(){
   if(!sbOnline||!sbClient) return;
   try{
     const {data:sData}=await sbClient.from('solicitacoes')
-      .select('*').order('data_solicitacao',{ascending:false}).limit(200);
+      .select('*').order('data_solicitacao',{ascending:false}).limit(500);
     if(sData){
       solicitacoes=sData.map(s=>({
         id:s.id, proto:s.protocolo, prof:s.professor, sala:s.sala, uni:s.unidade||'aimores',
@@ -2034,11 +2131,20 @@ function renderAprovadosHoje(){
   const retirCt=document.getElementById('aprov-retir-count'); if(retirCt) retirCt.textContent=retirados.length?`${retirados.length} entregue(s)`:'';
 }
 
-function renderEmprestimos(){
+let _empPagina=1;
+const _empPorPagina=25;
+
+function renderEmprestimos(pagina){
+  if(pagina) _empPagina=pagina;
   const tbody=document.getElementById('emp-tbody'); if(!tbody) return;
   const todos=solicitacoes.filter(s=>_campusOk(s.uni));
+  const total=todos.length;
+  const totalPags=Math.max(1,Math.ceil(total/_empPorPagina));
+  if(_empPagina>totalPags) _empPagina=totalPags;
+  const inicio=(_empPagina-1)*_empPorPagina;
+  const pagAtual=todos.slice(inicio,inicio+_empPorPagina);
   const statusMap={ pendente:'<span class="bdg pend">Pendente</span>', aprovado:'<span class="bdg aprov">Aprovado</span>', retirado:'<span class="bdg retir">Retirado</span>', cancelado:'<span class="bdg atr">Cancelado</span>', devolucao_pendente:'<span class="bdg devpend">Dev. Pend.</span>' };
-  tbody.innerHTML=todos.map(s=>`
+  tbody.innerHTML=pagAtual.map(s=>`
     <tr>
       <td><span class="mono-sm" style="color:var(--blue)">${s.proto}</span></td>
       <td><strong>${escHtml(s.prof)}</strong></td>
@@ -2067,21 +2173,63 @@ async function aprovar(id){
   showBanner('📦',`Aprovado: ${s.prof}`,`${s.equips.join(', ')} · Aguardando retirada`,'aprov');
 }
 
+let _recusarId=null, _recusarTipo=null;
 function recusar(id){
   const s=solicitacoes.find(x=>x.id===id); if(!s) return;
-  if(!confirm(`Recusar a solicitação de ${s.prof}?\n${s.equips.join(', ')}`)) return;
-  solicitacoes=solicitacoes.filter(x=>x.id!==id);
-  renderAll(); updateBadges();
-  toast('❌','Recusado','Solicitação removida.','r');
-  addLog('r','Recusa',`${currentUser?.nome||'Técnico'} recusou ${s.proto} de ${s.prof}`);
+  _recusarId=id; _recusarTipo='solic';
+  document.getElementById('rcz-titulo').textContent=`Recusar solicitação de ${s.prof}?`;
+  document.getElementById('rcz-sub').textContent=s.equips.join(', ')+' · Sala '+s.sala;
+  document.getElementById('rcz-motivo').value='';
+  document.getElementById('ov-recusar').classList.add('open');
 }
 
 function recusarDev(id){
   const d=devsPendentes.find(x=>x.id===id); if(!d) return;
-  if(!confirm(`Recusar devolução de ${d.prof}?`)) return;
-  devsPendentes=devsPendentes.filter(x=>x.id!==id);
+  _recusarId=id; _recusarTipo='dev';
+  document.getElementById('rcz-titulo').textContent=`Recusar devolução de ${d.prof}?`;
+  document.getElementById('rcz-sub').textContent=d.equips.join(', ');
+  document.getElementById('rcz-motivo').value='';
+  document.getElementById('ov-recusar').classList.add('open');
+}
+
+async function confirmarRecusa(){
+  const motivo=document.getElementById('rcz-motivo').value.trim()||'Sem motivo informado';
+  const btn=document.querySelector('#ov-recusar .bs.red');
+  if(btn){ btn.disabled=true; btn.textContent='Recusando…'; }
+
+  if(_recusarTipo==='solic'){
+    const s=solicitacoes.find(x=>x.id===_recusarId); if(!s){ closeOv('ov-recusar'); return; }
+    // Salvar no banco como cancelado
+    if(sbOnline&&sbClient){
+      await sbClient.from('solicitacoes').update({
+        status:'cancelado', observacao_cancelamento:motivo,
+        tecnico_aprovador:currentUser?.nome||'Técnico',
+        data_aprovacao:new Date().toISOString()
+      }).eq('id',_recusarId);
+    }
+    s.status='cancelado';
+    addLog('r','Recusa',`${currentUser?.nome} recusou ${s.proto} de ${s.prof} · Motivo: ${motivo}`);
+    toast('❌','Solicitação recusada',`${s.prof} · ${motivo}`,'r');
+  } else {
+    const d=devsPendentes.find(x=>x.id===_recusarId); if(!d){ closeOv('ov-recusar'); return; }
+    if(sbOnline&&sbClient){
+      await sbClient.from('devolucoes').update({
+        status:'recusado', observacao_tec:motivo,
+        tecnico_nome:currentUser?.nome||'Técnico'
+      }).eq('id',_recusarId);
+      // Reverter status da solicitação original
+      await sbClient.from('solicitacoes').update({status:'retirado'}).eq('protocolo',d.protoOrig);
+    }
+    const solOrig=solicitacoes.find(s=>s.proto===d.protoOrig);
+    if(solOrig) solOrig.status='retirado';
+    devsPendentes=devsPendentes.filter(x=>x.id!==_recusarId);
+    addLog('r','Dev. Recusada',`${currentUser?.nome} recusou devolução de ${d.prof} · ${motivo}`);
+    toast('❌','Devolução recusada',motivo,'r');
+  }
+
+  if(btn){ btn.disabled=false; btn.textContent='✕ Confirmar Recusa'; }
+  closeOv('ov-recusar');
   renderAll(); updateBadges();
-  toast('❌','Devolução recusada','Verifique com o professor.','r');
 }
 
 function markReadSolics(){ solicitacoes=solicitacoes.map(s=>({...s,nova:false})); updateBadges(); renderSolics(); }
