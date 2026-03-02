@@ -421,6 +421,48 @@ tbody tr:hover td{background:rgba(255,255,255,.012)}
     </button>
   </div>
   <p class="home-note" style="position:relative;z-index:1">🔖 Escaneie o <strong>QR Code</strong> do armário de TI para abrir direto. Ao devolver, use o QR do seu comprovante.</p>
+  <button onclick="abrirConsultaStatus()" style="position:relative;z-index:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:var(--r);padding:.5rem 1.2rem;color:var(--muted);font-size:.72rem;cursor:pointer;margin-top:.35rem;font-family:'Outfit',sans-serif;transition:.15s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">🔎 Consultar status do meu protocolo</button>
+</div>
+
+<!-- CONSULTA STATUS -->
+<div id="s-consulta" class="screen">
+  <div class="pf-wrap" style="z-index:1">
+    <div class="pf-topbar">
+      <button class="btn-back" onclick="show('s-home')">←</button>
+      <div><div class="tb-title">🔎 Consultar Status</div><div class="tb-sub">Acompanhe seu protocolo</div></div>
+    </div>
+
+    <!-- Protocolos salvos na sessão -->
+    <div id="consulta-recentes" style="display:none">
+      <div style="font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:.5rem;padding:0 .1rem">Seus protocolos recentes</div>
+      <div id="consulta-recentes-list"></div>
+    </div>
+
+    <div class="fcard">
+      <div class="fc-title">🔍 Buscar Protocolo</div>
+      <div class="proto-search-bar">
+        <input type="text" id="cons-proto-inp" class="proto-inp" placeholder="Ex: NSI2025-XXXX" oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter')consultarStatus()">
+        <button class="proto-search-btn" onclick="consultarStatus()">Buscar</button>
+      </div>
+    </div>
+
+    <div id="cons-result" style="display:none">
+      <div class="fcard">
+        <div style="font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:.75rem">Resultado</div>
+        <div class="dr-row"><span class="dr-lbl">Protocolo</span><span class="dr-val mono-sm" id="cons-proto" style="color:var(--blue)">—</span></div>
+        <div class="dr-row"><span class="dr-lbl">Professor</span><span class="dr-val" id="cons-nome">—</span></div>
+        <div class="dr-row"><span class="dr-lbl">Equipamentos</span><div class="dev-tags" id="cons-equips" style="margin-top:.2rem"></div></div>
+        <div class="dr-row"><span class="dr-lbl">Solicitado em</span><span class="dr-val mono-sm" id="cons-hora">—</span></div>
+        <div style="margin-top:.75rem;padding:.85rem;border-radius:var(--rs);text-align:center" id="cons-status-box">
+          <div style="font-size:1.6rem;margin-bottom:.3rem" id="cons-status-ico">⏳</div>
+          <div style="font-size:.9rem;font-weight:700" id="cons-status-txt">—</div>
+          <div style="font-size:.72rem;color:var(--muted);margin-top:.2rem" id="cons-status-sub">—</div>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-ghost" onclick="show('s-home')">← Voltar ao Início</button>
+  </div>
 </div>
 
 <!-- SOLICITAR EQUIPAMENTO -->
@@ -441,7 +483,7 @@ tbody tr:hover td{background:rgba(255,255,255,.012)}
     </div>
     <div class="fcard">
       <div class="fc-title">👤 Identificação</div>
-      <div class="field"><label>Nome Completo <span class="req">*</span></label><input type="text" id="pf-nome" placeholder="Ex: João da Silva" autocomplete="name"></div>
+      <div class="field"><label>Nome Completo <span class="req">*</span></label><input type="text" id="pf-nome" placeholder="Ex: João da Silva" autocomplete="name" oninput="validarCampoProf(this,'nome')"><div class="field-err" id="err-nome" style="display:none;font-size:.62rem;color:var(--red);margin-top:.2rem"></div></div>
       <div class="frow">
         <div class="field"><label>Unidade <span class="req">*</span></label>
           <select id="pf-uni">
@@ -450,7 +492,7 @@ tbody tr:hover td{background:rgba(255,255,255,.012)}
             <option value="liberdade">UNA Liberdade</option>
           </select>
         </div>
-        <div class="field"><label>Sala <span class="req">*</span></label><input type="text" id="pf-sala" placeholder="Ex: L101"></div>
+        <div class="field"><label>Sala <span class="req">*</span></label><input type="text" id="pf-sala" placeholder="Ex: L101" oninput="validarCampoProf(this,'sala')"><div class="field-err" id="err-sala" style="display:none;font-size:.62rem;color:var(--red);margin-top:.2rem"></div></div>
       </div>
     </div>
     <div class="fcard">
@@ -475,6 +517,12 @@ tbody tr:hover td{background:rgba(255,255,255,.012)}
       </div>
     </div>
 
+    <div class="fcard">
+      <div class="fc-title">📝 Observações <span class="opt-tag" style="font-size:.6rem;padding:.1rem .4rem;border-radius:4px;background:rgba(255,255,255,.06);color:var(--muted);font-weight:500">OPCIONAL</span></div>
+      <div class="field" style="margin-bottom:0">
+        <textarea id="pf-obs" placeholder="Ex: Preciso para aula prática às 14h, cuidado com o cabo…" style="min-height:56px"></textarea>
+      </div>
+    </div>
     <div class="fcard">
       <div class="fc-title green">✍️ Assinatura do Professor</div>
       <p style="font-size:.74rem;color:var(--muted);margin-bottom:.75rem;line-height:1.55">Ao assinar, você confirma a solicitação e <strong style="color:var(--text2)">assume responsabilidade</strong> pelos equipamentos.</p>
@@ -672,7 +720,7 @@ tbody tr:hover td{background:rgba(255,255,255,.012)}
     <div class="tec-page" id="pg-solics">
       <div class="pg-head"><div><h1>Solicitações</h1><p>Verifique dados e assinatura antes de aprovar</p></div><div class="live-pill">Tempo Real</div></div>
       <div class="tc">
-        <div class="tc-head"><div class="tc-title">🔔 Fila de Aprovação</div><span id="solic-count" style="font-size:.7rem;color:var(--muted)"></span></div>
+        <div class="tc-head"><div class="tc-title">🔔 Fila de Aprovação</div><div style="display:flex;align-items:center;gap:.5rem"><span id="solic-count" style="font-size:.7rem;color:var(--muted)"></span><input class="sinp" placeholder="Buscar professor, sala…" oninput="filterSolics(this)" style="width:180px"></div></div>
         <div class="solic-list" id="solics-list"></div>
       </div>
     </div>
@@ -1680,17 +1728,48 @@ function renderQR(canvasId, proto){
 /* ═══════════════════════════════════════
    PROFESSOR — SOLICITAR
 ═══════════════════════════════════════ */
+function _salvarDadosProf(nome,sala,uni){
+  try{ sessionStorage.setItem('nsi_prof',JSON.stringify({nome,sala,uni})); }catch(e){}
+}
+function _carregarDadosProf(){
+  try{ return JSON.parse(sessionStorage.getItem('nsi_prof')||'null'); }catch(e){ return null; }
+}
+
 function abrirFormulario(){
-  ['pf-nome','pf-sala'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
-  document.getElementById('pf-uni').value='';
   document.querySelectorAll('.eq-item').forEach(e=>e.classList.remove('sel'));
   document.querySelectorAll('.qty-row').forEach(e=>e.style.display='none');
   selEquips=[]; profSig=null; localSelecionado='';
+  const obsEl=document.getElementById('pf-obs'); if(obsEl) obsEl.value='';
   clearSig('sig-p','sig-hp','sig-wp');
   setTipo('agora');
+  // Preencher com dados da sessão anterior
+  const saved=_carregarDadosProf();
+  if(saved){
+    document.getElementById('pf-nome').value=saved.nome||'';
+    document.getElementById('pf-sala').value=saved.sala||'';
+    document.getElementById('pf-uni').value=saved.uni||'';
+  } else {
+    ['pf-nome','pf-sala'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+    document.getElementById('pf-uni').value='';
+  }
   show('s-prof');
   carregarEquipamentosForm();
   setTimeout(()=>initSig('sig-p','sig-hp','sig-wp',v=>profSig=v),200);
+}
+
+
+function validarCampoProf(el, campo){
+  const v=el.value.trim();
+  const erros={
+    nome: v.length>0&&v.length<3?'Nome muito curto':'',
+    sala: v.length>0&&!/^[a-zA-Z0-9\-\/\s]+$/.test(v)?'Sala inválida':'',
+  };
+  const errEl=document.getElementById('err-'+campo);
+  if(errEl){
+    errEl.textContent=erros[campo]||'';
+    errEl.style.display=erros[campo]?'block':'none';
+  }
+  el.style.borderColor=erros[campo]?'var(--red)':'';
 }
 
 function toggleEq(el){
@@ -1721,7 +1800,8 @@ async function submitProf(){
   const agData=tipoSolic==='agendar'?(document.getElementById('pf-ag-data').value||''):'';
   const agHora=tipoSolic==='agendar'?(document.getElementById('pf-ag-hora').value||''):'';
 
-  const nova={ id:Date.now(), proto, prof:nome, sala, uni, equips:ef, obs:'', tipo:tipoSolic,
+  const obs=document.getElementById('pf-obs').value.trim();
+  const nova={ id:Date.now(), proto, prof:nome, sala, uni, equips:ef, obs, tipo:tipoSolic,
     hora:_agora(), nova:true, sig:profSig, local:'', localDet:'', status:'pendente', agData, agHora };
 
   if(!sbOnline){
@@ -1755,9 +1835,16 @@ async function submitProf(){
   if(sbRes.data && sbRes.data.id) nova.id = sbRes.data.id;
 
   solicitacoes.unshift(nova);
+  _salvarDadosProf(nome,sala,uni); // memorizar para próxima vez
   updateBadges(); addLog('e','Solicitação Enviada',`${nome} → ${ef.join(', ')} · Sala ${sala}`);
 
   document.getElementById('proto-num').textContent=proto;
+  // Salvar protocolo na sessão para consulta posterior
+  try{
+    const protos=JSON.parse(sessionStorage.getItem('nsi_protos')||'[]');
+    protos.unshift({proto,nome,sala,equips:ef,hora:_agora()});
+    sessionStorage.setItem('nsi_protos',JSON.stringify(protos.slice(0,5)));
+  }catch(e){}
   document.getElementById('proto-sub').textContent=tipoSolic==='agora'?`${nome} · Sala ${sala} · Retirada imediata`:`${nome} · Sala ${sala} · Agendado ${agData||'—'} às ${agHora||'—'}`;
 
   clearTimeout(_submitTimeout);
@@ -2042,8 +2129,21 @@ function navTo(pid,btn){
 ═══════════════════════════════════════ */
 function renderAll(){ renderDash(); renderSolics(); renderDevs(); renderAprovadosHoje(); renderEmprestimos(); verificarAgendamentosHoje(); }
 
+function _tempoEspera(hora){
+  try{
+    const m=hora.match(/(\d{2})\/(\d{2})\/(\d{4}) (\d{2}):(\d{2})/);
+    if(!m) return null;
+    const d=new Date(+m[3],+m[2]-1,+m[1],+m[4],+m[5]);
+    const mins=Math.floor((Date.now()-d)/60000);
+    if(mins<60) return {txt:`há ${mins} min`,urgente:mins>30,mto:mins>60};
+    const hrs=Math.floor(mins/60);
+    return {txt:`há ${hrs}h`,urgente:hrs>=1,mto:hrs>=2};
+  }catch(e){ return null; }
+}
+
 function solicCardHTML(s){
   const isAgendado=s.tipo==='agendar';
+  const espera=s.status==='pendente'?_tempoEspera(s.hora):null;
   const localTxt=s.local?`<span class="sc-local">📍 ${s.local}${s.localDet?' · '+s.localDet:''}</span>`:'';
   const agInfo=isAgendado&&s.agData?`<span style="font-size:.65rem;color:var(--blue);margin-top:.08rem;display:block">🗓️ Para ${s.agData} ${s.agHora?' às '+s.agHora:''}</span>`:'';
   const sigBtn=s.sig
@@ -2054,7 +2154,7 @@ function solicCardHTML(s){
     <div class="sc-top">
       <div>
         <div class="sc-name">${escHtml(s.prof)}</div>
-        <div class="sc-meta">Sala ${escHtml(s.sala)} · <span style="color:${CAMPUS_COR[s.uni]||'var(--muted)'}">🏫 ${CAMPUS_LABEL[s.uni]||escHtml(s.uni||'—')}</span></div>
+        <div class="sc-meta">Sala ${escHtml(s.sala)} · <span style="color:${CAMPUS_COR[s.uni]||'var(--muted)'}">🏫 ${CAMPUS_LABEL[s.uni]||escHtml(s.uni||'—')}</span>${espera?` · <span style="color:${espera.mto?'var(--red)':espera.urgente?'var(--amber)':'var(--muted)'};font-weight:${espera.urgente?'700':'400'}">${espera.mto?'🔴':espera.urgente?'🟡':''} ${espera.txt}</span>`:''}</div>
         ${agInfo}${localTxt}
       </div>
       <div style="text-align:right;flex-shrink:0">
@@ -2171,8 +2271,14 @@ function renderDevs(){
 }
 
 function renderAprovadosHoje(){
+  const hoje=new Date().toDateString();
   const aprovados=solicitacoes.filter(s=>s.status==='aprovado'&&_campusOk(s.uni));
-  const retirados=solicitacoes.filter(s=>s.status==='retirado'&&_campusOk(s.uni));
+  // Retirados só de hoje
+  const retirados=solicitacoes.filter(s=>s.status==='retirado'&&_campusOk(s.uni)&&(()=>{
+    try{ const m=s.horaRetirada?s.horaRetirada.match(/(\d{2})\/(\d{2})\/(\d{4})/):null;
+    if(m) return new Date(+m[3],+m[2]-1,+m[1]).toDateString()===hoje; }catch(e){}
+    return true; // se não tiver data, inclui
+  })());
   const pendEl=document.getElementById('aprov-pend-list');
   if(pendEl) pendEl.innerHTML=aprovados.length?aprovados.map(s=>aprovCardHTML(s)).join(''):`<div class="empty"><i>⏳</i><p>Nenhum aguardando retirada</p></div>`;
   const pendCt=document.getElementById('aprov-pend-count'); if(pendCt) pendCt.textContent=aprovados.length?`${aprovados.length} aguardando`:'';
@@ -2185,6 +2291,13 @@ let _empPagina=1;
 const _empPorPagina=25;
 let _empFiltroStatus='todos';
 let _empFiltroTexto='';
+
+function filterSolics(inp){
+  const q=inp.value.toLowerCase();
+  document.querySelectorAll('#solics-list .sc-card').forEach(card=>{
+    card.style.display=card.textContent.toLowerCase().includes(q)?'':'none';
+  });
+}
 
 function filterEmpStatus(btn, status){
   document.querySelectorAll('.remp-btn').forEach(b=>b.classList.remove('on'));
@@ -2467,6 +2580,73 @@ async function confirmarDevTec(){
 /* ═══════════════════════════════════════
    LOGS
 ═══════════════════════════════════════ */
+
+
+/* ═══════════════════════════════════════
+   CONSULTA DE STATUS (PROFESSOR)
+═══════════════════════════════════════ */
+function abrirConsultaStatus(){
+  show('s-consulta');
+  document.getElementById('cons-proto-inp').value='';
+  document.getElementById('cons-result').style.display='none';
+  // Mostrar protocolos recentes da sessão
+  try{
+    const protos=JSON.parse(sessionStorage.getItem('nsi_protos')||'[]');
+    const recEl=document.getElementById('consulta-recentes');
+    const listEl=document.getElementById('consulta-recentes-list');
+    if(protos.length&&recEl&&listEl){
+      recEl.style.display='block';
+      listEl.innerHTML=protos.map(p=>`
+        <div onclick="document.getElementById('cons-proto-inp').value='${p.proto}';consultarStatus()"
+          style="background:var(--card);border:1px solid var(--bdr);border-radius:var(--rs);padding:.65rem .85rem;margin-bottom:.4rem;cursor:pointer;transition:.14s"
+          onmouseover="this.style.borderColor='var(--blue)'" onmouseout="this.style.borderColor='var(--bdr)'">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span class="mono-sm" style="color:var(--blue);font-size:.75rem">${escHtml(p.proto)}</span>
+            <span style="font-size:.62rem;color:var(--muted)">${escHtml(p.hora)}</span>
+          </div>
+          <div style="font-size:.75rem;color:var(--text2);margin-top:.15rem">${escHtml(p.nome)} · ${p.equips.join(', ')}</div>
+        </div>`).join('');
+    } else if(recEl){ recEl.style.display='none'; }
+  }catch(e){}
+}
+
+async function consultarStatus(){
+  const proto=document.getElementById('cons-proto-inp').value.trim();
+  if(!proto||proto.length<5){ toast('⚠️','Protocolo inválido','Digite o número completo.','w'); return; }
+  toast('🔍','Buscando…','','b');
+  const res=await sbBuscarProtocolo(proto);
+  const resEl=document.getElementById('cons-result');
+  resEl.style.display='block';
+  if(!res.ok){
+    document.getElementById('cons-proto').textContent=proto;
+    document.getElementById('cons-nome').textContent='—';
+    document.getElementById('cons-equips').innerHTML='';
+    document.getElementById('cons-hora').textContent='—';
+    document.getElementById('cons-status-ico').textContent='❌';
+    document.getElementById('cons-status-txt').textContent='Protocolo não encontrado';
+    document.getElementById('cons-status-sub').textContent='Verifique o número digitado';
+    document.getElementById('cons-status-box').style.background='rgba(255,77,109,.06)';
+    return;
+  }
+  const d=res.data;
+  document.getElementById('cons-proto').textContent=proto;
+  document.getElementById('cons-nome').textContent=d.professor||'—';
+  document.getElementById('cons-equips').innerHTML=(d.equipamentos||[]).map(e=>`<span class="dev-tag">${escHtml(e)}</span>`).join('');
+  document.getElementById('cons-hora').textContent=d.hora||'—';
+  const statusInfo={
+    pendente:      {ico:'⏳',txt:'Aguardando Aprovação',sub:'A equipe de TI irá analisar em breve.',bg:'rgba(255,181,71,.06)'},
+    aprovado:      {ico:'✅',txt:'Aprovado! Dirija-se ao balcão de TI',sub:'Seu pedido foi aprovado. Retire os equipamentos.',bg:'rgba(0,217,126,.06)'},
+    retirado:      {ico:'🔄',txt:'Equipamentos em uso',sub:'Você está com os equipamentos. Devolva ao término.',bg:'rgba(79,142,247,.06)'},
+    cancelado:     {ico:'❌',txt:'Solicitação Cancelada',sub:'Entre em contato com o setor de TI.',bg:'rgba(255,77,109,.06)'},
+    devolucao_pendente:{ico:'↩️',txt:'Devolução Registrada',sub:'Aguardando confirmação do técnico.',bg:'rgba(255,181,71,.06)'},
+    devolvido_confirmado:{ico:'🏁',txt:'Devolvido e Confirmado',sub:'Devolução concluída com sucesso.',bg:'rgba(0,217,126,.06)'},
+  };
+  const si=statusInfo[d.status]||{ico:'❓',txt:d.status,sub:'',bg:'rgba(255,255,255,.04)'};
+  document.getElementById('cons-status-ico').textContent=si.ico;
+  document.getElementById('cons-status-txt').textContent=si.txt;
+  document.getElementById('cons-status-sub').textContent=si.sub;
+  document.getElementById('cons-status-box').style.background=si.bg;
+}
 
 /* ═══════════════════════════════════════
    RELATÓRIOS
