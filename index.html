@@ -6,14 +6,10 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>NSI Locker</title>
-<meta name="theme-color" content="#040810">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="NSI Locker">
-<!-- manifest injetado inline via JS -->
-<link rel="apple-touch-icon" sizes="192x192" href="/Imprestimos-nsi/icon-192.png">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <style>
 :root{
   --bg:#040810;--surf:#080d1c;--card:#0c1225;--card2:#10172e;
@@ -473,90 +469,9 @@ tbody tr:hover td{background:rgba(255,255,255,.012)}
 .relat-tbl td:last-child{text-align:right;font-family:'JetBrains Mono',monospace;color:var(--blue)}
 .relat-bar-bg{background:rgba(255,255,255,.06);border-radius:4px;height:5px;margin-top:.25rem}
 .relat-bar-fill{height:5px;border-radius:4px;background:var(--blue);transition:width .4s}
-
-/* ══════════════════════════════════════
-   PWA — INSTALL BANNER + SPLASH
-══════════════════════════════════════ */
-
-/* Splash */
-#pwa-splash{position:fixed;inset:0;z-index:99999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.1rem;transition:opacity .45s,visibility .45s}
-#pwa-splash.hide{opacity:0;visibility:hidden;pointer-events:none}
-.spl-mark{width:84px;height:84px;border-radius:22px;font-size:2.2rem;background:linear-gradient(135deg,rgba(79,142,247,.2),rgba(0,217,126,.1));border:1px solid rgba(79,142,247,.3);display:flex;align-items:center;justify-content:center;box-shadow:0 0 48px rgba(79,142,247,.22);animation:splPulse 1.6s ease-in-out infinite alternate}
-@keyframes splPulse{from{box-shadow:0 0 20px rgba(79,142,247,.12)}to{box-shadow:0 0 64px rgba(79,142,247,.38)}}
-.spl-name{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;letter-spacing:-2px;color:#fff}
-.spl-name em{color:var(--blue);font-style:normal}
-.spl-sub{font-size:.6rem;letter-spacing:3.5px;text-transform:uppercase;color:var(--muted)}
-.spl-bar{width:48px;height:3px;background:var(--bdr2);border-radius:4px;overflow:hidden;margin-top:.4rem}
-.spl-bar-fill{height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--green));border-radius:4px;animation:splLoad 1.1s ease forwards .4s}
-@keyframes splLoad{from{width:0}to{width:100%}}
-
-/* Banner Android/Desktop */
-#pwa-banner{position:fixed;bottom:0;left:0;right:0;z-index:9998;padding:clamp(.9rem,3vw,1.15rem) clamp(1rem,4vw,1.5rem);padding-bottom:max(clamp(.9rem,3vw,1.15rem),env(safe-area-inset-bottom));background:linear-gradient(135deg,rgba(8,13,28,.98),rgba(12,18,37,.99));border-top:1px solid rgba(79,142,247,.25);box-shadow:0 -8px 40px rgba(0,0,0,.55);display:none;align-items:center;gap:.9rem;animation:slideUp .32s cubic-bezier(.25,.46,.45,.94);backdrop-filter:blur(20px)}
-#pwa-banner.show{display:flex}
-@keyframes slideUp{from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1}}
-.pwa-ban-icon{width:50px;height:50px;flex-shrink:0;border-radius:13px;background:linear-gradient(135deg,rgba(79,142,247,.18),rgba(0,217,126,.1));border:1px solid rgba(79,142,247,.28);display:flex;align-items:center;justify-content:center;font-size:1.5rem;box-shadow:0 4px 14px rgba(79,142,247,.18)}
-.pwa-ban-txt{flex:1;min-width:0}
-.pwa-ban-txt strong{display:block;font-family:'Syne',sans-serif;font-size:.9rem;color:#fff;margin-bottom:.12rem}
-.pwa-ban-txt span{font-size:.67rem;color:var(--muted);line-height:1.4}
-.pwa-ban-acts{display:flex;gap:.45rem;flex-direction:column;flex-shrink:0}
-.pwa-btn-ok{background:linear-gradient(135deg,var(--blue),var(--blue2));border:none;border-radius:var(--rs);color:#fff;font-family:'Syne',sans-serif;font-size:.74rem;font-weight:700;padding:.52rem 1rem;cursor:pointer;white-space:nowrap;box-shadow:0 4px 14px rgba(79,142,247,.32);transition:.16s}
-.pwa-btn-ok:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(79,142,247,.45)}
-.pwa-btn-no{background:transparent;border:1px solid var(--bdr2);border-radius:var(--rs);color:var(--muted);font-size:.64rem;padding:.32rem .65rem;cursor:pointer;font-family:'Outfit',sans-serif;transition:.14s;text-align:center}
-.pwa-btn-no:hover{color:var(--text2)}
-
-/* Banner iOS */
-#pwa-ios{position:fixed;bottom:0;left:0;right:0;z-index:9998;padding:1rem 1.2rem;padding-bottom:max(1rem,env(safe-area-inset-bottom));background:linear-gradient(135deg,rgba(8,13,28,.98),rgba(12,18,37,.99));border-top:1px solid rgba(79,142,247,.22);box-shadow:0 -8px 40px rgba(0,0,0,.55);display:none;flex-direction:column;gap:.6rem;animation:slideUp .32s cubic-bezier(.25,.46,.45,.94)}
-#pwa-ios.show{display:flex}
-.ios-title{font-family:'Syne',sans-serif;font-size:.88rem;color:#fff;display:flex;align-items:center;gap:.45rem}
-.ios-steps{display:flex;flex-direction:column;gap:.38rem}
-.ios-step{display:flex;align-items:flex-start;gap:.55rem;font-size:.71rem;color:var(--text2);line-height:1.45}
-.ios-step-n{width:20px;height:20px;border-radius:50%;background:rgba(79,142,247,.15);border:1px solid rgba(79,142,247,.25);color:var(--blue);font-size:.6rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:.05rem}
-.ios-arrow{text-align:center;font-size:1.3rem;color:rgba(79,142,247,.5);animation:iosBounce .75s ease-in-out infinite alternate}
-@keyframes iosBounce{from{transform:translateY(0)}to{transform:translateY(5px)}}
-.ios-close{align-self:center;background:transparent;border:1px solid var(--bdr2);border-radius:var(--rs);color:var(--muted);font-size:.67rem;padding:.35rem 1.1rem;cursor:pointer;font-family:'Outfit',sans-serif;transition:.14s}
-.ios-close:hover{color:var(--text2)}
-
-/* Botão instalar no home */
-#pwa-home-btn{display:none;align-items:center;justify-content:center;gap:.5rem;width:100%;max-width:400px;background:linear-gradient(135deg,rgba(79,142,247,.09),rgba(0,217,126,.05));border:1px solid rgba(79,142,247,.22);border-radius:var(--r);padding:.62rem 1.1rem;color:var(--blue);font-size:.73rem;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;transition:.18s;position:relative;z-index:1}
-#pwa-home-btn:hover{border-color:rgba(79,142,247,.5);background:linear-gradient(135deg,rgba(79,142,247,.14),rgba(0,217,126,.08))}
-.pwa-home-badge{font-size:.5rem;font-weight:800;letter-spacing:.5px;text-transform:uppercase;background:linear-gradient(90deg,var(--blue),var(--green));color:#fff;padding:.07rem .3rem;border-radius:3px;margin-left:.2rem}
 </style>
 </head>
 <body>
-
-
-<!-- ══ PWA SPLASH ══ -->
-<div id="pwa-splash">
-  <div class="spl-mark">🔒</div>
-  <div class="spl-name">NSI<em>Locker</em></div>
-  <div class="spl-sub">UNA · Gestão de Equipamentos TI</div>
-  <div class="spl-bar"><div class="spl-bar-fill"></div></div>
-</div>
-
-<!-- ══ PWA BANNER ANDROID/DESKTOP ══ -->
-<div id="pwa-banner">
-  <div class="pwa-ban-icon">🔒</div>
-  <div class="pwa-ban-txt">
-    <strong>Instalar NSI Locker</strong>
-    <span>Adicione à tela inicial — acesso direto sem QR Code</span>
-  </div>
-  <div class="pwa-ban-acts">
-    <button class="pwa-btn-ok" onclick="pwaInstalar()">⬇ Instalar</button>
-    <button class="pwa-btn-no" onclick="pwaDismiss()">Agora não</button>
-  </div>
-</div>
-
-<!-- ══ PWA HINT iOS ══ -->
-<div id="pwa-ios">
-  <div class="ios-title">📱 Instalar NSI Locker no iPhone</div>
-  <div class="ios-steps">
-    <div class="ios-step"><span class="ios-step-n">1</span><span>Toque no botão <strong>Compartilhar</strong> <span style="font-size:.9rem">⎋</span> na barra inferior do Safari</span></div>
-    <div class="ios-step"><span class="ios-step-n">2</span><span>Role a lista e toque em <strong>"Adicionar à Tela de Início"</strong></span></div>
-    <div class="ios-step"><span class="ios-step-n">3</span><span>Confirme tocando em <strong>Adicionar</strong> — o ícone aparecerá na sua tela!</span></div>
-  </div>
-  <div class="ios-arrow">↓</div>
-  <button class="ios-close" onclick="pwaFecharIOS()">Entendi, fechar</button>
-</div>
 
 <div class="bg-fx"></div>
 <div class="grid-bg"></div>
@@ -584,7 +499,6 @@ tbody tr:hover td{background:rgba(255,255,255,.012)}
   </div>
   <p class="home-note" style="position:relative;z-index:1">🔖 Escaneie o <strong>QR Code</strong> do armário de TI para abrir direto. Ao devolver, use o QR do seu comprovante.</p>
   <button onclick="abrirConsultaStatus()" style="position:relative;z-index:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:var(--r);padding:.5rem 1.2rem;color:var(--muted);font-size:.72rem;cursor:pointer;margin-top:.35rem;font-family:'Outfit',sans-serif;transition:.15s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">🔎 Consultar status do meu protocolo</button>
-  <button id="pwa-home-btn" onclick="pwaInstalar()">⬇ Instalar App <span class="pwa-home-badge">NOVO</span></button>
 </div>
 
 <!-- CONSULTA STATUS -->
@@ -643,7 +557,7 @@ tbody tr:hover td{background:rgba(255,255,255,.012)}
         <!-- Alerta de devolução atrasada (aparece quando status=retirado e passou mais de 4h) -->
         <div id="cons-late-alert" style="display:none" class="late-return-card">
           <strong>⚠️ Lembrete de Devolução</strong>
-          <p>Você está com os equipamentos há mais de <strong id="cons-late-tempo">—</strong>. Não esqueça de devolver ao término da aula! Use o QR Code do comprovante.</p>
+          <p>Não esqueça de devolver os equipamentos ao término da aula! Use o QR Code do comprovante.</p>
           <button class="late-btn" onclick="pararConsultaLive();abrirDevolucao()">↩️ Registrar Devolução Agora</button>
         </div>
       </div>
@@ -1485,22 +1399,18 @@ let sbClient = null, sbOnline = false;
 
 async function sbInit(){
   try{
-    await loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js');
+    if(!window.supabase) throw new Error('SDK não carregou');
     sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-      auth: { persistSession: false, autoRefreshToken: false },
-      realtime: { params: { eventsPerSecond: 10 } }
+      auth: { persistSession: false, autoRefreshToken: false }
     });
-    const testRes = await fetch(`${SUPABASE_URL}/rest/v1/solicitacoes?select=id&limit=1`, {
-      headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
-    });
-    if(!testRes.ok && testRes.status !== 406) throw new Error(`HTTP ${testRes.status}`);
+    const { error } = await sbClient.from('solicitacoes').select('id').limit(1);
+    if(error && error.code !== 'PGRST116' && error.code !== '406') throw new Error(error.message);
     sbOnline = true;
     setSbStatus('ok','Supabase conectado · Tempo real');
     setupRealtime();
   }catch(e){ sbOnline=false; setSbStatus('err','Modo local (Supabase offline)'); console.warn('SB offline:',e.message); }
 }
 
-function loadScript(src){ return new Promise((res,rej)=>{ const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=rej;document.head.appendChild(s); }); }
 function setSbStatus(t,txt){}
 
 function setupRealtime(){
@@ -1827,9 +1737,10 @@ async function sbBuscarTecnico(email, senha){
     .eq('email',email.toLowerCase()).eq('senha',senha).eq('ativo',true).single();
   if(error||!data) return {ok:false};
   sbClient.from('tecnicos').update({ultimo_acesso:new Date().toISOString()}).eq('id',data.id);
+  // CORRECAO 4 - nao expor senha no objeto de sessao
   return {ok:true,data:{email:data.email,nome:data.nome,nivel:data.nivel,role:data.role,
     av:data.av||(data.nome.split(' ').map(n=>n[0]).slice(0,2).join('').toUpperCase()),
-    senha:data.senha, campus:data.campus||'todos'}};
+    campus:data.campus||'todos'}};
 }
 
 async function sbListarTecnicos(){
@@ -1876,7 +1787,7 @@ async function sbBuscarProtocolo(proto){
    STATE
 ═══════════════════════════════════════ */
 let solicitacoes = [];
-let _somAtivo = true;
+let _somAtivo = true; // variável única de controle de som para todo o sistema
 
 function _notifSom(){
   if(!_somAtivo) return;
@@ -1905,14 +1816,17 @@ let tecUsers=[];
 /* ═══════════════════════════════════════
    HELPERS
 ═══════════════════════════════════════ */
+// CORRECAO 6 - contador atomico garante unicidade mesmo em submits rapidos
+let _protoCounter = 0;
 function gerarProtocolo(prefix){
-  const ano = new Date().getFullYear();
-  const ts  = Date.now().toString(36).toUpperCase().slice(-4);
-  const rand = Math.random().toString(36).toUpperCase().slice(2,6);
-  return `${prefix}${ano}-${ts}${rand}`;
+  const ano  = new Date().getFullYear();
+  const ts   = Date.now().toString(36).toUpperCase().slice(-5);
+  const cnt  = (++_protoCounter).toString(36).toUpperCase().padStart(2,'0');
+  const rand = Math.random().toString(36).toUpperCase().slice(2,4);
+  return `${prefix}${ano}-${ts}${cnt}${rand}`;
 }
 
-function _agora(){ const n=new Date(); return `${_p(n.getDate())}/${_p(n.getMonth()+1)} ${_p(n.getHours())}:${_p(n.getMinutes())}`; }
+function _agora(){ const n=new Date(); return `${_p(n.getDate())}/${_p(n.getMonth()+1)}/${n.getFullYear()} ${_p(n.getHours())}:${_p(n.getMinutes())}`; }
 function _p(v){ return String(v).padStart(2,'0'); }
 function _campusOk(uni){ if(!currentUser) return false; if(currentUser.campus==='todos'||currentUser.nivel==='master') return true; return (currentUser.campus||'').toLowerCase()===(uni||'').toLowerCase(); }
 const CAMPUS_LABEL={'aimores':'UNA Aimorés','liberdade':'UNA Liberdade','todos':'Todos os Campus'};
@@ -2187,7 +2101,13 @@ async function submitDevolucao(){
     hora:_agora()
   };
 
-  await sbInsertDevolucao(dados);
+  // CORRECAO 2 - verificar retorno antes de avançar
+  const devRes=await sbInsertDevolucao(dados);
+  if(!devRes.ok){
+    btn.disabled=false; btn.textContent='↩️ Registrar Devolução';
+    toast('❌','Erro ao registrar','Não foi possível salvar a devolução. Tente novamente.','r');
+    return;
+  }
   const nova={ id:Date.now(), ...dados, nova:true };
   devsPendentes.unshift(nova);
   const solOrig=solicitacoes.find(s=>s.proto===dados.protoOrig);
@@ -2268,8 +2188,12 @@ async function doLogin(){
 /* ═══════════════════════════════════════
    CARREGAR DADOS DO BANCO NO LOGIN
 ═══════════════════════════════════════ */
+let _carregandoDados = false; // guarda contra corrida de requisições
+
 async function carregarDadosBanco(){
   if(!sbOnline||!sbClient) return;
+  if(_carregandoDados) return; // já está carregando, ignorar chamada duplicada
+  _carregandoDados = true;
   try{
     const {data:sData}=await sbClient.from('solicitacoes')
       .select('*').order('data_solicitacao',{ascending:false}).limit(500);
@@ -2309,6 +2233,7 @@ async function carregarDadosBanco(){
     renderAll(); updateBadges();
     toast('📋','Dados carregados',`${solicitacoes.length} solicitação(ões) · ${devsPendentes.length} pendente(s)`,'b');
   }catch(e){ console.warn('Erro ao carregar banco:',e); }
+  finally{ _carregandoDados = false; }
 }
 
 function _formatarData(iso){
@@ -2330,6 +2255,13 @@ function _formatarDataCurta(iso){
 
 function doLogout(){
   if(currentUser) addLog('d','Logout',`${currentUser.nome} saiu do sistema`);
+  // CORRECAO 1 - Limpar todos os timers e canais Realtime antes de resetar estado
+  if(_atrasoTimer){ clearInterval(_atrasoTimer); _atrasoTimer=null; }
+  _atrasoUltimoAviso=0;
+  pararPolling();
+  pararConsultaLive();
+  _carregandoDados=false;
+  // Limpar estado da sessao
   currentUser=null; solicitacoes=[]; devsPendentes=[]; devsConfirmadas=[]; logs=[];
   show('s-home');
 }
@@ -2560,11 +2492,10 @@ function renderEmprestimos(pagina){
     try{
       const horaRef=s.horaRetirada||s.hora;
       if(!horaRef) return false;
-      const m=horaRef.match(/(\d{2})\/(\d{2})\/(\d{4}) (\d{2}):(\d{2})/)||horaRef.match(/(\d{2})\/(\d{2}) (\d{2}):(\d{2})/);
+      // CORRECAO 5 - apenas formato com ano (dd/mm/yyyy HH:MM)
+      const m=horaRef.match(/(\d{2})\/(\d{2})\/(\d{4}) (\d{2}):(\d{2})/);
       if(!m) return false;
-      let d;
-      if(m[3]&&m[3].length===4){ d=new Date(+m[3],+m[2]-1,+m[1],+m[4],+m[5]); }
-      else { const n=new Date(); d=new Date(n.getFullYear(),n.getMonth(),+m[1],+m[2],+m[3]); }
+      const d=new Date(+m[3],+m[2]-1,+m[1],+m[4],+m[5]);
       return (Date.now()-d)/(1000*60*60)>=4;
     }catch(e){ return false; }
   }
@@ -2857,15 +2788,10 @@ function _verificarAtrasados(){
     try{
       const horaRef=s.horaRetirada||s.hora;
       if(!horaRef) return false;
-      const m=horaRef.match(/(\d{2})\/(\d{2})\/(\d{4}) (\d{2}):(\d{2})/)||horaRef.match(/(\d{2})\/(\d{2}) (\d{2}):(\d{2})/);
+      // CORRECAO 5 - apenas formato com ano (dd/mm/yyyy HH:MM)
+      const m=horaRef.match(/(\d{2})\/(\d{2})\/(\d{4}) (\d{2}):(\d{2})/);
       if(!m) return false;
-      let d;
-      if(m[3]&&m[3].length===4){
-        d=new Date(+m[3],+m[2]-1,+m[1],+m[4],+m[5]);
-      } else {
-        const now=new Date();
-        d=new Date(now.getFullYear(),now.getMonth(),+m[1],+m[2],+m[3]);
-      }
+      const d=new Date(+m[3],+m[2]-1,+m[1],+m[4],+m[5]);
       const hrs=(agora-d)/(1000*60*60);
       return hrs>=LIMITE_HORAS;
     }catch(e){ return false; }
@@ -2901,6 +2827,9 @@ let _atrasoUltimoAviso=0;
 let _pollingTimer=null;
 let _pollingProto='';
 let _pollingUltimoStatus='';
+
+// Estado separado para o Realtime do professor (evita conflito com polling)
+let _realtimeProfUltimoStatus='';
 
 const _statusInfo={
   pendente:{
@@ -3123,37 +3052,25 @@ function _verificarAlertaAtraso(data){
   try{
     const hora=data.horaRetirada||data.hora;
     if(!hora){ lateEl.style.display='none'; return; }
-    const m=hora.match(/(\d{2})\/(\d{2})\/(\d{4}) (\d{2}):(\d{2})/)||hora.match(/(\d{2})\/(\d{2}) (\d{2}):(\d{2})/);
+    // CORRECAO 5 - apenas formato com ano (dd/mm/yyyy HH:MM)
+    const m=hora.match(/(\d{2})\/(\d{2})\/(\d{4}) (\d{2}):(\d{2})/);
     if(!m){ lateEl.style.display='none'; return; }
-    let d;
-    if(m[3]&&m[3].length===4){
-      d=new Date(+m[3],+m[2]-1,+m[1],+m[4],+m[5]);
-    } else {
-      const now=new Date();
-      d=new Date(now.getFullYear(),now.getMonth(),+m[1],+m[2],+m[3]);
-    }
+    const d=new Date(+m[3],+m[2]-1,+m[1],+m[4],+m[5]);
     const mins=Math.floor((Date.now()-d)/60000);
-    if(mins>=120){ // 2 horas
-      const hrs=Math.floor(mins/60);
-      const min=mins%60;
-      const tempoTxt=hrs>=1?(hrs+'h'+(min>0?' '+min+'min':'')):(mins+'min');
-      const tempoEl=document.getElementById('cons-late-tempo');
-      if(tempoEl) tempoEl.textContent=tempoTxt;
-      lateEl.style.display='block';
-    } else {
-      lateEl.style.display='none';
-    }
+    // Mostrar alerta se passou mais de 2h sem devolver
+    lateEl.style.display=(mins>=120)?'block':'none';
   }catch(e){ lateEl.style.display='none'; }
 }
 
 /* ═══════════════════════════════════════
-   CONSULTA AO VIVO — POLLING AUTOMÁTICO
+   CONSULTA AO VIVO — POLLING + REALTIME
 ═══════════════════════════════════════ */
 let _consultaLiveTimer=null;
 let _consultaLiveCountdown=null;
 let _consultaLiveProto='';
 let _consultaLiveUltimoStatus='';
 let _consultaLiveSegundos=30;
+let _consultaLiveChannel=null; // canal Realtime para consulta instantânea
 
 function iniciarConsultaLive(proto, statusAtual){
   pararConsultaLive();
@@ -3164,15 +3081,43 @@ function iniciarConsultaLive(proto, statusAtual){
   const ind=document.getElementById('cons-live-indicator');
   if(ind) ind.style.display='flex';
 
-  // Countdown visual
+  // Realtime instantâneo — atualiza sem precisar esperar o polling
+  if(sbClient&&sbOnline){
+    _consultaLiveChannel=sbClient.channel('cons-live-'+Date.now())
+      .on('postgres_changes',{event:'UPDATE',schema:'public',table:'solicitacoes',filter:`protocolo=eq.${proto}`},p=>{
+        const novoStatus=p.new.status;
+        if(novoStatus===_consultaLiveUltimoStatus) return;
+        const anterior=_consultaLiveUltimoStatus;
+        _consultaLiveUltimoStatus=novoStatus;
+        _consultaLiveSegundos=30; // reseta countdown visual
+        _aplicarStatusConsulta(novoStatus, p.new);
+        _verificarAlertaAtraso(p.new);
+        if(anterior==='pendente'&&novoStatus==='aprovado'){
+          _notifAprovado();
+          _dispararPushLocal('✅ Pedido APROVADO!','Dirija-se ao balcão de TI para retirar os equipamentos agora.');
+          _mostrarPushBanner('✅ Pedido APROVADO!','Dirija-se ao balcão de TI para retirar os equipamentos.','aprov');
+        } else if(novoStatus==='devolvido_confirmado'){
+          _dispararPushLocal('🏁 Devolução confirmada!','Equipamentos confirmados pelo técnico. Obrigado!');
+          _mostrarPushBanner('🏁 Devolução Confirmada!','O técnico confirmou o recebimento dos equipamentos.','aprov');
+        } else if(novoStatus==='cancelado'){
+          _dispararPushLocal('❌ Solicitação cancelada','Entre em contato com o setor de TI.');
+          _mostrarPushBanner('❌ Solicitação Cancelada','Entre em contato com o setor de TI para mais informações.','warn');
+        } else if(novoStatus==='devolucao_pendente'){
+          _mostrarPushBanner('↩️ Devolução Registrada','O técnico irá confirmar em breve.','info');
+        }
+        if(['cancelado','devolvido_confirmado'].includes(novoStatus)) pararConsultaLive();
+      })
+      .subscribe();
+  }
+
+  // Countdown visual — sincronizado com o polling (30s fixos)
   _consultaLiveCountdown=setInterval(()=>{
-    _consultaLiveSegundos--;
+    if(_consultaLiveSegundos>0) _consultaLiveSegundos--;
     const timerEl=document.getElementById('cons-live-timer');
     if(timerEl) timerEl.textContent=`Próx. atualização em ${_consultaLiveSegundos}s`;
-    if(_consultaLiveSegundos<=0) _consultaLiveSegundos=30;
   },1000);
 
-  // Polling real a cada 30s
+  // Polling de segurança a cada 30s (fallback se Realtime falhar)
   _consultaLiveTimer=setInterval(async()=>{
     _consultaLiveSegundos=30;
     const res=await sbBuscarProtocolo(_consultaLiveProto);
@@ -3183,8 +3128,6 @@ function iniciarConsultaLive(proto, statusAtual){
       _consultaLiveUltimoStatus=novoStatus;
       _aplicarStatusConsulta(novoStatus, res.data);
       _verificarAlertaAtraso(res.data);
-
-      // Disparar notificação push ao professor
       if(anterior==='pendente'&&novoStatus==='aprovado'){
         _notifAprovado();
         _dispararPushLocal('✅ Pedido APROVADO!','Dirija-se ao balcão de TI para retirar os equipamentos agora.');
@@ -3198,11 +3141,7 @@ function iniciarConsultaLive(proto, statusAtual){
       } else if(novoStatus==='devolucao_pendente'){
         _mostrarPushBanner('↩️ Devolução Registrada','O técnico irá confirmar em breve.','info');
       }
-
-      // Parar polling em status finais
-      if(['cancelado','devolvido_confirmado'].includes(novoStatus)){
-        pararConsultaLive();
-      }
+      if(['cancelado','devolvido_confirmado'].includes(novoStatus)) pararConsultaLive();
     }
   }, 30000);
 }
@@ -3210,6 +3149,7 @@ function iniciarConsultaLive(proto, statusAtual){
 function pararConsultaLive(){
   if(_consultaLiveTimer){ clearInterval(_consultaLiveTimer); _consultaLiveTimer=null; }
   if(_consultaLiveCountdown){ clearInterval(_consultaLiveCountdown); _consultaLiveCountdown=null; }
+  if(_consultaLiveChannel){ try{ sbClient.removeChannel(_consultaLiveChannel); }catch(e){} _consultaLiveChannel=null; }
   _consultaLiveProto='';
   _consultaLiveUltimoStatus='';
   const ind=document.getElementById('cons-live-indicator');
@@ -3305,15 +3245,22 @@ function iniciarRealtimeProf(proto){
   if(!sbClient||!sbOnline||!proto) return;
   pararRealtimeProf();
   _profRealtimeProto=proto;
+  _realtimeProfUltimoStatus='pendente'; // estado próprio, não compartilhado com polling
 
   _profRealtimeChannel=sbClient.channel('prof-status-'+Date.now())
     .on('postgres_changes',{event:'UPDATE',schema:'public',table:'solicitacoes',filter:`protocolo=eq.${proto}`},p=>{
       const s=p.new;
       const novoStatus=s.status;
-      const anterior=_pollingUltimoStatus;
+      const anterior=_realtimeProfUltimoStatus;
+
+      // Não processar se status não mudou
+      if(novoStatus===anterior) return;
+      _realtimeProfUltimoStatus=novoStatus;
+
+      // Sincronizar também o polling para evitar notificação duplicada
+      _pollingUltimoStatus=novoStatus;
 
       // Atualizar status na tela de sucesso
-      _pollingUltimoStatus=novoStatus;
       _atualizarStatusBox(novoStatus);
 
       // Notificações
@@ -3633,12 +3580,16 @@ async function sbCarregarLogs(){
       .select('tipo,acao,detalhe,tecnico,hora')
       .order('hora',{ascending:false}).limit(200);
     if(data&&data.length){
-      const existentes=new Set(logs.map(l=>l.acao+l.detalhe+l.hora));
+      // CORRECAO 3 - usar hora ISO como chave unica para deduplicacao correta
+      const existentesISO=new Set(logs.map(l=>l.horaISO).filter(Boolean));
       const novos=data
-        .filter(d=>!existentes.has(d.acao+d.detalhe+(d.hora?_formatarData(d.hora):'')))
-        .map(d=>({tipo:d.tipo,acao:d.acao,detalhe:d.detalhe,hora:d.hora?_formatarData(d.hora):_agora()}));
+        .filter(d=>!existentesISO.has(d.hora))
+        .map(d=>({tipo:d.tipo,acao:d.acao,detalhe:d.detalhe,
+          hora:d.hora?_formatarData(d.hora):_agora(),
+          horaISO:d.hora||''}));
+      if(!novos.length) return;
       logs=[...logs,...novos];
-      logs.sort((a,b)=>b.hora.localeCompare(a.hora));
+      logs.sort((a,b)=>(b.horaISO||b.hora).localeCompare(a.horaISO||a.hora));
       renderLogs();
     }
   }catch(e){}
@@ -3949,283 +3900,6 @@ function initSig(cid,hid,wid,cb){
 }
 function clearSig(cid,hid,wid){ const c=document.getElementById(cid); if(!c)return; const ctx=c.getContext('2d'); ctx.fillStyle='#fff';ctx.fillRect(0,0,c.width,c.height); const h=document.getElementById(hid);if(h)h.style.display='flex'; const w=document.getElementById(wid);if(w)w.classList.remove('has'); const st=_sigState[cid];if(st)st.hasSig=false; }
 
-
-/* ══════════════════════════════════════════
-   PWA INSTALL MANAGER — NSI Locker
-   Gerencia: SW, splash, banner, install
-══════════════════════════════════════════ */
-
-// ── Variáveis globais ──────────────────
-let _pwaPrompt   = null;
-let _pwaInstalado = false;
-
-// ── Detectores ─────────────────────────
-const _isIOS = () => /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
-const _isStandalone = () =>
-  window.matchMedia('(display-mode: standalone)').matches ||
-  window.navigator.standalone === true;
-
-// ── Ocultar splash ─────────────────────
-function _hideSplash(){
-  const el = document.getElementById('pwa-splash');
-  if(!el) return;
-  setTimeout(() => {
-    el.classList.add('hide');
-    setTimeout(() => el.remove(), 460);
-  }, 950);
-}
-
-// ── Mostrar banner ─────────────────────
-function _showBanner(){
-  if(_pwaInstalado || _isStandalone()) return;
-  try{
-    const last = parseInt(localStorage.getItem('pwa_dismiss') || '0');
-    if(Date.now() - last < 3 * 86400000) return; // aguarda 3 dias após dispensar
-  }catch(e){}
-
-  if(_isIOS()){
-    setTimeout(() => document.getElementById('pwa-ios')?.classList.add('show'), 3500);
-  } else if(_pwaPrompt){
-    setTimeout(() => {
-      document.getElementById('pwa-banner')?.classList.add('show');
-      document.getElementById('pwa-home-btn').style.display = 'flex';
-    }, 2500);
-  }
-}
-
-// ── Instalar (Android/Desktop) ─────────
-async function pwaInstalar(){
-  if(!_pwaPrompt){ _showBanner(); return; }
-  document.getElementById('pwa-banner')?.classList.remove('show');
-  _pwaPrompt.prompt();
-  const { outcome } = await _pwaPrompt.userChoice;
-  if(outcome === 'accepted'){
-    _pwaInstalado = true;
-    document.getElementById('pwa-home-btn').style.display = 'none';
-    toast('🎉', 'App instalado!', 'NSI Locker está na sua tela inicial.', 'b');
-    try{ localStorage.setItem('pwa_installed', '1'); }catch(e){}
-  }
-  _pwaPrompt = null;
-}
-
-// ── Dispensar banner ───────────────────
-function pwaDismiss(){
-  document.getElementById('pwa-banner')?.classList.remove('show');
-  try{ localStorage.setItem('pwa_dismiss', Date.now().toString()); }catch(e){}
-}
-
-// ── Fechar dica iOS ────────────────────
-function pwaFecharIOS(){
-  document.getElementById('pwa-ios')?.classList.remove('show');
-  try{ localStorage.setItem('pwa_dismiss', Date.now().toString()); }catch(e){}
-}
-
-// ── Capturar evento nativo de install ──
-window.addEventListener('beforeinstallprompt', e => {
-  e.preventDefault();
-  _pwaPrompt = e;
-  document.getElementById('pwa-home-btn').style.display = 'flex';
-  _showBanner();
-});
-
-window.addEventListener('appinstalled', () => {
-  _pwaInstalado = true;
-  _pwaPrompt = null;
-  document.getElementById('pwa-banner')?.classList.remove('show');
-  document.getElementById('pwa-home-btn').style.display = 'none';
-  toast('🎉', 'Instalado!', 'Acesse pelo ícone na tela inicial.', 'b');
-});
-
-// ── Registrar Service Worker ───────────
-(async function initPWA(){
-
-  // ── Injetar manifest.json inline via Blob ──────────────────
-  (function injectManifest(){
-    try{
-      const manifestData = `{
-  "name": "NSI Locker",
-  "short_name": "NSI Locker",
-  "description": "Sistema de empréstimo de equipamentos TI — UNA",
-  "start_url": "/Imprestimos-nsi/",
-  "scope": "/Imprestimos-nsi/",
-  "display": "standalone",
-  "background_color": "#040810",
-  "theme_color": "#040810",
-  "orientation": "portrait-primary",
-  "lang": "pt-BR",
-  "icons": [
-    {
-      "src": "/Imprestimos-nsi/icon-72.png",
-      "sizes": "72x72",
-      "type": "image/png"
-    },
-    {
-      "src": "/Imprestimos-nsi/icon-96.png",
-      "sizes": "96x96",
-      "type": "image/png"
-    },
-    {
-      "src": "/Imprestimos-nsi/icon-128.png",
-      "sizes": "128x128",
-      "type": "image/png"
-    },
-    {
-      "src": "/Imprestimos-nsi/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/Imprestimos-nsi/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    }
-  ],
-  "shortcuts": [
-    {
-      "name": "Solicitar Equipamento",
-      "short_name": "Solicitar",
-      "url": "/Imprestimos-nsi/?action=solicitar",
-      "icons": [
-        {
-          "src": "/Imprestimos-nsi/icon-96.png",
-          "sizes": "96x96"
-        }
-      ]
-    },
-    {
-      "name": "Devolver Equipamento",
-      "short_name": "Devolver",
-      "url": "/Imprestimos-nsi/?action=devolver",
-      "icons": [
-        {
-          "src": "/Imprestimos-nsi/icon-96.png",
-          "sizes": "96x96"
-        }
-      ]
-    }
-  ]
-}`;
-      const blob = new Blob([manifestData], {type:'application/json'});
-      const url  = URL.createObjectURL(blob);
-      const link = document.createElement('link');
-      link.rel  = 'manifest';
-      link.href = url;
-      document.head.appendChild(link);
-      console.log('[PWA] Manifest injetado via Blob');
-    }catch(e){ console.warn('[PWA] Manifest Blob falhou:', e); }
-  })();
-
-  if(!('serviceWorker' in navigator)) { _hideSplash(); return; }
-
-  // ── Injetar sw.js inline via Blob ──────────────────────────
-  try{
-    const swCode = `/* ══════════════════════════════════
-   NSI LOCKER — Service Worker v2
-   Cache offline + Web Push
-══════════════════════════════════ */
-const CACHE = 'nsilocker-v2';
-const SHELL = ['./', './manifest.json', './icon-192.png', './icon-512.png'];
-
-self.addEventListener('install', e => {
-  self.skipWaiting();
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL).catch(()=>{})));
-});
-
-self.addEventListener('activate', e => {
-  e.waitUntil(
-    caches.keys()
-      .then(keys => Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k))))
-      .then(() => clients.claim())
-  );
-});
-
-self.addEventListener('fetch', e => {
-  const url = new URL(e.request.url);
-  if(url.hostname.includes('supabase.co') || e.request.method !== 'GET') return;
-  e.respondWith(
-    caches.match(e.request).then(cached => {
-      if(cached) return cached;
-      return fetch(e.request).then(res => {
-        if(res.ok && url.origin === self.location.origin){
-          caches.open(CACHE).then(c => c.put(e.request, res.clone()));
-        }
-        return res;
-      }).catch(() => cached);
-    })
-  );
-});
-
-self.addEventListener('push', e => {
-  let d = { title:'NSI Locker', body:'Atualização no seu pedido.', type:'info' };
-  if(e.data){ try{ d={...d,...e.data.json()}; }catch(_){} }
-  const ico = d.type==='aprovado'?'✅':d.type==='cancelado'?'❌':d.type==='devolvido'?'🏁':'🔔';
-  e.waitUntil(self.registration.showNotification(\`\${ico} \${d.title}\`, {
-    body: d.body,
-    icon: './icon-192.png',
-    badge: './icon-72.png',
-    tag: 'nsilocker-' + (d.proto||'status'),
-    renotify: true,
-    vibrate: [300,100,300,100,500],
-    data: { proto: d.proto||'' }
-  }));
-});
-
-self.addEventListener('notificationclick', e => {
-  e.notification.close();
-  const proto = e.notification.data?.proto || '';
-  const base  = self.location.origin + self.location.pathname.replace('sw.js','');
-  const url   = proto ? \`\${base}?proto=\${proto}\` : base;
-  e.waitUntil(
-    clients.matchAll({type:'window',includeUncontrolled:true}).then(list => {
-      for(const c of list){
-        if(c.url.startsWith(self.location.origin)){ c.focus(); c.postMessage({type:'OPEN_PROTO',proto}); return; }
-      }
-      clients.openWindow(url);
-    })
-  );
-});
-`;
-    const swBlob = new Blob([swCode], {type:'application/javascript'});
-    const swUrl  = URL.createObjectURL(swBlob);
-    const reg    = await navigator.serviceWorker.register(swUrl, { scope: './' });
-    console.log('[PWA] SW registrado via Blob:', reg.scope);
-
-    navigator.serviceWorker.addEventListener('message', e => {
-      if(e.data?.type === 'OPEN_PROTO' && e.data.proto){
-        const inp = document.getElementById('cons-proto-inp');
-        if(inp) inp.value = e.data.proto;
-        if(typeof show === 'function') show('s-consulta');
-        if(typeof consultarStatus === 'function') setTimeout(consultarStatus, 300);
-      }
-    });
-  }catch(err){
-    console.warn('[PWA] SW Blob falhou, tentando arquivo externo:', err.message);
-    // Fallback: tentar arquivo externo se existir
-    try{
-      const reg = await navigator.serviceWorker.register('./sw.js', { scope: './' });
-      console.log('[PWA] SW externo registrado:', reg.scope);
-    }catch(e2){ console.warn('[PWA] SW externo também falhou:', e2.message); }
-  }
-
-  if(_isStandalone()){
-    _pwaInstalado = true;
-    _hideSplash();
-    return;
-  }
-
-  _hideSplash();
-
-  if(_isIOS()){
-    try{
-      const last = parseInt(localStorage.getItem('pwa_dismiss') || '0');
-      if(Date.now() - last > 3 * 86400000) setTimeout(_showBanner, 3500);
-    }catch(e){}
-  }
-})();
-
-
 /* ═══════════════════════════════════════
    INIT
 ═══════════════════════════════════════ */
@@ -4235,7 +3909,33 @@ document.addEventListener('DOMContentLoaded',()=>{
 });
 </script>
 
-<!-- bloco duplicado removido -->
+<!-- Funções de notificação/som — usa o sbClient já inicializado acima -->
+<script>
+  function ativarAlertas() {
+    solicitarPermissaoPush();
+  }
+
+  function tocarSom() {
+    if (!_somAtivo) return;
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ctx.createOscillator(); const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.type = 'sine'; osc.frequency.value = 880; gain.gain.value = 0.1;
+      osc.start(); setTimeout(() => osc.stop(), 300);
+    } catch(e) {}
+  }
+
+  function toggleSom() {
+    _somAtivo = !_somAtivo;
+    const el = document.getElementById('som-status');
+    if (el) el.textContent = _somAtivo ? 'Ativado' : 'Desativado';
+  }
+
+  window.ativarAlertas = ativarAlertas;
+  window.toggleSom = toggleSom;
+  window.tocarSom = tocarSom;
+</script>
 
   
 </body>
