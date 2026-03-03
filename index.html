@@ -5,7 +5,43 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="NSI Locker">
+<meta name="theme-color" content="#040810">
+<meta name="description" content="Sistema de empréstimo de equipamentos — NSI UNA">
 <title>NSI Locker</title>
+
+<!-- PWA Manifest inline via JS (single-file app) -->
+<script>
+(function(){
+  const manifest = {
+    name: "NSI Locker",
+    short_name: "NSI Locker",
+    description: "Sistema de empréstimo de equipamentos — NSI UNA",
+    start_url: window.location.href.split('?')[0],
+    display: "standalone",
+    orientation: "portrait",
+    background_color: "#040810",
+    theme_color: "#040810",
+    icons: [
+      {
+        src: "data:image/svg+xml," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="110" fill="#040810"/><rect x="60" y="60" width="392" height="392" rx="80" fill="url(#g)"/><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1a3a6e"/><stop offset="100%" stop-color="#0a1f40"/></linearGradient></defs><text x="256" y="310" text-anchor="middle" font-size="200" fill="#4f8ef7">🔒</text><text x="256" y="420" text-anchor="middle" font-size="72" font-family="Arial Black,sans-serif" font-weight="900" fill="#4f8ef7" letter-spacing="-2">NSI</text></svg>'),
+        sizes: "512x512",
+        type: "image/svg+xml",
+        purpose: "any maskable"
+      }
+    ]
+  };
+  const blob = new Blob([JSON.stringify(manifest)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('link');
+  link.rel = 'manifest'; link.href = url;
+  document.currentScript.parentNode.insertBefore(link, document.currentScript);
+})();
+</script>
+
+<!-- Apple Touch Icon inline -->
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='110' fill='%23040810'/%3E%3Ctext x='256' y='320' text-anchor='middle' font-size='220' fill='%234f8ef7'%3E%F0%9F%94%92%3C/text%3E%3Ctext x='256' y='430' text-anchor='middle' font-size='80' font-family='Arial Black' font-weight='900' fill='%234f8ef7'%3ENSI%3C/text%3E%3C/svg%3E">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" defer></script>
@@ -413,6 +449,7 @@ tbody tr:hover td{background:rgba(255,255,255,.012)}
 .toast strong{display:block;font-size:clamp(.74rem,2vw,.81rem);margin-bottom:.07rem;font-family:'Syne',sans-serif}
 .toast small{font-size:clamp(.62rem,1.8vw,.68rem);color:var(--muted)}
 @keyframes tin{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:translateX(0)}}
+@keyframes slideUp{from{opacity:0;transform:translateX(-50%) translateY(20px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 
 @media(max-width:720px){
   #s-tec{flex-direction:column}
@@ -1604,6 +1641,22 @@ tbody tr:hover td{background:rgba(255,255,255,.012)}
 </div>
 
 <div id="toast-container" class="toast-container"></div>
+
+<!-- iOS Install Hint (iPhone não tem beforeinstallprompt) -->
+<div id="ios-install-hint" style="display:none;position:fixed;bottom:max(1rem,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);width:calc(100% - 2rem);max-width:420px;background:#0c1225;border:1px solid rgba(255,181,71,.4);border-radius:16px;padding:1rem 1.1rem;z-index:9999;box-shadow:0 8px 32px rgba(0,0,0,.6);animation:slideUp .35s ease">
+  <button onclick="document.getElementById('ios-install-hint').style.display='none'" style="position:absolute;top:.6rem;right:.7rem;background:none;border:none;color:#526080;cursor:pointer;font-size:1rem">✕</button>
+  <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.65rem">
+    <div style="width:40px;height:40px;flex-shrink:0;background:rgba(79,142,247,.15);border:1px solid rgba(79,142,247,.3);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.3rem">🔒</div>
+    <div>
+      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.88rem;color:#fff">Instalar NSI Locker no iPhone</div>
+      <div style="font-size:.66rem;color:#526080;margin-top:.06rem">Adicione à tela inicial em 2 passos</div>
+    </div>
+  </div>
+  <div style="font-size:.72rem;color:#b8c6e0;line-height:1.7">
+    <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.3rem"><span style="background:rgba(79,142,247,.15);border-radius:6px;padding:.1rem .45rem;font-weight:700;color:#4f8ef7;font-size:.68rem">1</span> Toque no ícone <strong style="color:#fff">Compartilhar</strong> <span style="font-size:1rem">⬆️</span> na barra do Safari</div>
+    <div style="display:flex;align-items:center;gap:.5rem"><span style="background:rgba(79,142,247,.15);border-radius:6px;padding:.1rem .45rem;font-weight:700;color:#4f8ef7;font-size:.68rem">2</span> Toque em <strong style="color:#fff">"Adicionar à Tela de Início"</strong> <span style="font-size:1rem">➕</span></div>
+  </div>
+</div>
 <div id="connection-status" class="connection-status online"><span>🟢 Conectado</span></div>
 
 <div id="toasts"></div>
@@ -4529,9 +4582,107 @@ document.addEventListener('DOMContentLoaded',()=>{
   sbInit();
   checkURLParams();
   
-  // Service Worker via Blob URL não funciona em produção (same-origin policy).
-  // Para suporte completo a push em background, seria necessário um arquivo sw.js separado.
-  // As notificações locais (Notification API) funcionam sem Service Worker.
+  // ── PWA Install Prompt ──────────────────────────────────────────
+  let _pwaInstallEvent = null;
+  
+  // Detectar iOS para mostrar instruções manuais
+  const _isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const _isInStandaloneMode = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+  
+  if (_isIOS && !_isInStandaloneMode) {
+    // iPhone: mostrar hint de instalação após 5s se não estiver instalado
+    setTimeout(() => {
+      const hint = document.getElementById('ios-install-hint');
+      if (hint) hint.style.display = 'block';
+    }, 5000);
+  }
+
+  window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault();
+    _pwaInstallEvent = e;
+    // Mostrar banner de instalação após 4 segundos na tela de sucesso ou home
+    setTimeout(() => _mostrarBannerInstalar(), 4000);
+  });
+
+  window.addEventListener('appinstalled', () => {
+    _pwaInstallEvent = null;
+    toast('✅', 'App instalado!', 'NSI Locker adicionado à sua tela inicial.', 'b');
+  });
+
+  function _mostrarBannerInstalar() {
+    if (!_pwaInstallEvent) return;
+    // Só mostrar se professor estiver na tela (não técnico)
+    if (document.getElementById('s-tec')?.classList.contains('active')) return;
+    if (document.getElementById('s-login')?.classList.contains('active')) return;
+
+    const existente = document.getElementById('pwa-install-banner');
+    if (existente) return;
+
+    const banner = document.createElement('div');
+    banner.id = 'pwa-install-banner';
+    banner.style.cssText = `position:fixed;bottom:max(1rem,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);width:calc(100% - 2rem);max-width:420px;background:#0c1225;border:1px solid rgba(79,142,247,.35);border-radius:16px;padding:1rem 1.1rem;display:flex;align-items:center;gap:.85rem;z-index:9999;box-shadow:0 8px 32px rgba(0,0,0,.5);animation:slideUp .35s ease`;
+    banner.innerHTML = `
+      <div style="width:44px;height:44px;flex-shrink:0;background:linear-gradient(135deg,rgba(79,142,247,.2),rgba(0,217,126,.1));border:1px solid rgba(79,142,247,.3);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.4rem">🔒</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.88rem;color:#fff">Instalar NSI Locker</div>
+        <div style="font-size:.68rem;color:#526080;margin-top:.1rem">Adicionar à tela inicial — sem precisar de loja</div>
+      </div>
+      <button onclick="_instalarPWA()" style="background:linear-gradient(135deg,#4f8ef7,#2563eb);color:#fff;border:none;border-radius:10px;padding:.5rem .9rem;font-size:.75rem;font-weight:700;cursor:pointer;flex-shrink:0;font-family:'Outfit',sans-serif">Instalar</button>
+      <button onclick="this.parentNode.remove()" style="background:none;border:none;color:#526080;cursor:pointer;font-size:1.1rem;padding:.2rem;flex-shrink:0">✕</button>
+    `;
+    document.body.appendChild(banner);
+    setTimeout(() => { if(banner.parentNode) banner.remove(); }, 15000);
+  }
+
+  window._instalarPWA = async function() {
+    if (!_pwaInstallEvent) return;
+    _pwaInstallEvent.prompt();
+    const { outcome } = await _pwaInstallEvent.userChoice;
+    if (outcome === 'accepted') _pwaInstallEvent = null;
+    const b = document.getElementById('pwa-install-banner');
+    if (b) b.remove();
+  };
+
+  // ── Service Worker (PWA offline/ícone) ──────────────────────────
+  if ('serviceWorker' in navigator) {
+    const swCode = `
+const CACHE = 'nsi-locker-v1';
+self.addEventListener('install', e => { self.skipWaiting(); });
+self.addEventListener('activate', e => { e.waitUntil(clients.claim()); });
+self.addEventListener('fetch', e => {
+  // Só cacheia recursos estáticos (fontes, scripts CDN)
+  if(e.request.url.includes('fonts.googleapis') || e.request.url.includes('cdnjs') || e.request.url.includes('jsdelivr')){
+    e.respondWith(caches.open(CACHE).then(c=>c.match(e.request).then(r=>r||(fetch(e.request).then(res=>{c.put(e.request,res.clone());return res;})))));
+  }
+});
+self.addEventListener('push', e => {
+  if(!e.data) return;
+  try{
+    const d = e.data.json();
+    e.waitUntil(self.registration.showNotification(d.title||'NSI Locker', {
+      body: d.body||'',
+      icon: 'data:image/svg+xml,...',
+      vibrate: [200,100,200],
+      data: { url: d.url||'/' }
+    }));
+  }catch(err){}
+});
+self.addEventListener('notificationclick', e => {
+  e.notification.close();
+  e.waitUntil(clients.matchAll({type:'window'}).then(cs=>{
+    const c=cs.find(x=>x.focus); if(c) return c.focus();
+    return clients.openWindow(e.notification.data?.url||'/');
+  }));
+});
+    `;
+    try {
+      const blob = new Blob([swCode], { type: 'application/javascript' });
+      const url = URL.createObjectURL(blob);
+      navigator.serviceWorker.register(url, { scope: './' })
+        .then(() => URL.revokeObjectURL(url))
+        .catch(() => URL.revokeObjectURL(url));
+    } catch(e) {}
+  }
 });
 </script>
 
