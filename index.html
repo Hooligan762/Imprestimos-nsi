@@ -3870,5 +3870,90 @@ document.addEventListener('DOMContentLoaded',()=>{
   checkURLParams();
 });
 </script>
+
+<!-- ============================================ -->
+<!-- FUNCIONALIDADES ADICIONADAS: Supabase + Notificações -->
+<!-- ============================================ -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+    // CONFIGURAÇÃO DO SUPABASE
+    const SUPABASE_URL = 'https://stybfwmbpuibsroxxmbx.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_cOnmQ_l3dElESc-0QXZXwg_ryrZS7Dj';
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    
+    let somAtivado = true;
+
+    // Função: Ativar Notificações
+    function ativarAlertas() {
+        if (!("Notification" in window)) { alert("Seu navegador não suporta notificações."); return; }
+        if (Notification.permission === "granted") { alert("✅ Alertas já estão ativos!"); }
+        else if (Notification.permission !== "denied") {
+            Notification.requestPermission().then(function (permission) {
+                if (permission === "granted") { alert("✅ Notificações ativadas!"); }
+            });
+        } else { alert("⚠️ Notificações bloqueadas. Ative nas configurações do navegador."); }
+    }
+
+    // Função: Mostrar Notificação
+    function mostrarNotificacao(titulo, corpo) {
+        if (Notification.permission === "granted") {
+            new Notification(titulo, { body: corpo, icon: '/icon-192.png', vibrate: [200, 100, 200] });
+        }
+    }
+
+    // Função: Tocar Som de Alerta
+    function tocarSom() {
+        if (!somAtivado) return;
+        try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = ctx.createOscillator(); const gain = ctx.createGain();
+            osc.connect(gain); gain.connect(ctx.destination);
+            osc.type = 'sine'; osc.frequency.value = 880; gain.gain.value = 0.1;
+            osc.start(); setTimeout(() => osc.stop(), 300);
+        } catch(e) { console.log('Som não suportado'); }
+    }
+
+    // Função: Toggle Som (para o técnico)
+    function toggleSom() {
+        somAtivado = !somAtivado;
+        const el = document.getElementById('som-status');
+        if (el) el.textContent = somAtivado ? 'Ativado' : 'Desativado';
+    }
+
+    // Função: Monitorar Mudanças no Banco (Realtime)
+    function iniciarMonitoramento() {
+        supabase.channel('monitor-pedidos')
+            .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'solicitacoes' }, (payload) => {
+                console.log('🔄 Mudança detectada:', payload);
+                if (payload.new.status === 'Aprovado') {
+                    mostrarNotificacao("✅ Pedido Aprovado!", "Seu protocolo foi liberado. Retire no TI.");
+                    tocarSom();
+                }
+            })
+            .subscribe();
+    }
+
+    // Conectar botão "Ativar alertas" ao clique
+    document.addEventListener('DOMContentLoaded', function() {
+        // Procura todos os botões com texto "Ativar alertas" ou "Ativar"
+        document.querySelectorAll('button').forEach(btn => {
+            if (btn.textContent.includes('Ativar alertas') || btn.textContent.includes('Ativar')) {
+                btn.onclick = ativarAlertas;
+            }
+        });
+        
+        // Inicia monitoramento se estiver na área do técnico
+        if (document.getElementById('tecnico-painel') && !document.getElementById('tecnico-painel').classList.contains('hidden')) {
+            iniciarMonitoramento();
+        }
+    });
+
+    // Expor funções globalmente para usar nos onclick do HTML
+    window.ativarAlertas = ativarAlertas;
+    window.toggleSom = toggleSom;
+    window.iniciarMonitoramento = iniciarMonitoramento;
+</script>
+
+  
 </body>
 </html>
