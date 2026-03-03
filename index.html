@@ -6,6 +6,11 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>NSI Locker</title>
+<meta name="theme-color" content="#040810">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="NSI Locker">
+<!-- manifest injetado inline via JS -->
+<link rel="apple-touch-icon" sizes="192x192" href="/Imprestimos-nsi/icon-192.png">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" defer></script>
@@ -468,9 +473,90 @@ tbody tr:hover td{background:rgba(255,255,255,.012)}
 .relat-tbl td:last-child{text-align:right;font-family:'JetBrains Mono',monospace;color:var(--blue)}
 .relat-bar-bg{background:rgba(255,255,255,.06);border-radius:4px;height:5px;margin-top:.25rem}
 .relat-bar-fill{height:5px;border-radius:4px;background:var(--blue);transition:width .4s}
+
+/* ══════════════════════════════════════
+   PWA — INSTALL BANNER + SPLASH
+══════════════════════════════════════ */
+
+/* Splash */
+#pwa-splash{position:fixed;inset:0;z-index:99999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.1rem;transition:opacity .45s,visibility .45s}
+#pwa-splash.hide{opacity:0;visibility:hidden;pointer-events:none}
+.spl-mark{width:84px;height:84px;border-radius:22px;font-size:2.2rem;background:linear-gradient(135deg,rgba(79,142,247,.2),rgba(0,217,126,.1));border:1px solid rgba(79,142,247,.3);display:flex;align-items:center;justify-content:center;box-shadow:0 0 48px rgba(79,142,247,.22);animation:splPulse 1.6s ease-in-out infinite alternate}
+@keyframes splPulse{from{box-shadow:0 0 20px rgba(79,142,247,.12)}to{box-shadow:0 0 64px rgba(79,142,247,.38)}}
+.spl-name{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;letter-spacing:-2px;color:#fff}
+.spl-name em{color:var(--blue);font-style:normal}
+.spl-sub{font-size:.6rem;letter-spacing:3.5px;text-transform:uppercase;color:var(--muted)}
+.spl-bar{width:48px;height:3px;background:var(--bdr2);border-radius:4px;overflow:hidden;margin-top:.4rem}
+.spl-bar-fill{height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--green));border-radius:4px;animation:splLoad 1.1s ease forwards .4s}
+@keyframes splLoad{from{width:0}to{width:100%}}
+
+/* Banner Android/Desktop */
+#pwa-banner{position:fixed;bottom:0;left:0;right:0;z-index:9998;padding:clamp(.9rem,3vw,1.15rem) clamp(1rem,4vw,1.5rem);padding-bottom:max(clamp(.9rem,3vw,1.15rem),env(safe-area-inset-bottom));background:linear-gradient(135deg,rgba(8,13,28,.98),rgba(12,18,37,.99));border-top:1px solid rgba(79,142,247,.25);box-shadow:0 -8px 40px rgba(0,0,0,.55);display:none;align-items:center;gap:.9rem;animation:slideUp .32s cubic-bezier(.25,.46,.45,.94);backdrop-filter:blur(20px)}
+#pwa-banner.show{display:flex}
+@keyframes slideUp{from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1}}
+.pwa-ban-icon{width:50px;height:50px;flex-shrink:0;border-radius:13px;background:linear-gradient(135deg,rgba(79,142,247,.18),rgba(0,217,126,.1));border:1px solid rgba(79,142,247,.28);display:flex;align-items:center;justify-content:center;font-size:1.5rem;box-shadow:0 4px 14px rgba(79,142,247,.18)}
+.pwa-ban-txt{flex:1;min-width:0}
+.pwa-ban-txt strong{display:block;font-family:'Syne',sans-serif;font-size:.9rem;color:#fff;margin-bottom:.12rem}
+.pwa-ban-txt span{font-size:.67rem;color:var(--muted);line-height:1.4}
+.pwa-ban-acts{display:flex;gap:.45rem;flex-direction:column;flex-shrink:0}
+.pwa-btn-ok{background:linear-gradient(135deg,var(--blue),var(--blue2));border:none;border-radius:var(--rs);color:#fff;font-family:'Syne',sans-serif;font-size:.74rem;font-weight:700;padding:.52rem 1rem;cursor:pointer;white-space:nowrap;box-shadow:0 4px 14px rgba(79,142,247,.32);transition:.16s}
+.pwa-btn-ok:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(79,142,247,.45)}
+.pwa-btn-no{background:transparent;border:1px solid var(--bdr2);border-radius:var(--rs);color:var(--muted);font-size:.64rem;padding:.32rem .65rem;cursor:pointer;font-family:'Outfit',sans-serif;transition:.14s;text-align:center}
+.pwa-btn-no:hover{color:var(--text2)}
+
+/* Banner iOS */
+#pwa-ios{position:fixed;bottom:0;left:0;right:0;z-index:9998;padding:1rem 1.2rem;padding-bottom:max(1rem,env(safe-area-inset-bottom));background:linear-gradient(135deg,rgba(8,13,28,.98),rgba(12,18,37,.99));border-top:1px solid rgba(79,142,247,.22);box-shadow:0 -8px 40px rgba(0,0,0,.55);display:none;flex-direction:column;gap:.6rem;animation:slideUp .32s cubic-bezier(.25,.46,.45,.94)}
+#pwa-ios.show{display:flex}
+.ios-title{font-family:'Syne',sans-serif;font-size:.88rem;color:#fff;display:flex;align-items:center;gap:.45rem}
+.ios-steps{display:flex;flex-direction:column;gap:.38rem}
+.ios-step{display:flex;align-items:flex-start;gap:.55rem;font-size:.71rem;color:var(--text2);line-height:1.45}
+.ios-step-n{width:20px;height:20px;border-radius:50%;background:rgba(79,142,247,.15);border:1px solid rgba(79,142,247,.25);color:var(--blue);font-size:.6rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:.05rem}
+.ios-arrow{text-align:center;font-size:1.3rem;color:rgba(79,142,247,.5);animation:iosBounce .75s ease-in-out infinite alternate}
+@keyframes iosBounce{from{transform:translateY(0)}to{transform:translateY(5px)}}
+.ios-close{align-self:center;background:transparent;border:1px solid var(--bdr2);border-radius:var(--rs);color:var(--muted);font-size:.67rem;padding:.35rem 1.1rem;cursor:pointer;font-family:'Outfit',sans-serif;transition:.14s}
+.ios-close:hover{color:var(--text2)}
+
+/* Botão instalar no home */
+#pwa-home-btn{display:none;align-items:center;justify-content:center;gap:.5rem;width:100%;max-width:400px;background:linear-gradient(135deg,rgba(79,142,247,.09),rgba(0,217,126,.05));border:1px solid rgba(79,142,247,.22);border-radius:var(--r);padding:.62rem 1.1rem;color:var(--blue);font-size:.73rem;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;transition:.18s;position:relative;z-index:1}
+#pwa-home-btn:hover{border-color:rgba(79,142,247,.5);background:linear-gradient(135deg,rgba(79,142,247,.14),rgba(0,217,126,.08))}
+.pwa-home-badge{font-size:.5rem;font-weight:800;letter-spacing:.5px;text-transform:uppercase;background:linear-gradient(90deg,var(--blue),var(--green));color:#fff;padding:.07rem .3rem;border-radius:3px;margin-left:.2rem}
 </style>
 </head>
 <body>
+
+
+<!-- ══ PWA SPLASH ══ -->
+<div id="pwa-splash">
+  <div class="spl-mark">🔒</div>
+  <div class="spl-name">NSI<em>Locker</em></div>
+  <div class="spl-sub">UNA · Gestão de Equipamentos TI</div>
+  <div class="spl-bar"><div class="spl-bar-fill"></div></div>
+</div>
+
+<!-- ══ PWA BANNER ANDROID/DESKTOP ══ -->
+<div id="pwa-banner">
+  <div class="pwa-ban-icon">🔒</div>
+  <div class="pwa-ban-txt">
+    <strong>Instalar NSI Locker</strong>
+    <span>Adicione à tela inicial — acesso direto sem QR Code</span>
+  </div>
+  <div class="pwa-ban-acts">
+    <button class="pwa-btn-ok" onclick="pwaInstalar()">⬇ Instalar</button>
+    <button class="pwa-btn-no" onclick="pwaDismiss()">Agora não</button>
+  </div>
+</div>
+
+<!-- ══ PWA HINT iOS ══ -->
+<div id="pwa-ios">
+  <div class="ios-title">📱 Instalar NSI Locker no iPhone</div>
+  <div class="ios-steps">
+    <div class="ios-step"><span class="ios-step-n">1</span><span>Toque no botão <strong>Compartilhar</strong> <span style="font-size:.9rem">⎋</span> na barra inferior do Safari</span></div>
+    <div class="ios-step"><span class="ios-step-n">2</span><span>Role a lista e toque em <strong>"Adicionar à Tela de Início"</strong></span></div>
+    <div class="ios-step"><span class="ios-step-n">3</span><span>Confirme tocando em <strong>Adicionar</strong> — o ícone aparecerá na sua tela!</span></div>
+  </div>
+  <div class="ios-arrow">↓</div>
+  <button class="ios-close" onclick="pwaFecharIOS()">Entendi, fechar</button>
+</div>
 
 <div class="bg-fx"></div>
 <div class="grid-bg"></div>
@@ -498,6 +584,7 @@ tbody tr:hover td{background:rgba(255,255,255,.012)}
   </div>
   <p class="home-note" style="position:relative;z-index:1">🔖 Escaneie o <strong>QR Code</strong> do armário de TI para abrir direto. Ao devolver, use o QR do seu comprovante.</p>
   <button onclick="abrirConsultaStatus()" style="position:relative;z-index:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:var(--r);padding:.5rem 1.2rem;color:var(--muted);font-size:.72rem;cursor:pointer;margin-top:.35rem;font-family:'Outfit',sans-serif;transition:.15s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">🔎 Consultar status do meu protocolo</button>
+  <button id="pwa-home-btn" onclick="pwaInstalar()">⬇ Instalar App <span class="pwa-home-badge">NOVO</span></button>
 </div>
 
 <!-- CONSULTA STATUS -->
@@ -3862,6 +3949,283 @@ function initSig(cid,hid,wid,cb){
 }
 function clearSig(cid,hid,wid){ const c=document.getElementById(cid); if(!c)return; const ctx=c.getContext('2d'); ctx.fillStyle='#fff';ctx.fillRect(0,0,c.width,c.height); const h=document.getElementById(hid);if(h)h.style.display='flex'; const w=document.getElementById(wid);if(w)w.classList.remove('has'); const st=_sigState[cid];if(st)st.hasSig=false; }
 
+
+/* ══════════════════════════════════════════
+   PWA INSTALL MANAGER — NSI Locker
+   Gerencia: SW, splash, banner, install
+══════════════════════════════════════════ */
+
+// ── Variáveis globais ──────────────────
+let _pwaPrompt   = null;
+let _pwaInstalado = false;
+
+// ── Detectores ─────────────────────────
+const _isIOS = () => /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
+const _isStandalone = () =>
+  window.matchMedia('(display-mode: standalone)').matches ||
+  window.navigator.standalone === true;
+
+// ── Ocultar splash ─────────────────────
+function _hideSplash(){
+  const el = document.getElementById('pwa-splash');
+  if(!el) return;
+  setTimeout(() => {
+    el.classList.add('hide');
+    setTimeout(() => el.remove(), 460);
+  }, 950);
+}
+
+// ── Mostrar banner ─────────────────────
+function _showBanner(){
+  if(_pwaInstalado || _isStandalone()) return;
+  try{
+    const last = parseInt(localStorage.getItem('pwa_dismiss') || '0');
+    if(Date.now() - last < 3 * 86400000) return; // aguarda 3 dias após dispensar
+  }catch(e){}
+
+  if(_isIOS()){
+    setTimeout(() => document.getElementById('pwa-ios')?.classList.add('show'), 3500);
+  } else if(_pwaPrompt){
+    setTimeout(() => {
+      document.getElementById('pwa-banner')?.classList.add('show');
+      document.getElementById('pwa-home-btn').style.display = 'flex';
+    }, 2500);
+  }
+}
+
+// ── Instalar (Android/Desktop) ─────────
+async function pwaInstalar(){
+  if(!_pwaPrompt){ _showBanner(); return; }
+  document.getElementById('pwa-banner')?.classList.remove('show');
+  _pwaPrompt.prompt();
+  const { outcome } = await _pwaPrompt.userChoice;
+  if(outcome === 'accepted'){
+    _pwaInstalado = true;
+    document.getElementById('pwa-home-btn').style.display = 'none';
+    toast('🎉', 'App instalado!', 'NSI Locker está na sua tela inicial.', 'b');
+    try{ localStorage.setItem('pwa_installed', '1'); }catch(e){}
+  }
+  _pwaPrompt = null;
+}
+
+// ── Dispensar banner ───────────────────
+function pwaDismiss(){
+  document.getElementById('pwa-banner')?.classList.remove('show');
+  try{ localStorage.setItem('pwa_dismiss', Date.now().toString()); }catch(e){}
+}
+
+// ── Fechar dica iOS ────────────────────
+function pwaFecharIOS(){
+  document.getElementById('pwa-ios')?.classList.remove('show');
+  try{ localStorage.setItem('pwa_dismiss', Date.now().toString()); }catch(e){}
+}
+
+// ── Capturar evento nativo de install ──
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  _pwaPrompt = e;
+  document.getElementById('pwa-home-btn').style.display = 'flex';
+  _showBanner();
+});
+
+window.addEventListener('appinstalled', () => {
+  _pwaInstalado = true;
+  _pwaPrompt = null;
+  document.getElementById('pwa-banner')?.classList.remove('show');
+  document.getElementById('pwa-home-btn').style.display = 'none';
+  toast('🎉', 'Instalado!', 'Acesse pelo ícone na tela inicial.', 'b');
+});
+
+// ── Registrar Service Worker ───────────
+(async function initPWA(){
+
+  // ── Injetar manifest.json inline via Blob ──────────────────
+  (function injectManifest(){
+    try{
+      const manifestData = `{
+  "name": "NSI Locker",
+  "short_name": "NSI Locker",
+  "description": "Sistema de empréstimo de equipamentos TI — UNA",
+  "start_url": "/Imprestimos-nsi/",
+  "scope": "/Imprestimos-nsi/",
+  "display": "standalone",
+  "background_color": "#040810",
+  "theme_color": "#040810",
+  "orientation": "portrait-primary",
+  "lang": "pt-BR",
+  "icons": [
+    {
+      "src": "/Imprestimos-nsi/icon-72.png",
+      "sizes": "72x72",
+      "type": "image/png"
+    },
+    {
+      "src": "/Imprestimos-nsi/icon-96.png",
+      "sizes": "96x96",
+      "type": "image/png"
+    },
+    {
+      "src": "/Imprestimos-nsi/icon-128.png",
+      "sizes": "128x128",
+      "type": "image/png"
+    },
+    {
+      "src": "/Imprestimos-nsi/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/Imprestimos-nsi/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Solicitar Equipamento",
+      "short_name": "Solicitar",
+      "url": "/Imprestimos-nsi/?action=solicitar",
+      "icons": [
+        {
+          "src": "/Imprestimos-nsi/icon-96.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Devolver Equipamento",
+      "short_name": "Devolver",
+      "url": "/Imprestimos-nsi/?action=devolver",
+      "icons": [
+        {
+          "src": "/Imprestimos-nsi/icon-96.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ]
+}`;
+      const blob = new Blob([manifestData], {type:'application/json'});
+      const url  = URL.createObjectURL(blob);
+      const link = document.createElement('link');
+      link.rel  = 'manifest';
+      link.href = url;
+      document.head.appendChild(link);
+      console.log('[PWA] Manifest injetado via Blob');
+    }catch(e){ console.warn('[PWA] Manifest Blob falhou:', e); }
+  })();
+
+  if(!('serviceWorker' in navigator)) { _hideSplash(); return; }
+
+  // ── Injetar sw.js inline via Blob ──────────────────────────
+  try{
+    const swCode = `/* ══════════════════════════════════
+   NSI LOCKER — Service Worker v2
+   Cache offline + Web Push
+══════════════════════════════════ */
+const CACHE = 'nsilocker-v2';
+const SHELL = ['./', './manifest.json', './icon-192.png', './icon-512.png'];
+
+self.addEventListener('install', e => {
+  self.skipWaiting();
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL).catch(()=>{})));
+});
+
+self.addEventListener('activate', e => {
+  e.waitUntil(
+    caches.keys()
+      .then(keys => Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k))))
+      .then(() => clients.claim())
+  );
+});
+
+self.addEventListener('fetch', e => {
+  const url = new URL(e.request.url);
+  if(url.hostname.includes('supabase.co') || e.request.method !== 'GET') return;
+  e.respondWith(
+    caches.match(e.request).then(cached => {
+      if(cached) return cached;
+      return fetch(e.request).then(res => {
+        if(res.ok && url.origin === self.location.origin){
+          caches.open(CACHE).then(c => c.put(e.request, res.clone()));
+        }
+        return res;
+      }).catch(() => cached);
+    })
+  );
+});
+
+self.addEventListener('push', e => {
+  let d = { title:'NSI Locker', body:'Atualização no seu pedido.', type:'info' };
+  if(e.data){ try{ d={...d,...e.data.json()}; }catch(_){} }
+  const ico = d.type==='aprovado'?'✅':d.type==='cancelado'?'❌':d.type==='devolvido'?'🏁':'🔔';
+  e.waitUntil(self.registration.showNotification(\`\${ico} \${d.title}\`, {
+    body: d.body,
+    icon: './icon-192.png',
+    badge: './icon-72.png',
+    tag: 'nsilocker-' + (d.proto||'status'),
+    renotify: true,
+    vibrate: [300,100,300,100,500],
+    data: { proto: d.proto||'' }
+  }));
+});
+
+self.addEventListener('notificationclick', e => {
+  e.notification.close();
+  const proto = e.notification.data?.proto || '';
+  const base  = self.location.origin + self.location.pathname.replace('sw.js','');
+  const url   = proto ? \`\${base}?proto=\${proto}\` : base;
+  e.waitUntil(
+    clients.matchAll({type:'window',includeUncontrolled:true}).then(list => {
+      for(const c of list){
+        if(c.url.startsWith(self.location.origin)){ c.focus(); c.postMessage({type:'OPEN_PROTO',proto}); return; }
+      }
+      clients.openWindow(url);
+    })
+  );
+});
+`;
+    const swBlob = new Blob([swCode], {type:'application/javascript'});
+    const swUrl  = URL.createObjectURL(swBlob);
+    const reg    = await navigator.serviceWorker.register(swUrl, { scope: './' });
+    console.log('[PWA] SW registrado via Blob:', reg.scope);
+
+    navigator.serviceWorker.addEventListener('message', e => {
+      if(e.data?.type === 'OPEN_PROTO' && e.data.proto){
+        const inp = document.getElementById('cons-proto-inp');
+        if(inp) inp.value = e.data.proto;
+        if(typeof show === 'function') show('s-consulta');
+        if(typeof consultarStatus === 'function') setTimeout(consultarStatus, 300);
+      }
+    });
+  }catch(err){
+    console.warn('[PWA] SW Blob falhou, tentando arquivo externo:', err.message);
+    // Fallback: tentar arquivo externo se existir
+    try{
+      const reg = await navigator.serviceWorker.register('./sw.js', { scope: './' });
+      console.log('[PWA] SW externo registrado:', reg.scope);
+    }catch(e2){ console.warn('[PWA] SW externo também falhou:', e2.message); }
+  }
+
+  if(_isStandalone()){
+    _pwaInstalado = true;
+    _hideSplash();
+    return;
+  }
+
+  _hideSplash();
+
+  if(_isIOS()){
+    try{
+      const last = parseInt(localStorage.getItem('pwa_dismiss') || '0');
+      if(Date.now() - last > 3 * 86400000) setTimeout(_showBanner, 3500);
+    }catch(e){}
+  }
+})();
+
+
 /* ═══════════════════════════════════════
    INIT
 ═══════════════════════════════════════ */
@@ -3871,88 +4235,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 });
 </script>
 
-<!-- ============================================ -->
-<!-- FUNCIONALIDADES ADICIONADAS: Supabase + Notificações -->
-<!-- ============================================ -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-    // CONFIGURAÇÃO DO SUPABASE
-    const SUPABASE_URL = 'https://stybfwmbpuibsroxxmbx.supabase.co';
-    const SUPABASE_KEY = 'sb_publishable_cOnmQ_l3dElESc-0QXZXwg_ryrZS7Dj';
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    
-    let somAtivado = true;
-
-    // Função: Ativar Notificações
-    function ativarAlertas() {
-        if (!("Notification" in window)) { alert("Seu navegador não suporta notificações."); return; }
-        if (Notification.permission === "granted") { alert("✅ Alertas já estão ativos!"); }
-        else if (Notification.permission !== "denied") {
-            Notification.requestPermission().then(function (permission) {
-                if (permission === "granted") { alert("✅ Notificações ativadas!"); }
-            });
-        } else { alert("⚠️ Notificações bloqueadas. Ative nas configurações do navegador."); }
-    }
-
-    // Função: Mostrar Notificação
-    function mostrarNotificacao(titulo, corpo) {
-        if (Notification.permission === "granted") {
-            new Notification(titulo, { body: corpo, icon: '/icon-192.png', vibrate: [200, 100, 200] });
-        }
-    }
-
-    // Função: Tocar Som de Alerta
-    function tocarSom() {
-        if (!somAtivado) return;
-        try {
-            const ctx = new (window.AudioContext || window.webkitAudioContext)();
-            const osc = ctx.createOscillator(); const gain = ctx.createGain();
-            osc.connect(gain); gain.connect(ctx.destination);
-            osc.type = 'sine'; osc.frequency.value = 880; gain.gain.value = 0.1;
-            osc.start(); setTimeout(() => osc.stop(), 300);
-        } catch(e) { console.log('Som não suportado'); }
-    }
-
-    // Função: Toggle Som (para o técnico)
-    function toggleSom() {
-        somAtivado = !somAtivado;
-        const el = document.getElementById('som-status');
-        if (el) el.textContent = somAtivado ? 'Ativado' : 'Desativado';
-    }
-
-    // Função: Monitorar Mudanças no Banco (Realtime)
-    function iniciarMonitoramento() {
-        supabase.channel('monitor-pedidos')
-            .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'solicitacoes' }, (payload) => {
-                console.log('🔄 Mudança detectada:', payload);
-                if (payload.new.status === 'Aprovado') {
-                    mostrarNotificacao("✅ Pedido Aprovado!", "Seu protocolo foi liberado. Retire no TI.");
-                    tocarSom();
-                }
-            })
-            .subscribe();
-    }
-
-    // Conectar botão "Ativar alertas" ao clique
-    document.addEventListener('DOMContentLoaded', function() {
-        // Procura todos os botões com texto "Ativar alertas" ou "Ativar"
-        document.querySelectorAll('button').forEach(btn => {
-            if (btn.textContent.includes('Ativar alertas') || btn.textContent.includes('Ativar')) {
-                btn.onclick = ativarAlertas;
-            }
-        });
-        
-        // Inicia monitoramento se estiver na área do técnico
-        if (document.getElementById('tecnico-painel') && !document.getElementById('tecnico-painel').classList.contains('hidden')) {
-            iniciarMonitoramento();
-        }
-    });
-
-    // Expor funções globalmente para usar nos onclick do HTML
-    window.ativarAlertas = ativarAlertas;
-    window.toggleSom = toggleSom;
-    window.iniciarMonitoramento = iniciarMonitoramento;
-</script>
+<!-- bloco duplicado removido -->
 
   
 </body>
