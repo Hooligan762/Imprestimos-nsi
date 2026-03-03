@@ -787,13 +787,15 @@ tbody tr:hover td{background:rgba(255,255,255,.012)}
           <div class="live-status-pill polling" id="cons-live-pill">⟳ Monitorando ao vivo…</div>
           <span style="font-size:.62rem;color:var(--muted)" id="cons-live-timer">Próx. atualização em 30s</span>
         </div>
+      </div>
 
-        <div style="margin-top:.75rem;padding:.85rem;border-radius:var(--rs);text-align:center;transition:.4s" id="cons-status-box">
-          <div style="font-size:1.6rem;margin-bottom:.3rem" id="cons-status-ico">⏳</div>
-          <div style="font-size:.9rem;font-weight:700" id="cons-status-txt">—</div>
-          <div style="font-size:.72rem;color:var(--muted);margin-top:.2rem" id="cons-status-sub">—</div>
-          <div style="font-size:.6rem;color:var(--muted);margin-top:.4rem;font-family:'JetBrains Mono',monospace" id="cons-ultima-att"></div>
-        </div>
+      <!-- STATUS — card grande e destacado -->
+      <div id="cons-status-box" style="border-radius:var(--rl);padding:2rem 1.5rem;text-align:center;transition:.4s;border:2px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);margin-top:-.3rem">
+        <div style="font-size:3.5rem;margin-bottom:.6rem;line-height:1;filter:drop-shadow(0 0 18px currentColor)" id="cons-status-ico">⏳</div>
+        <div style="font-size:1.25rem;font-weight:800;font-family:'Syne',sans-serif;letter-spacing:-.5px;margin-bottom:.4rem;line-height:1.2" id="cons-status-txt">—</div>
+        <div style="font-size:.82rem;color:var(--muted);line-height:1.5;max-width:280px;margin:0 auto" id="cons-status-sub">—</div>
+        <div style="font-size:.62rem;color:var(--muted2);margin-top:.85rem;font-family:'JetBrains Mono',monospace" id="cons-ultima-att"></div>
+      </div>
 
         <!-- Alerta de devolução atrasada (aparece quando status=retirado e passou mais de 4h) -->
         <div id="cons-late-alert" style="display:none" class="late-return-card">
@@ -801,7 +803,6 @@ tbody tr:hover td{background:rgba(255,255,255,.012)}
           <p>Não esqueça de devolver os equipamentos ao término da aula! Use o QR Code do comprovante.</p>
           <button class="late-btn" onclick="pararConsultaLive();abrirDevolucao()">↩️ Registrar Devolução Agora</button>
         </div>
-      </div>
     </div>
 
     <button class="btn-ghost" onclick="pararConsultaLive();show('s-home')">← Voltar ao Início</button>
@@ -3741,7 +3742,8 @@ function _aplicarStatusConsulta(status, data){
   document.getElementById('cons-status-sub').textContent=si.sub;
   const box=document.getElementById('cons-status-box');
   box.style.background=si.bg;
-  box.style.border=`1px solid ${si.bdr}`;
+  box.style.border=`2px solid ${si.bdr}`;
+  box.style.boxShadow=`0 0 40px ${si.bdr}`;
   document.getElementById('cons-ultima-att').textContent='Atualizado: '+_agora();
 }
 
