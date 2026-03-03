@@ -197,8 +197,8 @@ code,.mono{font-family:'JetBrains Mono',monospace}
 .qr-detected i{font-size:1.5rem;flex-shrink:0}
 
 /* PUSH NOTIFICATION PERMISSION BANNER */
-.push-banner{position:fixed;bottom:0;left:0;right:0;z-index:9999;background:linear-gradient(135deg,rgba(8,13,28,.98),rgba(12,18,37,.98));border-top:1px solid rgba(79,142,247,.3);padding:clamp(.85rem,2.5vw,1.1rem) clamp(1rem,3vw,1.5rem);display:flex;align-items:center;gap:1rem;backdrop-filter:blur(16px);transform:translateY(100%);transition:transform .35s cubic-bezier(.16,1,.3,1);box-shadow:0 -8px 32px rgba(0,0,0,.5)}
-.push-banner.show{transform:translateY(0)}
+.push-banner{position:fixed;bottom:0;left:0;right:0;z-index:9999;background:linear-gradient(135deg,rgba(8,13,28,.98),rgba(12,18,37,.98));border-top:1px solid rgba(79,142,247,.3);padding:clamp(.85rem,2.5vw,1.1rem) clamp(1rem,3vw,1.5rem);display:none;align-items:center;gap:1rem;backdrop-filter:blur(16px);transition:transform .35s cubic-bezier(.16,1,.3,1);box-shadow:0 -8px 32px rgba(0,0,0,.5)}
+.push-banner.show{display:flex}
 .push-banner-ico{font-size:1.6rem;flex-shrink:0;animation:bellRing 1.2s ease-in-out infinite}
 @keyframes bellRing{0%,100%{transform:rotate(0)}10%{transform:rotate(12deg)}20%{transform:rotate(-10deg)}30%{transform:rotate(8deg)}40%{transform:rotate(-6deg)}50%{transform:rotate(0)}}
 .push-banner-txt{flex:1;min-width:0}
@@ -408,7 +408,7 @@ tbody tr:hover td{background:rgba(255,255,255,.012)}
 
 #toasts{position:fixed;bottom:max(1.2rem,env(safe-area-inset-bottom));right:max(1.2rem,env(safe-area-inset-right));z-index:500;display:flex;flex-direction:column;gap:.45rem;pointer-events:none;max-width:min(295px,88vw)}
 .toast{background:var(--card);border:1px solid var(--bdr);border-left:3px solid var(--green);border-radius:var(--r);padding:.78rem 1rem;box-shadow:var(--sh);animation:tin .24s ease;display:flex;gap:.6rem;align-items:flex-start;pointer-events:all}
-.toast.w{border-left-color:var(--amber)}.toast.r{border-left-color:var(--red)}.toast.p{border-left-color:var(--purple)}.toast.b{border-left-color:var(--blue)}
+.toast.w{border-left-color:var(--amber)}.toast.r{border-left-color:var(--red)}.toast.p{border-left-color:var(--purple)}.toast.b{border-left-color:var(--blue)}.toast.info{border-left-color:var(--blue)}.toast.lembrete{border-left-color:var(--amber)}.toast.erro{border-left-color:var(--red)}.toast.aprovado{border-left-color:var(--green)}.toast.devolvido{border-left-color:var(--blue)}
 .t-ico{font-size:.9rem;flex-shrink:0;margin-top:.05rem}
 .toast strong{display:block;font-size:clamp(.74rem,2vw,.81rem);margin-bottom:.07rem;font-family:'Syne',sans-serif}
 .toast small{font-size:clamp(.62rem,1.8vw,.68rem);color:var(--muted)}
@@ -480,7 +480,7 @@ tbody tr:hover td{background:rgba(255,255,255,.012)}
   background: linear-gradient(135deg, var(--card), var(--card2));
   border-bottom: 2px solid var(--blue);
   padding: 1rem;
-  display: flex;
+  display: none;
   align-items: center;
   gap: 1rem;
   transform: translateY(-100%);
@@ -489,6 +489,7 @@ tbody tr:hover td{background:rgba(255,255,255,.012)}
 }
 
 .notification-permission-banner.show {
+  display: flex;
   transform: translateY(0);
 }
 
@@ -1577,7 +1578,7 @@ tbody tr:hover td{background:rgba(255,255,255,.012)}
 </div>
 
 <!-- PUSH NOTIFICATION BANNER -->
-<div id="push-banner" class="push-banner">
+<div id="push-banner" class="push-banner" style="display:none">
   <span class="push-banner-ico">🔔</span>
   <div class="push-banner-txt">
     <strong>Receber alertas do seu pedido?</strong>
@@ -1590,7 +1591,7 @@ tbody tr:hover td{background:rgba(255,255,255,.012)}
 </div>
 
 <!-- NOVOS COMPONENTES DE NOTIFICAÇÃO -->
-<div id="notification-permission-banner" class="notification-permission-banner">
+<div id="notification-permission-banner" class="notification-permission-banner" style="display:none">
   <span class="icon">🔔</span>
   <div class="content">
     <strong>Receba alertas em tempo real!</strong>
@@ -1633,7 +1634,13 @@ async function sbInit(){
   }catch(e){ sbOnline=false; setSbStatus('err','Modo local (Supabase offline)'); console.warn('SB offline:',e.message); }
 }
 
-function setSbStatus(t,txt){}
+function setSbStatus(t,txt){
+  const connEl=document.getElementById('connection-status');
+  if(connEl){
+    connEl.className='connection-status '+(t==='ok'?'online':'offline');
+    connEl.innerHTML=`<span>${t==='ok'?'🟢 Conectado':'🔴 Offline'}</span>`;
+  }
+}
 
 function setupRealtime(){
   if(!sbClient||!sbOnline) return;
@@ -1668,17 +1675,7 @@ function setupRealtime(){
             horaAprovacao:s.hora_aprovacao||'', tecAprovador:s.tecnico_aprovador||'',
             horaRetirada:s.hora_retirada||''};
           updateBadges(); renderAll();
-          
-          // NOTIFICAR PROFESSOR QUANDO APROVADO
-          if(old.status === 'pendente' && s.status === 'aprovado') {
-            const solic = solicitacoes[idx];
-            NotificacoesNSI.solicitacaoAprovada(s.protocolo, s.professor, s.equipamentos);
-          }
-          
-          // NOTIFICAR PROFESSOR QUANDO DEVOLUÇÃO CONFIRMADA
-          if(s.status === 'devolvido_confirmado') {
-            NotificacoesNSI.devolucaoConfirmada(s.protocolo, s.professor);
-          }
+          // Notificações de status são disparadas pelo polling do professor — não duplicar aqui
         }
       })
       .on('postgres_changes',{event:'INSERT',schema:'public',table:'devolucoes'},p=>{
@@ -1757,7 +1754,12 @@ const NotificacoesNSI = {
   
   mostrarBanner() {
     const banner = document.getElementById('notification-permission-banner');
-    if (banner) banner.classList.add('show');
+    if (banner) {
+      banner.style.display = 'flex';
+      // força reflow antes de adicionar a classe para a transição funcionar
+      banner.offsetHeight;
+      banner.classList.add('show');
+    }
   },
   
   allow() {
@@ -1769,13 +1771,27 @@ const NotificacoesNSI = {
         }
       });
     }
-    document.getElementById('notification-permission-banner')?.classList.remove('show');
-    localStorage.setItem('nsi_notificacoes', JSON.stringify(this.config));
+    const _hideEl = (id) => {
+      const el = document.getElementById(id);
+      if (el) { el.classList.remove('show'); setTimeout(()=>{ el.style.display='none'; }, 400); }
+    };
+    _hideEl('notification-permission-banner');
+    _hideEl('push-banner');
+    const ppb = document.getElementById('push-perm-banner');
+    if (ppb) ppb.style.display = 'none';
+    const spb = document.getElementById('suc-push-banner');
+    if (spb) spb.style.display = 'none';
+    try{ localStorage.setItem('nsi_notificacoes', JSON.stringify(this.config)); }catch(e){}
   },
-  
+
   deny() {
-    document.getElementById('notification-permission-banner')?.classList.remove('show');
-    localStorage.setItem('nsi_notificacoes', JSON.stringify(this.config));
+    const _hideEl = (id) => {
+      const el = document.getElementById(id);
+      if (el) { el.classList.remove('show'); setTimeout(()=>{ el.style.display='none'; }, 400); }
+    };
+    _hideEl('notification-permission-banner');
+    _hideEl('push-banner');
+    try{ localStorage.setItem('nsi_notificacoes', JSON.stringify(this.config)); }catch(e){}
   },
   
   async solicitacaoAprovada(protocolo, professor, equipamentos) {
@@ -1854,33 +1870,7 @@ const NotificacoesNSI = {
   },
   
   notificarTecnicos(titulo, mensagem, tipo) {
-    if (tipo === 'nova_solicitacao') {
-      const badge = document.getElementById('bdg');
-      if (badge) {
-        const atual = parseInt(badge.textContent) || 0;
-        badge.textContent = atual + 1;
-        badge.style.display = 'flex';
-      }
-    }
-    
-    if (tipo === 'nova_devolucao') {
-      const badge = document.getElementById('bdg-dev');
-      if (badge) {
-        const atual = parseInt(badge.textContent) || 0;
-        badge.textContent = atual + 1;
-        badge.style.display = 'flex';
-      }
-    }
-    
-    if (tipo === 'atraso_grave') {
-      const badge = document.getElementById('bdg-atrasados');
-      if (badge) {
-        const atual = parseInt(badge.textContent) || 0;
-        badge.textContent = atual + 1;
-        badge.style.display = 'flex';
-      }
-    }
-    
+    // Badges são gerenciados centralmente por updateBadges() — não manipular aqui
     if (document.getElementById('s-tec')?.classList.contains('active')) {
       this.toast(
         tipo === 'nova_solicitacao' ? '🔔' : 
@@ -2022,6 +2012,7 @@ const NotificacoesNSI = {
       if (s.status === 'retirado') {
         try {
           const horaRef = s.horaRetirada || s.hora;
+          if (!horaRef) return;
           const m = horaRef.match(/(\d{2})\/(\d{2})\/(\d{4}) (\d{2}):(\d{2})/);
           if (m) {
             const d = new Date(+m[3], +m[2]-1, +m[1], +m[4], +m[5]);
@@ -2030,11 +2021,13 @@ const NotificacoesNSI = {
             [1, 2, 3, 4].forEach(h => {
               if (horas >= h && horas < h + 0.5) {
                 const chave = `lembrete_${s.id}_${h}`;
-                if (!localStorage.getItem(chave)) {
-                  this.lembreteDevolucao(s.prof, h, s.proto);
-                  localStorage.setItem(chave, 'true');
-                  setTimeout(() => localStorage.removeItem(chave), 24 * 60 * 60 * 1000);
-                }
+                try {
+                  if (!localStorage.getItem(chave)) {
+                    this.lembreteDevolucao(s.prof, h, s.proto);
+                    localStorage.setItem(chave, String(Date.now()));
+                    setTimeout(() => { try{ localStorage.removeItem(chave); }catch(e){} }, 25 * 60 * 60 * 1000);
+                  }
+                } catch(e) {}
               }
             });
           }
@@ -2396,6 +2389,10 @@ const CAMPUS_COR={'aimores':'#4f8ef7','liberdade':'#9b72f7','todos':'#00d97e'};
 function escHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function show(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); window.scrollTo(0,0); }
 
+function _carregarProtosRecentes(){
+  try{ return JSON.parse(localStorage.getItem('nsi_protos')||'[]'); }catch(e){ return []; }
+}
+
 /* ═══════════════════════════════════════
    QR CODE / URL PARAMS
 ═══════════════════════════════════════ */
@@ -2479,7 +2476,23 @@ function toggleEq(el){
   if(qid){ document.getElementById(qid).style.display=s?'flex':'none'; }
 }
 
-function chQty(id,d){ const el=document.getElementById(id); let v=parseInt(el.textContent)+d; if(v<1)v=1; if(v>20)v=20; el.textContent=v; }
+function chQty(id,d){
+  const el=document.getElementById(id); if(!el) return;
+  let v=parseInt(el.textContent)+d;
+  if(v<1)v=1;
+  // Verificar disponibilidade máxima pelo estoque
+  const catMap={'cb-n':'Chromebook','nb-n':'Notebook'};
+  const cat=catMap[id];
+  if(cat && d>0){
+    const item=equipamentosCache.filter(e=>e.categoria===cat&&e.status==='disponivel').length;
+    if(item>0 && v>item) v=item;
+    else if(item===0) v=Math.max(1,parseInt(el.textContent));
+    else if(v>20) v=20;
+  } else {
+    if(v>20)v=20;
+  }
+  el.textContent=v;
+}
 function setTipo(t){ tipoSolic=t; document.getElementById('t-agora').classList.toggle('sel',t==='agora'); document.getElementById('t-agendar').classList.toggle('sel',t==='agendar'); document.getElementById('agendar-block').style.display=t==='agendar'?'block':'none'; }
 
 async function submitProf(){
@@ -2523,6 +2536,7 @@ async function submitProf(){
   const sbRes=await sbInsertSolicitacao(nova);
 
   if(!sbRes.ok){
+    clearTimeout(_submitTimeout);
     btn.disabled=false; btn.textContent='📤 Enviar Solicitação';
     toast('❌','Erro ao salvar','Não foi possível registrar no banco. Tente novamente.','r');
     return;
@@ -2639,11 +2653,14 @@ async function submitDevolucao(){
   if(!localDevSelecionado){ toast('📍','Local obrigatório','Selecione onde está devolvendo.','w'); return; }
   if(!document.getElementById('sig-wdp').classList.contains('has')){ toast('✍️','Assinatura obrigatória','Assine para confirmar.','w'); document.getElementById('sig-wdp').scrollIntoView({behavior:'smooth',block:'center'}); return; }
   const chk=await sbBuscarProtocolo(_devBuscaResult.proto);
-  if(chk.ok&&chk.data.status!=='retirado'){
-    const msgs={devolucao_pendente:'Devolução já registrada para este protocolo.',devolvido_confirmado:'Este equipamento já foi devolvido e confirmado.'};
-    toast('⚠️','Devolução bloqueada',msgs[chk.data.status]||'Este protocolo não pode ser devolvido agora.','r');
-    _devBuscaResult=null; return;
+  if(chk.ok && chk.data.status && chk.data.status!=='retirado'){
+    const msgs={devolucao_pendente:'Devolução já registrada para este protocolo.',devolvido_confirmado:'Este equipamento já foi devolvido e confirmado.',pendente:'Empréstimo ainda não foi aprovado.',aprovado:'Equipamento ainda não foi retirado.',cancelado:'Este empréstimo foi cancelado.'};
+    if(msgs[chk.data.status]){
+      toast('⚠️','Devolução bloqueada',msgs[chk.data.status]||'Este protocolo não pode ser devolvido agora.','r');
+      _devBuscaResult=null; return;
+    }
   }
+  // Se chk.ok===false (sem conexão), continua normalmente com os dados em cache
 
   const btn=document.getElementById('btn-submit-dev');
   btn.disabled=true; btn.innerHTML = '<span class="loading-spinner"></span> Enviando...';
@@ -2818,8 +2835,16 @@ function doLogout(){
   _atrasoUltimoAviso=0;
   pararPolling();
   pararConsultaLive();
+  pararRealtimeProf();
   _carregandoDados=false;
   currentUser=null; solicitacoes=[]; devsPendentes=[]; devsConfirmadas=[]; logs=[];
+  // Limpar campos de login
+  const emailEl=document.getElementById('l-email');
+  const senhaEl=document.getElementById('l-senha');
+  if(emailEl) emailEl.value='';
+  if(senhaEl) senhaEl.value='';
+  const errEl=document.getElementById('l-err');
+  if(errEl) errEl.style.display='none';
   show('s-home');
 }
 
@@ -3034,7 +3059,10 @@ function renderEmprestimos(pagina){
   const tbody=document.getElementById('emp-tbody'); if(!tbody) return;
   let todos=solicitacoes.filter(s=>_campusOk(s.uni));
   if(_empFiltroStatus!=='todos') todos=todos.filter(s=>s.status===_empFiltroStatus);
-  if(_empFiltroTexto) todos=todos.filter(s=>JSON.stringify(s).toLowerCase().includes(_empFiltroTexto));
+  if(_empFiltroTexto) todos=todos.filter(s=>{
+    const campos=[s.proto,s.prof,s.sala,s.uni,(s.equips||[]).join(' '),s.status,s.hora,s.obs].join(' ').toLowerCase();
+    return campos.includes(_empFiltroTexto);
+  });
   const total=todos.length;
   const totalPags=Math.max(1,Math.ceil(total/_empPorPagina));
   if(_empPagina>totalPags) _empPagina=totalPags;
@@ -3081,10 +3109,6 @@ async function aprovar(id){
   const s=solicitacoes.find(x=>x.id===id); if(!s) return;
   s.status='aprovado'; s.horaAprovacao=_agora(); s.tecAprovador=currentUser?.nome||'Técnico'; s.nova=false;
   await sbAprovar(id, currentUser?.nome||'Técnico');
-  
-  // NOTIFICAR PROFESSOR
-  await NotificacoesNSI.solicitacaoAprovada(s.proto, s.prof, s.equips);
-  
   renderAll(); updateBadges();
   toast('✅','Aprovado!',`${s.prof} · Aguardando retirada.`);
   addLog('a','Aprovação',`${currentUser?.nome||'Técnico'} aprovou ${s.proto} de ${s.prof}`);
@@ -3125,10 +3149,6 @@ async function confirmarRecusa(){
       }).eq('id',_recusarId);
     }
     s.status='cancelado';
-    
-    // NOTIFICAR PROFESSOR
-    await NotificacoesNSI.solicitacaoRecusada(s.proto, s.prof, motivo);
-    
     addLog('r','Recusa',`${currentUser?.nome} recusou ${s.proto} de ${s.prof} · Motivo: ${motivo}`);
     toast('❌','Solicitação recusada',`${s.prof} · ${motivo}`,'r');
   } else {
@@ -3307,9 +3327,6 @@ async function confirmarDevTec(){
         hora_aprovacao: horaReal
       }).eq('protocolo', proto);
     }
-    
-    // NOTIFICAR PROFESSOR
-    await NotificacoesNSI.devolucaoConfirmada(proto, nome);
   }
 
   if(btnConf){ btnConf.disabled=false; btnConf.textContent='✓ Confirmar Devolução'; }
@@ -3753,20 +3770,11 @@ function _dispararPushLocal(titulo, corpo){
 }
 
 function _mostrarPushBanner(titulo, msg, tipo){
-  document.querySelectorAll('.push-banner').forEach(b=>b.remove());
-  const b=document.createElement('div');
-  b.className=`push-banner ${tipo||''}`;
-  b.innerHTML=`
-    <span class="push-ico">${tipo==='aprov'?'✅':tipo==='warn'?'⚠️':'🔔'}</span>
-    <div class="push-content">
-      <div class="push-title">${escHtml(titulo)}</div>
-      <div class="push-msg">${escHtml(msg)}</div>
-      <div class="push-time">NSI Locker · ${_agora()}</div>
-    </div>
-    <button class="push-close" onclick="this.parentNode.remove()">✕ Fechar</button>
-  `;
-  document.body.appendChild(b);
-  setTimeout(()=>{ b.style.transition='.4s'; b.style.opacity='0'; b.style.transform='translateY(-100%)'; setTimeout(()=>b.remove(),400); }, 12000);
+  // Reutiliza o sistema showBanner já existente em vez de criar elementos soltos
+  const tipoMap={aprov:'aprov',warn:'warn'};
+  showBanner(tipo==='aprov'?'✅':'⚠️', titulo, msg, tipoMap[tipo]||'new');
+  // Também dispara push nativo se permitido
+  _dispararPushLocal(titulo, msg);
 }
 
 /* ═══════════════════════════════════════
@@ -3797,7 +3805,6 @@ function iniciarRealtimeProf(proto){
         _notifAprovado();
         NotificacoesNSI.solicitacaoAprovada(proto, s.professor, s.equipamentos);
         _mostrarPushBanner('✅ Pedido APROVADO!','Dirija-se ao balcão de TI para retirar os equipamentos.','aprov');
-        toast('✅','APROVADO!','Dirija-se ao balcão de TI para retirar.','b');
       } else if(novoStatus==='devolvido_confirmado'){
         NotificacoesNSI.devolucaoConfirmada(proto, s.professor);
         _mostrarPushBanner('🏁 Devolução Confirmada!','O técnico confirmou o recebimento dos equipamentos.','aprov');
@@ -4166,18 +4173,21 @@ function openNovoUserModal(){ ['nu-nome','nu-email','nu-senha'].forEach(id=>docu
 
 async function criarUsuario(){
   const nome=document.getElementById('nu-nome').value.trim();
-  const email=document.getElementById('nu-email').value.trim();
+  const email=document.getElementById('nu-email').value.trim().toLowerCase();
   const senha=document.getElementById('nu-senha').value;
   const roleVal=document.getElementById('nu-role').value;
   if(!nome||!email||!senha){ toast('⚠️','Campos obrigatórios','Preencha tudo.','w'); return; }
+  if(nome.length<3){ toast('⚠️','Nome muito curto','Mínimo 3 caracteres.','w'); return; }
   if(senha.length<6){ toast('⚠️','Senha fraca','Mín. 6 caracteres.','w'); return; }
   if(!/^[^@]+@[^@]+\.[^@]+$/.test(email)){ toast('⚠️','E-mail inválido','Verifique o e-mail.','w'); return; }
+  // Verificar duplicata localmente antes de ir ao banco
+  if(tecUsers.find(u=>u.email.toLowerCase()===email)){ toast('⚠️','E-mail já cadastrado','Use outro e-mail.','w'); return; }
   const av=nome.split(' ').map(n=>n[0]).slice(0,2).join('').toUpperCase();
-  const roleLabel=roleVal==='senior'?'Técnico Sênior':'Técnico TI';
-  const nivelLabel=roleVal==='senior'?'senior':'tecnico';
+  const nivelLabel=roleVal==='master'?'master':roleVal==='senior'?'senior':'tecnico';
+  const roleLabel=roleVal==='master'?'Master':roleVal==='senior'?'Técnico Sênior':'Técnico TI';
   const campusVal=document.getElementById('nu-campus').value||'aimores';
   const btn=document.querySelector('#ov-new-user .bs.blue');
-  if(btn){ btn.disabled=true; btn.textContent='Salvando…'; }
+  if(btn){ btn.disabled=true; btn.innerHTML='<span class="loading-spinner"></span> Salvando…'; }
   const res=await sbCriarTecnico({email,senha,nome,nivel:nivelLabel,role:roleLabel,av,campus:campusVal});
   if(btn){ btn.disabled=false; btn.textContent='✓ Criar'; }
   if(!res.ok){ toast('❌','Erro ao criar','E-mail já cadastrado ou erro de conexão.','r'); return; }
@@ -4205,16 +4215,18 @@ async function salvarEdicaoUser(){
   const senha=document.getElementById('eu-senha').value;
   const senha2=document.getElementById('eu-senha2').value;
   if(!nome){ toast('⚠️','Nome obrigatório','Informe o nome do técnico.','w'); return; }
+  if(nome.length<3){ toast('⚠️','Nome muito curto','Mínimo 3 caracteres.','w'); return; }
   if(senha&&senha.length<6){ toast('⚠️','Senha fraca','Mínimo 6 caracteres.','w'); return; }
   if(senha&&senha!==senha2){ toast('⚠️','Senhas diferentes','A confirmação não confere.','w'); return; }
   const roleLabel=roleVal==='master'?'Master':roleVal==='senior'?'Técnico Sênior':'Técnico TI';
   const av=nome.split(' ').map(n=>n[0]).slice(0,2).join('').toUpperCase();
-  const campusVal=document.getElementById('eu-campus').value||'aimores';
+  const campusVal=roleVal==='master'?'todos':(document.getElementById('eu-campus').value||'aimores');
   const dados={nome,nivel:roleVal,role:roleLabel,av,campus:campusVal};
   if(senha) dados.senha=senha;
-  const btn=document.getElementById('eu-save-btn'); btn.disabled=true; btn.textContent='Salvando…';
+  const btn=document.getElementById('eu-save-btn');
+  btn.disabled=true; btn.innerHTML='<span class="loading-spinner"></span> Salvando…';
   const res=await sbEditarTecnico(emailOrig,dados);
-  btn.disabled=false; btn.textContent='💾 Salvar Alterações';
+  if(btn){ btn.disabled=false; btn.textContent='💾 Salvar Alterações'; }
   if(!res.ok){ toast('❌','Erro ao salvar','Tente novamente.','r'); return; }
   if(currentUser&&currentUser.email.toLowerCase()===emailOrig.toLowerCase()){
     currentUser={...currentUser,...dados};
@@ -4385,6 +4397,13 @@ function showBanner(ico,titulo,detalhe,tipo){
 }
 
 function toast(icon,title,msg='',type=''){
+  // Unifica os dois sistemas de toast em um só container (toast-container do NotificacoesNSI)
+  if(window.NotificacoesNSI && typeof NotificacoesNSI.toast === 'function'){
+    const tipoMap={'w':'lembrete','r':'erro','b':'info','p':'info','':'info'};
+    NotificacoesNSI.toast(icon, title, msg, tipoMap[type]||type||'info');
+    return;
+  }
+  // Fallback para container legado
   const tc=document.getElementById('toasts'),t=document.createElement('div');
   t.className=`toast${type?' '+type:''}`;
   t.innerHTML=`<span class="t-ico">${icon}</span><div><strong>${escHtml(title)}</strong>${msg?`<small>${escHtml(msg)}</small>`:''}</div>`;
@@ -4450,9 +4469,10 @@ document.addEventListener('DOMContentLoaded',()=>{
 
 <!-- Funções de notificação/som -->
 <script>
-  function ativarAlertas() {
-    solicitarPermissaoPush();
-  }
+  function ativarAlertas() { NotificacoesNSI.allow(); }
+  function permitirNotificacoes() { NotificacoesNSI.allow(); }
+  function fecharPushBanner() { NotificacoesNSI.deny(); }
+  function solicitarPermissaoPush() { NotificacoesNSI.allow(); }
 
   function tocarSom() {
     if (!_somAtivo) return;
@@ -4467,11 +4487,15 @@ document.addEventListener('DOMContentLoaded',()=>{
 
   function toggleSom() {
     _somAtivo = !_somAtivo;
+    if(window.NotificacoesNSI) NotificacoesNSI.config.somAtivo = _somAtivo;
     const el = document.getElementById('som-status');
     if (el) el.textContent = _somAtivo ? 'Ativado' : 'Desativado';
   }
 
   window.ativarAlertas = ativarAlertas;
+  window.permitirNotificacoes = permitirNotificacoes;
+  window.fecharPushBanner = fecharPushBanner;
+  window.solicitarPermissaoPush = solicitarPermissaoPush;
   window.toggleSom = toggleSom;
   window.tocarSom = tocarSom;
 </script>
