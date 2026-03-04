@@ -5079,5 +5079,542 @@ self.addEventListener('notificationclick', e => {
   window.tocarSom = tocarSom;
 </script>
   
+<!-- ══════════════════════════════════════════════════════════════
+     NSI ANIMATION ENGINE v3 — Módulo de Interações Avançadas
+     Animações cinematográficas, alertas elétricos, radar ao vivo,
+     lock-unlock, achievement badges e muito mais.
+     Complementa o engine v2 existente.
+══════════════════════════════════════════════════════════════ -->
+<style id="nsi-anim-v3-styles">
+/* ── LOCK UNLOCK CINEMATIC ─────────────────────────────────── */
+#nsi-lock-overlay{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:rgba(4,8,16,.93);backdrop-filter:blur(24px);opacity:0;pointer-events:none;transition:opacity .3s ease}
+#nsi-lock-overlay.show{opacity:1;pointer-events:all}
+.nsi-lock-scene{text-align:center;position:relative;display:flex;flex-direction:column;align-items:center}
+.nsi-lock-icon{font-size:5.5rem;line-height:1;display:block;filter:drop-shadow(0 0 30px rgba(79,142,247,.8));position:relative;z-index:2}
+.nsi-lock-rings{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)}
+.nsi-lock-ring{position:absolute;border-radius:50%;border:1.5px solid transparent;top:50%;left:50%;transform:translate(-50%,-50%)}
+.nsi-lock-text{font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:800;color:#fff;margin-top:1.5rem;opacity:0;transform:translateY(22px);transition:all .55s cubic-bezier(.175,.885,.32,1.275);letter-spacing:-.5px}
+.nsi-lock-sub{font-size:.82rem;color:oklch(77% .22 162);margin-top:.4rem;opacity:0;transition:all .5s ease .18s;max-width:300px;line-height:1.4}
+@keyframes lockBounce{0%{transform:scale(1) rotate(0)}20%{transform:scale(1.1) rotate(-12deg)}40%{transform:scale(1.05) rotate(8deg)}60%{transform:scale(1.2) rotate(-4deg)}80%{transform:scale(1.15) rotate(2deg)}100%{transform:scale(1.3) rotate(0)}}
+@keyframes ringExpand{0%{width:60px;height:60px;opacity:.9;border-color:rgba(0,217,126,.8)}100%{width:320px;height:320px;opacity:0;border-color:rgba(0,217,126,.05)}}
+@keyframes ringExpand2{0%{width:40px;height:40px;opacity:.7;border-color:rgba(79,142,247,.6)}100%{width:260px;height:260px;opacity:0;border-color:rgba(79,142,247,.02)}}
+
+/* ── ELECTRIC ALERT ──────────────────────────────────────── */
+@keyframes electricGlow{0%,100%{border-color:rgba(255,77,109,.3);box-shadow:0 0 8px rgba(255,77,109,.2)}25%{border-color:rgba(255,181,71,.9);box-shadow:0 0 25px rgba(255,181,71,.5),0 0 50px rgba(255,77,109,.3),inset 0 0 15px rgba(255,181,71,.08)}50%{border-color:rgba(255,77,109,1);box-shadow:0 0 35px rgba(255,77,109,.65),0 0 70px rgba(255,77,109,.2),inset 0 0 20px rgba(255,77,109,.1)}75%{border-color:rgba(255,181,71,.7);box-shadow:0 0 18px rgba(255,181,71,.4)}}
+.electric-alert{animation:electricGlow 1.8s ease-in-out infinite !important}
+@keyframes electricText{0%,88%,100%{opacity:1;text-shadow:none}90%{opacity:.6;text-shadow:0 0 10px rgba(255,181,71,.9)}94%{opacity:1;text-shadow:0 0 20px rgba(255,77,109,1),0 0 40px rgba(255,181,71,.6)}97%{opacity:.85}}
+.electric-text{animation:electricText 2.8s ease-in-out infinite}
+@keyframes sparkFly{0%{opacity:1;transform:scale(1) translate(0,0)}100%{opacity:0;transform:scale(0) translate(var(--sx),var(--sy))}}
+
+/* ── RADAR / SONAR ───────────────────────────────────────── */
+.nsi-radar-wrap{position:relative;width:72px;height:72px;margin:0 auto .75rem;flex-shrink:0}
+.nsi-radar-bg{width:72px;height:72px;border-radius:50%;border:1.5px solid rgba(79,142,247,.22);position:absolute;top:0;left:0}
+.nsi-radar-mid{width:48px;height:48px;border-radius:50%;border:1px solid rgba(79,142,247,.13);position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)}
+.nsi-radar-sweep{width:72px;height:72px;border-radius:50%;position:absolute;top:0;left:0;background:conic-gradient(from 0deg,transparent 0deg,rgba(79,142,247,.55) 35deg,rgba(79,142,247,.12) 70deg,transparent 100deg);animation:radarSweep 2.4s linear infinite}
+@keyframes radarSweep{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+.nsi-radar-dot{width:7px;height:7px;border-radius:50%;background:var(--blue);position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);box-shadow:0 0 10px var(--blue),0 0 20px rgba(79,142,247,.4)}
+.nsi-radar-ping{position:absolute;top:0;left:0;width:72px;height:72px;border-radius:50%;border:1px solid rgba(79,142,247,.5);animation:radarPing 2.4s ease-out infinite}
+@keyframes radarPing{0%{transform:scale(.08);opacity:.8}100%{transform:scale(1);opacity:0}}
+.nsi-radar-ping2{position:absolute;top:0;left:0;width:72px;height:72px;border-radius:50%;border:1px solid rgba(79,142,247,.3);animation:radarPing 2.4s ease-out .8s infinite}
+
+/* ── ACHIEVEMENT BADGE ───────────────────────────────────── */
+#nsi-achievement{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);z-index:99998;background:linear-gradient(135deg,#080f22,#0d1830);border:2px solid oklch(77% .22 162);border-radius:24px;padding:2rem 2.5rem;text-align:center;box-shadow:0 0 80px rgba(0,217,126,.35),0 32px 80px rgba(0,0,0,.85);pointer-events:none;opacity:0;transition:transform .5s cubic-bezier(.175,.885,.32,1.275),opacity .4s ease;min-width:290px}
+#nsi-achievement.show{transform:translate(-50%,-50%) scale(1);opacity:1}
+#nsi-achievement.exit{transform:translate(-50%,-58%) scale(.85);opacity:0}
+.ach-icon{font-size:3.8rem;display:block;margin-bottom:.8rem;animation:achBounce .6s cubic-bezier(.175,.885,.32,1.275)}
+@keyframes achBounce{0%{transform:scale(0) rotate(-20deg)}70%{transform:scale(1.2) rotate(5deg)}100%{transform:scale(1) rotate(0)}}
+.ach-title{font-family:'Syne',sans-serif;font-size:1.15rem;font-weight:800;color:oklch(77% .22 162);margin-bottom:.38rem;letter-spacing:-.3px}
+.ach-sub{font-size:.8rem;color:var(--text2);line-height:1.5}
+.ach-bar{height:3px;background:rgba(255,255,255,.08);border-radius:99px;margin-top:1.2rem;overflow:hidden}
+.ach-bar-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,oklch(50% .22 258),oklch(77% .22 162));width:100%;animation:achDrain 2.5s linear forwards}
+@keyframes achDrain{from{width:100%}to{width:0%}}
+
+/* ── WAVE PROGRESS ───────────────────────────────────────── */
+.nsi-wave-bar{height:3px;background:rgba(255,255,255,.05);border-radius:99px;overflow:hidden;position:absolute;bottom:0;left:0;right:0}
+.nsi-wave-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,oklch(50% .22 258),oklch(77% .22 162));width:0%;transition:width .6s cubic-bezier(.25,.46,.45,.94);position:relative;overflow:hidden}
+.nsi-wave-fill::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.5),transparent);animation:waveShimmer 1s ease infinite}
+@keyframes waveShimmer{0%{transform:translateX(-100%)}100%{transform:translateX(200%)} }
+
+/* ── STATUS MORPH ────────────────────────────────────────── */
+@keyframes statusFlash{0%{filter:brightness(1)}25%{filter:brightness(2.5)}100%{filter:brightness(1)}}
+@keyframes iconSpin{0%{transform:scale(1) rotate(0);filter:blur(0);opacity:1}40%{transform:scale(1.8) rotate(180deg);filter:blur(6px);opacity:0}60%{transform:scale(.5) rotate(180deg);filter:blur(6px);opacity:0}100%{transform:scale(1) rotate(360deg);filter:blur(0);opacity:1}}
+.status-flash{animation:statusFlash .6s ease forwards}
+.icon-spin{animation:iconSpin .65s cubic-bezier(.25,.46,.45,.94) forwards}
+
+/* ── BADGE RING ──────────────────────────────────────────── */
+@keyframes badgePop{0%{transform:scale(0)}65%{transform:scale(1.5)}85%{transform:scale(.92)}100%{transform:scale(1)}}
+@keyframes badgeRing{0%{transform:scale(1);opacity:.7}100%{transform:scale(2.8);opacity:0}}
+.bdg-pop{animation:badgePop .45s cubic-bezier(.175,.885,.32,1.275) forwards}
+.bdg-ring-anim{position:absolute;inset:-5px;border-radius:50%;border:2px solid oklch(65% .23 22);animation:badgeRing 1.5s ease-out infinite;pointer-events:none}
+
+/* ── SLAM BUTTON ─────────────────────────────────────────── */
+@keyframes slam{0%{transform:scale(1)}20%{transform:scale(.92) translateY(2px)}65%{transform:scale(1.05)}100%{transform:scale(1)}}
+.slam-effect{animation:slam .3s cubic-bezier(.36,.07,.19,.97) forwards}
+
+/* ── GLITCH ──────────────────────────────────────────────── */
+@keyframes glitchAnim{0%,100%{clip-path:none;transform:translate(0)}5%{clip-path:polygon(0 15%,100% 15%,100% 25%,0 25%);transform:translate(-3px,1px);filter:hue-rotate(90deg)}10%{clip-path:polygon(0 60%,100% 60%,100% 75%,0 75%);transform:translate(3px,-1px);filter:hue-rotate(-90deg)}15%,25%{clip-path:none;transform:translate(0);filter:none}20%{clip-path:polygon(0 40%,100% 40%,100% 52%,0 52%);transform:translate(-2px,2px)}}
+.glitch{animation:glitchAnim .45s steps(1) forwards}
+
+/* ── FLOAT PARTICLES ─────────────────────────────────────── */
+.nsi-ambient-p{position:fixed;pointer-events:none;border-radius:50%;z-index:0}
+@keyframes floatUp{0%{opacity:0;transform:translateY(0) scale(0)}12%{opacity:.55;transform:translateY(-8px) scale(1)}88%{opacity:.2}100%{opacity:0;transform:translateY(-90px) scale(.4)}}
+
+/* ── NEON BORDER ─────────────────────────────────────────── */
+@keyframes neonPulse{0%,100%{box-shadow:0 0 5px rgba(79,142,247,.3),0 0 12px rgba(79,142,247,.18)}50%{box-shadow:0 0 15px rgba(79,142,247,.6),0 0 30px rgba(79,142,247,.35),0 0 55px rgba(79,142,247,.15),inset 0 0 15px rgba(79,142,247,.06)}}
+.neon-highlight{animation:neonPulse 2.2s ease-in-out infinite}
+
+/* ── TYPEWRITER ──────────────────────────────────────────── */
+@keyframes cursorBlink{0%,50%{border-right-color:currentColor}51%,100%{border-right-color:transparent}}
+.typewriter-cursor{border-right:2px solid currentColor;animation:cursorBlink .8s step-end infinite;display:inline}
+</style>
+
+<script>
+(function(){
+'use strict';
+
+// ══════════════════════════════════════════════════════════════
+//  NSI ANIMATION ENGINE v3
+//  Animações avançadas: Lock Unlock, Electric Alert, Radar Sonar,
+//  Achievement, Wave Progress, Status Morph, Badge Ring, Glitch
+// ══════════════════════════════════════════════════════════════
+
+window.NSIAnim = window.NSIAnim || {};
+
+// ── Inject DOM structures ─────────────────────────────────────
+function _injectDOM() {
+  if (!document.getElementById('nsi-lock-overlay')) {
+    const ov = document.createElement('div');
+    ov.id = 'nsi-lock-overlay';
+    ov.innerHTML = `
+      <div class="nsi-lock-scene" id="nsi-lock-scene">
+        <div class="nsi-lock-rings">
+          <div class="nsi-lock-ring" id="nsi-ring-1"></div>
+          <div class="nsi-lock-ring" id="nsi-ring-2"></div>
+        </div>
+        <span class="nsi-lock-icon" id="nsi-lock-icon">🔒</span>
+        <div class="nsi-lock-text" id="nsi-lock-text"></div>
+        <div class="nsi-lock-sub" id="nsi-lock-sub"></div>
+      </div>`;
+    document.body.appendChild(ov);
+  }
+  if (!document.getElementById('nsi-achievement')) {
+    const ach = document.createElement('div');
+    ach.id = 'nsi-achievement';
+    ach.innerHTML = `
+      <span class="ach-icon" id="ach-icon">🏆</span>
+      <div class="ach-title" id="ach-title">Sucesso!</div>
+      <div class="ach-sub" id="ach-sub"></div>
+      <div class="ach-bar"><div class="ach-bar-fill" id="ach-bar-fill"></div></div>`;
+    document.body.appendChild(ach);
+  }
+}
+
+// ── 1. LOCK UNLOCK CINEMATIC ──────────────────────────────────
+NSIAnim.lockUnlock = function(nome, equips) {
+  const ov   = document.getElementById('nsi-lock-overlay');
+  const icon = document.getElementById('nsi-lock-icon');
+  const txt  = document.getElementById('nsi-lock-text');
+  const sub  = document.getElementById('nsi-lock-sub');
+  const r1   = document.getElementById('nsi-ring-1');
+  const r2   = document.getElementById('nsi-ring-2');
+  if (!ov) return;
+
+  // Reset
+  icon.textContent = '🔒';
+  icon.style.cssText = 'font-size:5.5rem;line-height:1;display:block;filter:drop-shadow(0 0 30px rgba(79,142,247,.8));position:relative;z-index:2;transition:none;animation:none';
+  txt.style.opacity = '0'; txt.style.transform = 'translateY(22px)';
+  sub.style.opacity = '0';
+  r1.style.animation = 'none'; r2.style.animation = 'none';
+  ov.classList.add('show');
+
+  // Fase 1: Vibração + glow azul
+  setTimeout(() => {
+    icon.style.animation = 'lockBounce .75s cubic-bezier(.36,.07,.19,.97) forwards';
+    NSIAnim._miniSparks(icon, 'rgba(79,142,247,.8)', 12);
+  }, 150);
+
+  // Fase 2: Unlock + explosão verde
+  setTimeout(() => {
+    icon.textContent = '🔓';
+    icon.style.animation = 'none';
+    icon.style.transition = 'all .4s cubic-bezier(.175,.885,.32,1.275)';
+    icon.style.filter = 'drop-shadow(0 0 60px rgba(0,217,126,1)) drop-shadow(0 0 120px rgba(0,217,126,.5))';
+    icon.style.transform = 'scale(1.45)';
+
+    r1.style.animation = 'ringExpand .8s ease-out forwards';
+    setTimeout(() => { r2.style.animation = 'ringExpand2 .9s ease-out forwards'; }, 100);
+
+    txt.textContent = '✅ ' + (nome ? nome.split(' ')[0] + ', aprovado!' : 'Aprovado!');
+    txt.style.opacity = '1'; txt.style.transform = 'translateY(0)';
+    const eq = Array.isArray(equips) ? equips.join(' · ') : (equips || 'Equipamento liberado');
+    sub.textContent = eq; sub.style.opacity = '1';
+
+    NSIAnim._burstParticles(ov, 80);
+  }, 850);
+
+  // Fecha
+  setTimeout(() => {
+    ov.style.opacity = '0';
+    setTimeout(() => {
+      ov.classList.remove('show');
+      ov.style.opacity = '';
+      icon.style.cssText = '';
+    }, 380);
+  }, 3000);
+};
+
+// ── 2. BURST DE PARTÍCULAS ────────────────────────────────────
+NSIAnim._burstParticles = function(container, N) {
+  N = N || 60;
+  const colors = ['#4f8ef7','#00d97e','#ffb547','#9b72f7','#38bdf8','#fff','#00ffaa','#ff6b9d'];
+  for (let i = 0; i < N; i++) {
+    const el  = document.createElement('div');
+    const sz  = 4 + Math.random() * 10;
+    const clr = colors[Math.floor(Math.random() * colors.length)];
+    el.style.cssText = `position:absolute;pointer-events:none;z-index:10;border-radius:${Math.random()>.5?'50%':'3px'};width:${sz}px;height:${sz}px;left:50%;top:50%;background:${clr};opacity:0`;
+    container.style.position = 'relative';
+    container.style.overflow = 'visible';
+    container.appendChild(el);
+    const angle = (Math.PI * 2 * i) / N + (Math.random() - .5) * .8;
+    const dist  = 70 + Math.random() * 180;
+    const tx = Math.cos(angle) * dist;
+    const ty = Math.sin(angle) * dist;
+    const rot = Math.random() * 720;
+    const dur = 700 + Math.random() * 700;
+    const delay = Math.random() * 200;
+    const start = performance.now() + delay;
+    (function animate(now) {
+      if (now < start) { requestAnimationFrame(animate); return; }
+      const t = Math.min((now - start) / dur, 1);
+      const e = 1 - Math.pow(1-t, 2);
+      el.style.transform = `translate(calc(-50% + ${tx*e}px),calc(-50% + ${ty*e}px)) rotate(${rot*t}deg)`;
+      el.style.opacity   = String(t < .55 ? t/.55 : 1 - (t-.55)/.45);
+      if (t < 1) requestAnimationFrame(animate); else el.remove();
+    })(performance.now());
+  }
+};
+
+// ── 3. MINI SPARKS ────────────────────────────────────────────
+NSIAnim._miniSparks = function(el, color, n) {
+  if (!el) return;
+  const rect = el.getBoundingClientRect();
+  n = n || 8;
+  for (let i = 0; i < n; i++) {
+    const s = document.createElement('div');
+    const sz = 3 + Math.random() * 5;
+    const sx = ((Math.random()-.5)*60)+'px';
+    const sy = (-(15+Math.random()*30))+'px';
+    s.style.cssText = `position:fixed;pointer-events:none;z-index:100000;width:${sz}px;height:${sz}px;border-radius:50%;background:${color||'#ffb547'};box-shadow:0 0 ${sz*2}px ${color||'#ffb547'};left:${rect.left+rect.width/2}px;top:${rect.top+rect.height/2}px;--sx:${sx};--sy:${sy};animation:sparkFly .45s ease-out ${Math.random()*.15}s forwards;transform:translate(-50%,-50%)`;
+    document.body.appendChild(s);
+    setTimeout(() => s.remove(), 650);
+  }
+};
+
+// ── 4. ELECTRIC ALERT ────────────────────────────────────────
+NSIAnim.electricAlert = function(el) {
+  if (!el || el.dataset.electric) return;
+  el.dataset.electric = '1';
+  el.classList.add('electric-alert');
+
+  let _sparkTimer = setInterval(() => {
+    if (!document.body.contains(el)) { clearInterval(_sparkTimer); return; }
+    const s = document.createElement('div');
+    const x = Math.random() * 100;
+    const y = Math.random() * 100;
+    const sz = 2 + Math.random() * 5;
+    const sx = ((Math.random()-.5)*24)+'px';
+    const sy = (-(10+Math.random()*20))+'px';
+    s.style.cssText = `position:absolute;pointer-events:none;z-index:5;width:${sz}px;height:${sz}px;border-radius:50%;left:${x}%;top:${y}%;background:${Math.random()>.5?'#ffb547':'#ff4d6d'};box-shadow:0 0 ${sz*2}px currentColor;--sx:${sx};--sy:${sy};animation:sparkFly .42s ease-out forwards`;
+    el.style.position = el.style.position || 'relative';
+    el.appendChild(s);
+    setTimeout(() => s.remove(), 480);
+  }, 320);
+
+  setTimeout(() => clearInterval(_sparkTimer), 10000);
+};
+
+// ── 5. RADAR SONAR ────────────────────────────────────────────
+NSIAnim.injectRadar = function(targetEl) {
+  if (!targetEl || targetEl.querySelector('.nsi-radar-wrap')) return;
+  const r = document.createElement('div');
+  r.className = 'nsi-radar-wrap';
+  r.innerHTML = `<div class="nsi-radar-bg"></div><div class="nsi-radar-mid"></div><div class="nsi-radar-sweep"></div><div class="nsi-radar-ping"></div><div class="nsi-radar-ping2"></div><div class="nsi-radar-dot"></div>`;
+  targetEl.insertBefore(r, targetEl.firstChild);
+};
+
+// ── 6. ACHIEVEMENT POPUP ──────────────────────────────────────
+NSIAnim.achievement = function(icon, title, sub) {
+  const el  = document.getElementById('nsi-achievement');
+  const ico = document.getElementById('ach-icon');
+  const tit = document.getElementById('ach-title');
+  const sb  = document.getElementById('ach-sub');
+  const bar = document.getElementById('ach-bar-fill');
+  if (!el) return;
+  ico.textContent = icon || '🏆';
+  tit.textContent = title || 'Sucesso!';
+  sb.textContent  = sub || '';
+  if (bar) { bar.style.animation = 'none'; void bar.offsetWidth; bar.style.animation = 'achDrain 2.5s linear forwards'; }
+  el.classList.remove('exit');
+  el.classList.add('show');
+  NSIAnim._burstParticles(el, 50);
+  setTimeout(() => {
+    el.classList.add('exit');
+    setTimeout(() => { el.classList.remove('show','exit'); }, 450);
+  }, 2700);
+};
+
+// ── 7. STATUS MORPH ──────────────────────────────────────────
+NSIAnim.statusMorph = function(box, newIcon, newText, newColor) {
+  if (!box) return;
+  box.classList.add('status-flash');
+  const ico = box.querySelector('[id$="-ico"]') || box.querySelector('.ico') || box.firstElementChild;
+  if (ico) {
+    ico.classList.add('icon-spin');
+    setTimeout(() => { ico.textContent = newIcon; ico.classList.remove('icon-spin'); }, 330);
+  }
+  if (newColor) {
+    box.style.transition = 'border-color .5s,box-shadow .5s,background .5s';
+    box.style.borderColor = newColor;
+    box.style.boxShadow   = `0 0 40px ${newColor}55, inset 0 0 20px ${newColor}11`;
+  }
+  setTimeout(() => box.classList.remove('status-flash'), 700);
+};
+
+// ── 8. BADGE RING URGENTE ────────────────────────────────────
+NSIAnim.urgentBadge = function(el) {
+  if (!el || el.dataset.uring) return;
+  el.dataset.uring = '1';
+  el.classList.add('bdg-pop');
+  el.style.position = 'relative';
+  const ring = document.createElement('div');
+  ring.className = 'bdg-ring-anim';
+  el.appendChild(ring);
+  setTimeout(() => {
+    el.classList.remove('bdg-pop');
+    ring.remove();
+    delete el.dataset.uring;
+  }, 5000);
+};
+
+// ── 9. WAVE PROGRESS BAR ─────────────────────────────────────
+NSIAnim.waveProgress = function(hostEl, pct) {
+  if (!hostEl) return;
+  let bar  = hostEl.querySelector('.nsi-wave-bar');
+  let fill;
+  if (!bar) {
+    bar = document.createElement('div'); bar.className = 'nsi-wave-bar';
+    fill = document.createElement('div'); fill.className = 'nsi-wave-fill';
+    bar.appendChild(fill); hostEl.appendChild(bar);
+  } else { fill = bar.querySelector('.nsi-wave-fill'); }
+  requestAnimationFrame(() => { if (fill) fill.style.width = Math.min(100,Math.max(0,pct)) + '%'; });
+};
+
+// ── 10. TYPEWRITER ───────────────────────────────────────────
+NSIAnim.typewriter = function(el, text, speed) {
+  if (!el) return;
+  const chars = [...text];
+  el.textContent = '';
+  el.classList.add('typewriter-cursor');
+  let i = 0;
+  const spd = speed || 38;
+  (function type() {
+    if (i < chars.length) { el.textContent += chars[i++]; setTimeout(type, spd + Math.random()*18); }
+    else el.classList.remove('typewriter-cursor');
+  })();
+};
+
+// ── 11. GLITCH ──────────────────────────────────────────────
+NSIAnim.glitch = function(el) {
+  if (!el) return;
+  el.classList.add('glitch');
+  setTimeout(() => el.classList.remove('glitch'), 500);
+};
+
+// ── 12. SLAM BUTTON ─────────────────────────────────────────
+NSIAnim.slam = function(btn) {
+  if (!btn || btn.dataset.slamming) return;
+  btn.dataset.slamming = '1';
+  btn.classList.add('slam-effect');
+  setTimeout(() => { btn.classList.remove('slam-effect'); delete btn.dataset.slamming; }, 380);
+};
+
+// ── 13. AMBIENT PARTICLES ────────────────────────────────────
+NSIAnim._startAmbient = function() {
+  const colors = ['rgba(79,142,247,.45)','rgba(0,217,126,.35)','rgba(155,114,247,.35)','rgba(56,189,248,.3)'];
+  setInterval(() => {
+    const p = document.createElement('div');
+    p.className = 'nsi-ambient-p';
+    const sz = 3 + Math.random()*7;
+    p.style.cssText = `width:${sz}px;height:${sz}px;left:${Math.random()*100}vw;bottom:-${sz}px;background:${colors[Math.floor(Math.random()*colors.length)]};box-shadow:0 0 ${sz*1.5}px currentColor;animation:floatUp ${4+Math.random()*6}s ease-out forwards`;
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 11000);
+  }, 1100);
+};
+
+// ── HOOKS NO SISTEMA ─────────────────────────────────────────
+function _hookSystem() {
+  // Hook: aprovar
+  const _oAprovar = window.aprovar;
+  if (typeof _oAprovar === 'function') {
+    window.aprovar = async function(id) {
+      const s = (window.solicitacoes||[]).find(x => x.id===id);
+      const btn = document.activeElement;
+      if (btn && btn.tagName === 'BUTTON') NSIAnim.slam(btn);
+      const res = await _oAprovar.apply(this, arguments);
+      if (s) setTimeout(() => NSIAnim.lockUnlock(s.prof, s.equips), 250);
+      return res;
+    };
+  }
+
+  // Hook: confirmarEntrega
+  const _oEntrega = window.confirmarEntrega;
+  if (typeof _oEntrega === 'function') {
+    window.confirmarEntrega = async function() {
+      const res = await _oEntrega.apply(this, arguments);
+      setTimeout(() => NSIAnim.achievement('📦','Equipamento Entregue!','Retirada confirmada com sucesso.'), 300);
+      return res;
+    };
+  }
+
+  // Hook: confirmarDevTec
+  const _oDev = window.confirmarDevTec;
+  if (typeof _oDev === 'function') {
+    window.confirmarDevTec = async function() {
+      const res = await _oDev.apply(this, arguments);
+      setTimeout(() => NSIAnim.achievement('✅','Devolução Confirmada!','Equipamento de volta ao armário NSI.'), 300);
+      return res;
+    };
+  }
+
+  // Hook: updateBadges → badge ring em novas solicitações
+  const _oBadges = window.updateBadges;
+  if (typeof _oBadges === 'function') {
+    let _prevNp = 0;
+    window.updateBadges = function() {
+      _oBadges.apply(this, arguments);
+      const bdg = document.getElementById('bdg');
+      const np  = parseInt(bdg?.textContent||'0');
+      if (np > _prevNp && np > 0) {
+        NSIAnim.urgentBadge(bdg);
+        // Glow na nav de solicitações
+        document.querySelectorAll('.nav-btn').forEach(nb => {
+          if (nb.textContent.includes('Solic') || nb.getAttribute('onclick')?.includes('solic')) {
+            nb.classList.add('neon-highlight');
+            setTimeout(() => nb.classList.remove('neon-highlight'), 5000);
+          }
+        });
+      }
+      _prevNp = np;
+    };
+  }
+
+  // Hook: consultarStatus → radar no live indicator
+  const _oConsultar = window.consultarStatus;
+  if (typeof _oConsultar === 'function') {
+    window.consultarStatus = async function() {
+      const res = await _oConsultar.apply(this, arguments);
+      setTimeout(() => {
+        const box = document.getElementById('cons-live-indicator');
+        if (box && box.style.display !== 'none') NSIAnim.injectRadar(box);
+      }, 600);
+      return res;
+    };
+  }
+
+  // Hook: _shake → glitch visual junto com o shake
+  const _oShake = window._shake;
+  if (typeof _oShake === 'function') {
+    window._shake = function(el) {
+      _oShake.apply(this, arguments);
+      NSIAnim.glitch(el);
+      NSIAnim._miniSparks(el, '#ff4d6d', 6);
+    };
+  }
+
+  // Slam em todos os botões de ação principais
+  document.addEventListener('pointerdown', e => {
+    const btn = e.target.closest('.bs.green,.bs.blue,.bs.amber,.bs.red,.btn-main,.hbtn,.proto-search-btn');
+    if (btn) NSIAnim.slam(btn);
+  }, { passive: true });
+}
+
+// ── WATCH: itens atrasados ────────────────────────────────────
+function _watchLateItems() {
+  setInterval(() => {
+    document.querySelectorAll('.late-return-card').forEach(el => NSIAnim.electricAlert(el));
+    document.querySelectorAll('.bdg.atr').forEach(el => {
+      const row = el.closest('tr');
+      if (row && !row.dataset.elec) {
+        row.dataset.elec = '1';
+        row.style.background = 'rgba(255,77,109,.04)';
+        el.classList.add('electric-text');
+      }
+    });
+    // Marcar solicitações atrasadas no painel
+    document.querySelectorAll('.sc').forEach(card => {
+      const hasBadge = card.querySelector('[class*="atr"],.bdg.atr,[class*="late"]');
+      if (hasBadge && !card.dataset.elec) {
+        card.dataset.elec = '1';
+        NSIAnim.electricAlert(card);
+      }
+    });
+  }, 3500);
+}
+
+// ── WATCH: progress do formulário ────────────────────────────
+function _injectFormProgress() {
+  const profScreen = document.getElementById('s-prof');
+  const topbar = profScreen?.querySelector('.pf-topbar');
+  if (!topbar || topbar.dataset.wave) return;
+  topbar.dataset.wave = '1';
+  topbar.style.position = 'relative';
+  topbar.style.overflow = 'hidden';
+
+  const fields = ['#pf-nome','#pf-uni','#pf-turma','#pf-disc'];
+  const total = fields.length;
+  function updatePct() {
+    const filled = fields.filter(sel => {
+      const el = document.querySelector(sel);
+      return el && el.value.trim().length > 0;
+    }).length;
+    NSIAnim.waveProgress(topbar, (filled/total)*100);
+  }
+  fields.forEach(sel => {
+    const el = document.querySelector(sel);
+    if (el) { el.addEventListener('input', updatePct); el.addEventListener('change', updatePct); }
+  });
+}
+
+// ── TYPEWRITER na home ───────────────────────────────────────
+function _homeTypewriter() {
+  const sub = document.querySelector('.home-sub');
+  if (!sub || sub.dataset.typed) return;
+  sub.dataset.typed = '1';
+  const original = sub.textContent.trim();
+  sub.textContent = '';
+  setTimeout(() => NSIAnim.typewriter(sub, original, 32), 700);
+}
+
+// ── INIT ─────────────────────────────────────────────────────
+function init() {
+  _injectDOM();
+  _hookSystem();
+  _watchLateItems();
+  NSIAnim._startAmbient();
+  _homeTypewriter();
+
+  // Observer para form progress quando tela abre
+  const mo = new MutationObserver(() => {
+    const prof = document.getElementById('s-prof');
+    if (prof?.classList.contains('active')) _injectFormProgress();
+  });
+  mo.observe(document.body, { attributes: true, attributeFilter: ['class'], subtree: true });
+}
+
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+else setTimeout(init, 120);
+
+})();
+</script>
 </body>
 </html>
